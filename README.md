@@ -1,12 +1,23 @@
  LPC Spritesheet Character Generator
  =============================================
 
+**Live site:** https://rcbiscuitsbelfast-prog.github.io/MIFF-d-Universal-LPC-Spritesheet-Character-Generator/
+
  #### Translations
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/liberatedpixelcup/Universal-LPC-Spritesheet-Character-Generator/blob/master/README.md) [![zh](https://img.shields.io/badge/lang-zh-green.svg)](https://github.com/liberatedpixelcup/Universal-LPC-Spritesheet-Character-Generator/blob/master/lang/zh/README_ZH.md)
 
 This generator attempts to include all [LPC](https://lpc.opengameart.org) created character art up to now.
 
-Try it [here](https://liberatedpixelcup.github.io/Universal-LPC-Spritesheet-Character-Generator/).
+Try it [here](https://rcbiscuitsbelfast-prog.github.io/MIFF-d-Universal-LPC-Spritesheet-Character-Generator/).
+
+### What's New
+
+- Mobile-first interface with a fixed top navigation bar: Export, Import, Preview, Help.
+- Side pop-out menu for all customization options; grouped by category and scrollable on small screens.
+- Bottom, horizontally scrollable animation selector; selecting an animation updates the live preview instantly.
+- Responsive, touch-friendly layout with improved accessibility for small screens.
+- Hosted on GitHub Pages (root) with `.nojekyll` to ensure assets are served correctly.
+- Live site: https://rcbiscuitsbelfast-prog.github.io/MIFF-d-Universal-LPC-Spritesheet-Character-Generator/
 
 The Liberated Pixel Effort is a collaborative effort from a number of different great artists who helped produce sprites for the project.
 **If you wish to use LPC sprites in your project, you will need to credit everyone who helped contribute to the LPC sprites you are using.** See [below](#licensing-and-attribution-credits) for how to do this.
