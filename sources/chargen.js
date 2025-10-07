@@ -105,9 +105,9 @@ $(document).ready(function () {
 
     const title = document.createElement('strong');
     title.textContent = 'LPC Builder';
+    title.style.marginRight = '8px';
 
-    const spacer = document.createElement('div');
-    spacer.className = 'spacer';
+    // Ensure title remains at far left by DOM order; no spacer needed
 
     const exportBtn = document.createElement('button');
     exportBtn.id = 'exportButton';
@@ -134,9 +134,8 @@ $(document).ready(function () {
     helpLink.setAttribute('role', 'button');
     helpLink.textContent = 'Help';
 
-    topbar.appendChild(menuBtn);
     topbar.appendChild(title);
-    topbar.appendChild(spacer);
+    topbar.appendChild(menuBtn);
     topbar.appendChild(exportBtn);
     topbar.appendChild(importBtn);
     topbar.appendChild(previewLink);
@@ -185,6 +184,85 @@ $(document).ready(function () {
     document.getElementById('action-export-credits-txt')?.addEventListener('click', () => document.querySelector('.generateSheetCreditsTxt')?.click());
     document.getElementById('action-export-credits-csv')?.addEventListener('click', () => document.querySelector('.generateSheetCreditsCsv')?.click());
     document.getElementById('action-import')?.addEventListener('click', () => document.querySelector('.importFromClipboard')?.click());
+  })();
+
+  // Customize bar below topbar with category buttons and dropdown
+  (function buildCustomizeBar() {
+    if (document.getElementById('customize-bar')) return;
+    const bar = document.createElement('div');
+    bar.id = 'customize-bar';
+
+    const groups = [
+      { id: 'grp-body', label: 'Body' },
+      { id: 'grp-head', label: 'Head' },
+      { id: 'grp-arms', label: 'Arms' },
+      { id: 'grp-torso', label: 'Torso' },
+      { id: 'grp-legs', label: 'Legs' },
+      { id: 'grp-feet', label: 'Feet' },
+      { id: 'grp-weapons', label: 'Weapons' },
+      { id: 'grp-tools', label: 'Tools' },
+      { id: 'grp-cape', label: 'Capes' },
+      { id: 'grp-backpack', label: 'Backpacks' }
+    ];
+
+    const dropdown = document.createElement('div');
+    dropdown.id = 'customize-dropdown';
+    dropdown.setAttribute('hidden', '');
+    const list = document.createElement('div');
+    list.className = 'group-list';
+    dropdown.appendChild(list);
+
+    const chooser = document.getElementById('chooser');
+
+    function buildOptionsFor(label) {
+      list.innerHTML = '';
+      if (!chooser) return;
+      const headings = Array.from(chooser.querySelectorAll('h3'));
+      const sectionIndex = headings.findIndex(h => h.textContent.trim().toLowerCase() === label.toLowerCase());
+      if (sectionIndex === -1) return;
+      const section = headings[sectionIndex].nextElementSibling;
+      if (!section) return;
+      const topLevelLis = Array.from(section.children).filter(el => el.tagName === 'LI');
+      topLevelLis.forEach(li => {
+        const span = li.querySelector(':scope > span');
+        const text = span ? span.textContent.trim() : 'Options';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = text;
+        btn.addEventListener('click', () => {
+          // Expand the clicked group and scroll into view
+          if (span) {
+            span.classList.remove('condensed');
+            span.classList.add('expanded');
+          }
+          const ul = li.querySelector(':scope > ul');
+          if (ul) ul.style.display = 'block';
+          li.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          dropdown.setAttribute('hidden', '');
+        });
+        list.appendChild(btn);
+      });
+    }
+
+    groups.forEach(g => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = g.label;
+      btn.addEventListener('click', () => {
+        buildOptionsFor(g.label);
+        const hidden = dropdown.hasAttribute('hidden');
+        if (hidden) dropdown.removeAttribute('hidden'); else dropdown.setAttribute('hidden', '');
+      });
+      bar.appendChild(btn);
+    });
+
+    document.body.prepend(bar);
+    document.body.insertBefore(dropdown, document.getElementById('preview'));
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target) && !bar.contains(e.target)) {
+        dropdown.setAttribute('hidden', '');
+      }
+    });
   })();
 
   // Bottom animation strip synced to #whichAnim
