@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	<title>Universal LPC Sprite Sheet Character Generator</title>
+	<link rel="stylesheet" type="text/css" href="../sources/chargen.css">
+	<style>
+		html, body { height: 100%; }
+		body { margin: 0; padding: 0; display: grid; grid-template-rows: auto 1fr 28vh; }
+		#appbar { display: flex; gap: 8px; padding: 8px 12px; align-items: center; border-bottom: 1px solid #e5e5e5; }
+		#appbar h1 { font-size: 16px; margin: 0; }
+		#workspace { display: grid; grid-template-columns: minmax(260px, 36vw) 1fr; gap: 8px; overflow: hidden; }
+		#side { overflow: auto; padding: 8px; border-right: 1px solid #eee; }
+		#stage { overflow: auto; padding: 8px; }
+		#previewDock { border-top: 1px solid #e5e5e5; display: grid; grid-template-columns: 1fr; align-items: center; }
+		#animStrip { display: flex; gap: 8px; overflow-x: auto; padding: 8px 12px; -webkit-overflow-scrolling: touch; border-top: 1px solid #eee; }
+		#animStrip button { flex: 0 0 auto; padding: 8px 10px; border: 1px solid #ddd; border-radius: 999px; background: #f8f8f8; }
+		#animStrip button[aria-pressed="true"] { background: #222; color: #fff; border-color: #222; }
+		#livePreview { display: grid; place-items: center; padding: 8px; }
+	</style>
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script type="text/javascript" src="../sources/jhash-2.2.min.js"></script>
+	<script type="text/javascript" src="../sources/custom-animations.js"></script>
+	<script type="text/javascript" src="../sources/jszip.min.js"></script>
+	<script type="text/javascript" src="../sources/copy-image.js"></script>
+	<script type="text/javascript" src="../sources/performance-profiler.js"></script>
+	<script type="module">
+		import TinyGesture from 'https://cdn.jsdelivr.net/npm/tinygesture@3.0.0/+esm';
+		window.TinyGesture = TinyGesture;
+		const script = document.createElement('script');
+		script.src = '../sources/chargen.js';
+		document.body.appendChild(script);
+	</script>
+</head>
+<body>
+    <div id="appbar">
+        <h1>LPC Builder</h1>
+        <div style="margin-left:auto"></div>
+        <button id="btnExport" type="button">Export</button>
+        <button id="btnImport" type="button">Import</button>
+        <a href="#" id="btnHelp">Help</a>
+    </div>
+    <div id="workspace">
+      <div id="side">
+        <form id="customizeChar"></form>
+      </div>
+      <div id="stage">
+        <section id="preview">
+            <details open>
+                <summary>Full Preview</summary>
+                <div class="instr">Complete sprite sheet (click to zoom in, double click to zoom out): </div>
+                <canvas id="spritesheet" width="832" height="1344">HTML5 Browser required.</canvas>
+            </details>
+        </section>
+      </div>
+    </div>
+    <div id="previewDock">
+        <div id="livePreview">
+            <canvas id="previewAnimations" width="256" height="64"></canvas>
+        </div>
+        <div id="animStrip" role="toolbar" aria-label="Animation selector"></div>
+    </div>
+    <script>
+    // Wire buttons to existing actions
+    document.addEventListener('click', function(e){
+      if(e.target && e.target.id === 'btnExport'){
+        document.querySelector('#saveAsPNG')?.click();
+      }
+      if(e.target && e.target.id === 'btnImport'){
+        document.querySelector('.importFromClipboard')?.click();
+      }
+    });
+    // Build #customizeChar content by loading the original source_index.html fragment
+    (async function mountChooser(){
+      try {
+        const res = await fetch('../sources/source_index.html');
+        const html = await res.text();
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+        const form = temp.querySelector('#customizeChar');
+        if(form){
+          document.getElementById('customizeChar').replaceWith(form);
+        }
+        // Build the animation strip from #whichAnim
+        const whichAnim = document.getElementById('whichAnim');
+        const strip = document.getElementById('animStrip');
+        if (whichAnim && strip){
+          const sync = () => {
+            strip.innerHTML = '';
+            Array.from(whichAnim.options).forEach(opt => {
+              const b = document.createElement('button');
+              b.type = 'button';
+              b.textContent = opt.text;
+              b.setAttribute('aria-pressed', String(opt.selected));
+              b.addEventListener('click', () => {
+                whichAnim.value = opt.value;
+                whichAnim.dispatchEvent(new Event('change', { bubbles: true }));
+                strip.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed','false'));
+                b.setAttribute('aria-pressed','true');
+              });
+              strip.appendChild(b);
+            });
+          };
+          sync();
+          whichAnim.addEventListener('change', sync);
+        }
+      } catch (e) {
+        console.error('Failed to mount chooser', e);
+      }
+    })();
+    </script>
+</body>
+</html>
