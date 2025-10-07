@@ -397,3 +397,151 @@ label[for="displayMode-compact"] {
 a {
   border: 0;
 }
+
+/* --- Mobile-first UI shell additions --- */
+
+/* Top navigation bar */
+#topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e5e5;
+  z-index: 1000;
+}
+
+#topbar .spacer {
+  flex: 1 1 auto;
+}
+
+#topbar button, #topbar a {
+  font: inherit;
+  line-height: 1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #f8f8f8;
+  color: #222;
+  text-decoration: none;
+}
+
+#topbar button:active {
+  transform: scale(0.98);
+}
+
+/* Export popover */
+#export-menu {
+  position: fixed;
+  top: 56px;
+  right: 12px;
+  width: min(90vw, 320px);
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  z-index: 1100;
+  padding: 8px;
+}
+
+#export-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin: 4px 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  background: #fafafa;
+}
+
+/* Side drawer for chooser */
+body.drawer-open {
+  overflow: hidden;
+}
+
+#chooser {
+  transition: transform 0.25s ease;
+}
+
+@media (max-width: 900px) {
+  #chooser {
+    position: fixed;
+    top: 56px;
+    bottom: 56px;
+    left: 0;
+    width: 82vw;
+    max-width: 420px;
+    background: #ffffff;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+    border-right: 1px solid #eee;
+    transform: translateX(-100%);
+    margin: 0;
+    z-index: 1050;
+  }
+
+  body.drawer-open #chooser {
+    transform: translateX(0);
+  }
+}
+
+/* Bottom animation strip */
+#animation-strip {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #ffffff;
+  border-top: 1px solid #e5e5e5;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  z-index: 1000;
+}
+
+#animation-strip button {
+  flex: 0 0 auto;
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  background: #f5f5f5;
+}
+
+#animation-strip button[aria-pressed="true"] {
+  background: #222;
+  color: #fff;
+  border-color: #222;
+}
+
+/* Center live preview and add safe areas */
+body {
+  padding-top: 56px;
+  padding-bottom: 56px;
+}
+
+#previewAnimationsBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+#previewAnimations {
+  display: block;
+  margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+  #controls { display: none; }
+  #preview { margin-top: 8px; }
+}

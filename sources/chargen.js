@@ -72,6 +72,154 @@ const profiler = new PerformanceProfiler({
 window.profiler = profiler;
 
 $(document).ready(function () {
+  // Ensure mobile viewport meta exists
+  (function ensureViewport() {
+    try {
+      const hasViewport = document.querySelector('meta[name="viewport"]');
+      if (!hasViewport) {
+        const meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, initial-scale=1, viewport-fit=cover';
+        document.head.appendChild(meta);
+      }
+    } catch {}
+  })();
+
+  // Build top navigation bar and export menu
+  (function buildTopbar() {
+    if (document.getElementById('topbar')) return;
+    const topbar = document.createElement('nav');
+    topbar.id = 'topbar';
+    topbar.setAttribute('role', 'navigation');
+    topbar.setAttribute('aria-label', 'Primary');
+
+    const menuBtn = document.createElement('button');
+    menuBtn.id = 'drawerButton';
+    menuBtn.textContent = 'Menu';
+    menuBtn.setAttribute('aria-controls', 'chooser');
+    menuBtn.setAttribute('aria-expanded', 'false');
+    menuBtn.addEventListener('click', () => {
+      const open = document.body.classList.toggle('drawer-open');
+      menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+
+    const title = document.createElement('strong');
+    title.textContent = 'LPC Builder';
+
+    const spacer = document.createElement('div');
+    spacer.className = 'spacer';
+
+    const exportBtn = document.createElement('button');
+    exportBtn.id = 'exportButton';
+    exportBtn.textContent = 'Export';
+    exportBtn.setAttribute('aria-haspopup', 'true');
+    exportBtn.setAttribute('aria-expanded', 'false');
+
+    const importBtn = document.createElement('button');
+    importBtn.id = 'importButton';
+    importBtn.textContent = 'Import';
+    importBtn.addEventListener('click', () => {
+      document.querySelector('.importFromClipboard')?.click();
+    });
+
+    const previewLink = document.createElement('a');
+    previewLink.href = '#preview';
+    previewLink.setAttribute('role', 'button');
+    previewLink.textContent = 'Preview';
+
+    const helpLink = document.createElement('a');
+    helpLink.href = 'https://github.com/liberatedpixelcup/Universal-LPC-Spritesheet-Character-Generator#readme';
+    helpLink.target = '_blank';
+    helpLink.rel = 'noopener';
+    helpLink.setAttribute('role', 'button');
+    helpLink.textContent = 'Help';
+
+    topbar.appendChild(menuBtn);
+    topbar.appendChild(title);
+    topbar.appendChild(spacer);
+    topbar.appendChild(exportBtn);
+    topbar.appendChild(importBtn);
+    topbar.appendChild(previewLink);
+    topbar.appendChild(helpLink);
+    document.body.prepend(topbar);
+
+    const menu = document.createElement('div');
+    menu.id = 'export-menu';
+    menu.setAttribute('hidden', '');
+    menu.innerHTML = [
+      '<button id="action-export-png">Download spritesheet (PNG)</button>',
+      '<button id="action-export-zip-anims">Export split by animation (ZIP)</button>',
+      '<button id="action-export-zip-items">Export split by item (ZIP)</button>',
+      '<button id="action-export-zip-item-anims">Export by animation and item (ZIP)</button>',
+      '<hr>',
+      '<button id="action-export-credits-txt">Credits (text)</button>',
+      '<button id="action-export-credits-csv">Credits (CSV)</button>',
+      '<hr>',
+      '<button id="action-import">Import from Clipboard (JSON)</button>'
+    ].join('');
+    document.body.appendChild(menu);
+
+    const toggleMenu = (evt) => {
+      evt?.stopPropagation();
+      const isHidden = menu.hasAttribute('hidden');
+      if (isHidden) {
+        menu.removeAttribute('hidden');
+        exportBtn.setAttribute('aria-expanded', 'true');
+      } else {
+        menu.setAttribute('hidden', '');
+        exportBtn.setAttribute('aria-expanded', 'false');
+      }
+    };
+    exportBtn.addEventListener('click', toggleMenu);
+    document.addEventListener('click', (e) => {
+      if (!menu.contains(e.target) && e.target !== exportBtn) {
+        menu.setAttribute('hidden', '');
+        exportBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    document.getElementById('action-export-png')?.addEventListener('click', () => document.getElementById('saveAsPNG')?.click());
+    document.getElementById('action-export-zip-anims')?.addEventListener('click', () => document.querySelector('.exportSplitAnimations')?.click());
+    document.getElementById('action-export-zip-items')?.addEventListener('click', () => document.querySelector('.exportSplitItemSheets')?.click());
+    document.getElementById('action-export-zip-item-anims')?.addEventListener('click', () => document.querySelector('.exportSplitItemAnimations')?.click());
+    document.getElementById('action-export-credits-txt')?.addEventListener('click', () => document.querySelector('.generateSheetCreditsTxt')?.click());
+    document.getElementById('action-export-credits-csv')?.addEventListener('click', () => document.querySelector('.generateSheetCreditsCsv')?.click());
+    document.getElementById('action-import')?.addEventListener('click', () => document.querySelector('.importFromClipboard')?.click());
+  })();
+
+  // Bottom animation strip synced to #whichAnim
+  (function buildAnimationStrip() {
+    if (document.getElementById('animation-strip')) return;
+    const strip = document.createElement('div');
+    strip.id = 'animation-strip';
+    strip.setAttribute('role', 'toolbar');
+    strip.setAttribute('aria-label', 'Animation selector');
+    document.body.appendChild(strip);
+
+    const whichAnim = document.getElementById('whichAnim');
+    if (!whichAnim) return;
+
+    const syncStrip = () => {
+      strip.innerHTML = '';
+      const opts = Array.from(whichAnim.options);
+      for (const opt of opts) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = opt.text;
+        btn.setAttribute('data-value', opt.value);
+        btn.setAttribute('aria-pressed', String(opt.selected));
+        btn.addEventListener('click', () => {
+          whichAnim.value = opt.value;
+          whichAnim.dispatchEvent(new Event('change', { bubbles: true }));
+          strip.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', 'false'));
+          btn.setAttribute('aria-pressed', 'true');
+        });
+        strip.appendChild(btn);
+      }
+    };
+    syncStrip();
+    whichAnim.addEventListener('change', syncStrip);
+  })();
   let matchBodyColor = true;
   
   /** @type {ItemToDraw[]} */
