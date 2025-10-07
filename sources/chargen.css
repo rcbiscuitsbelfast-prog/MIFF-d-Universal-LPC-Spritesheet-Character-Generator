@@ -416,7 +416,7 @@ a {
   z-index: 1000;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x proximity;
+  white-space: nowrap;
 }
 
 #topbar .spacer {
@@ -556,7 +556,7 @@ body {
   left: 0;
   right: 0;
   height: 48px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 6px 12px;
@@ -564,6 +564,7 @@ body {
   border-bottom: 1px solid #e5e5e5;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  white-space: nowrap;
   z-index: 1000;
 }
 

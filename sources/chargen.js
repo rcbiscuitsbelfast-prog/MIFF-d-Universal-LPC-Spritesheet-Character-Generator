@@ -201,7 +201,6 @@ $(document).ready(function () {
       { id: 'grp-feet', label: 'Feet' },
       { id: 'grp-weapons', label: 'Weapons' },
       { id: 'grp-tools', label: 'Tools' },
-      { id: 'grp-cape', label: 'Capes' },
       { id: 'grp-backpack', label: 'Backpacks' }
     ];
 
@@ -297,6 +296,27 @@ $(document).ready(function () {
     };
     syncStrip();
     whichAnim.addEventListener('change', syncStrip);
+  })();
+
+  // Add quick reset near preview to restore base character
+  (function addQuickReset() {
+    const box = document.getElementById('previewAnimationsBox');
+    if (!box || document.getElementById('quickReset')) return;
+    const btn = document.createElement('button');
+    btn.id = 'quickReset';
+    btn.type = 'button';
+    btn.textContent = 'Reset Character';
+    btn.addEventListener('click', () => {
+      $("#chooser input[type=radio]").prop('checked', false).attr('checked', false);
+      $("#sex-male").prop('checked', true).attr('checked', true);
+      params = {};
+      jHash.val(params);
+      selectDefaults();
+      interpretParams();
+      redraw();
+      showOrHideElements();
+    });
+    box.appendChild(btn);
   })();
 
   // Make Credits and Advanced collapsible
