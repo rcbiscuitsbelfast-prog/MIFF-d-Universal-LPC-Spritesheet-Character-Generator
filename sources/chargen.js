@@ -298,6 +298,35 @@ $(document).ready(function () {
     syncStrip();
     whichAnim.addEventListener('change', syncStrip);
   })();
+
+  // Make Credits and Advanced collapsible
+  (function collapsibleSections() {
+    const credits = document.getElementById('credits');
+    if (credits && !credits.querySelector('details')) {
+      const content = Array.from(credits.childNodes);
+      credits.innerHTML = '';
+      const details = document.createElement('details');
+      details.open = false;
+      const summary = document.createElement('summary');
+      summary.textContent = 'Credits';
+      details.appendChild(summary);
+      content.forEach(n => details.appendChild(n));
+      credits.appendChild(details);
+    }
+
+    const advanced = document.getElementById('advanced');
+    if (advanced && !advanced.querySelector('details')) {
+      const content = Array.from(advanced.childNodes);
+      advanced.innerHTML = '';
+      const details = document.createElement('details');
+      details.open = false;
+      const summary = document.createElement('summary');
+      summary.textContent = 'Advanced Tools';
+      details.appendChild(summary);
+      content.forEach(n => details.appendChild(n));
+      advanced.appendChild(details);
+    }
+  })();
   let matchBodyColor = true;
   
   /** @type {ItemToDraw[]} */
