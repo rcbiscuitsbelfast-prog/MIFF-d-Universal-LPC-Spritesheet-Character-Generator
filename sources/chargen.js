@@ -186,83 +186,7 @@ $(document).ready(function () {
     document.getElementById('action-import')?.addEventListener('click', () => document.querySelector('.importFromClipboard')?.click());
   })();
 
-  // Customize bar below topbar with category buttons and dropdown
-  (function buildCustomizeBar() {
-    if (document.getElementById('customize-bar')) return;
-    const bar = document.createElement('div');
-    bar.id = 'customize-bar';
-
-    const groups = [
-      { id: 'grp-body', label: 'Body' },
-      { id: 'grp-head', label: 'Head' },
-      { id: 'grp-arms', label: 'Arms' },
-      { id: 'grp-torso', label: 'Torso' },
-      { id: 'grp-legs', label: 'Legs' },
-      { id: 'grp-feet', label: 'Feet' },
-      { id: 'grp-weapons', label: 'Weapons' },
-      { id: 'grp-tools', label: 'Tools' },
-      { id: 'grp-backpack', label: 'Backpacks' }
-    ];
-
-    const dropdown = document.createElement('div');
-    dropdown.id = 'customize-dropdown';
-    dropdown.setAttribute('hidden', '');
-    const list = document.createElement('div');
-    list.className = 'group-list';
-    dropdown.appendChild(list);
-
-    const chooser = document.getElementById('chooser');
-
-    function buildOptionsFor(label) {
-      list.innerHTML = '';
-      if (!chooser) return;
-      const headings = Array.from(chooser.querySelectorAll('h3'));
-      const sectionIndex = headings.findIndex(h => h.textContent.trim().toLowerCase() === label.toLowerCase());
-      if (sectionIndex === -1) return;
-      const section = headings[sectionIndex].nextElementSibling;
-      if (!section) return;
-      const topLevelLis = Array.from(section.children).filter(el => el.tagName === 'LI');
-      topLevelLis.forEach(li => {
-        const span = li.querySelector(':scope > span');
-        const text = span ? span.textContent.trim() : 'Options';
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.textContent = text;
-        btn.addEventListener('click', () => {
-          // Expand the clicked group and scroll into view
-          if (span) {
-            span.classList.remove('condensed');
-            span.classList.add('expanded');
-          }
-          const ul = li.querySelector(':scope > ul');
-          if (ul) ul.style.display = 'block';
-          li.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          dropdown.setAttribute('hidden', '');
-        });
-        list.appendChild(btn);
-      });
-    }
-
-    groups.forEach(g => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.textContent = g.label;
-      btn.addEventListener('click', () => {
-        buildOptionsFor(g.label);
-        const hidden = dropdown.hasAttribute('hidden');
-        if (hidden) dropdown.removeAttribute('hidden'); else dropdown.setAttribute('hidden', '');
-      });
-      bar.appendChild(btn);
-    });
-
-    document.body.prepend(bar);
-    document.body.insertBefore(dropdown, document.getElementById('preview'));
-    document.addEventListener('click', (e) => {
-      if (!dropdown.contains(e.target) && !bar.contains(e.target)) {
-        dropdown.setAttribute('hidden', '');
-      }
-    });
-  })();
+  // (removed) Custom scrollable customize bar; revert to original chooser
 
   // Bottom animation strip synced to #whichAnim
   (function buildAnimationStrip() {
@@ -321,31 +245,7 @@ $(document).ready(function () {
 
   // Make Credits and Advanced collapsible
   (function collapsibleSections() {
-    const credits = document.getElementById('credits');
-    if (credits && !credits.querySelector('details')) {
-      const content = Array.from(credits.childNodes);
-      credits.innerHTML = '';
-      const details = document.createElement('details');
-      details.open = false;
-      const summary = document.createElement('summary');
-      summary.textContent = 'Credits';
-      details.appendChild(summary);
-      content.forEach(n => details.appendChild(n));
-      credits.appendChild(details);
-    }
-
-    const advanced = document.getElementById('advanced');
-    if (advanced && !advanced.querySelector('details')) {
-      const content = Array.from(advanced.childNodes);
-      advanced.innerHTML = '';
-      const details = document.createElement('details');
-      details.open = false;
-      const summary = document.createElement('summary');
-      summary.textContent = 'Advanced Tools';
-      details.appendChild(summary);
-      content.forEach(n => details.appendChild(n));
-      advanced.appendChild(details);
-    }
+    // Already handled in HTML; no JS wrapping to avoid content loss
   })();
   let matchBodyColor = true;
   
@@ -480,6 +380,24 @@ $(document).ready(function () {
     $ul.toggle("slow").promise().done(drawPreviews);
     event.stopPropagation();
   });
+
+  // Make all h3 headings (e.g., Body, Head, Torso, etc.) collapsible wrappers
+  (function makeChooserHeadingsCollapsible() {
+    const chooser = document.getElementById('chooser');
+    if (!chooser) return;
+    const headings = Array.from(chooser.querySelectorAll('h3'));
+    headings.forEach((h3) => {
+      if (h3.nextElementSibling && h3.nextElementSibling.tagName === 'UL') {
+        const details = document.createElement('details');
+        details.open = true;
+        const summary = document.createElement('summary');
+        summary.textContent = h3.textContent.trim();
+        h3.replaceWith(details);
+        details.appendChild(summary);
+        details.appendChild(h3.nextElementSibling);
+      }
+    });
+  })();
 
   $("#collapse").click(function () {
     $("#chooser>details>ul ul").hide("slow");
