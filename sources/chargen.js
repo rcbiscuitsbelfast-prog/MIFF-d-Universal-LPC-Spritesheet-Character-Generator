@@ -72,6 +72,181 @@ const profiler = new PerformanceProfiler({
 window.profiler = profiler;
 
 $(document).ready(function () {
+  // Ensure mobile viewport meta exists
+  (function ensureViewport() {
+    try {
+      const hasViewport = document.querySelector('meta[name="viewport"]');
+      if (!hasViewport) {
+        const meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, initial-scale=1, viewport-fit=cover';
+        document.head.appendChild(meta);
+      }
+    } catch {}
+  })();
+
+  // Build top navigation bar and export menu
+  (function buildTopbar() {
+    if (document.getElementById('topbar')) return;
+    const topbar = document.createElement('nav');
+    topbar.id = 'topbar';
+    topbar.setAttribute('role', 'navigation');
+    topbar.setAttribute('aria-label', 'Primary');
+
+    const menuBtn = document.createElement('button');
+    menuBtn.id = 'drawerButton';
+    menuBtn.textContent = 'Menu';
+    menuBtn.setAttribute('aria-controls', 'chooser');
+    menuBtn.setAttribute('aria-expanded', 'false');
+    menuBtn.addEventListener('click', () => {
+      const open = document.body.classList.toggle('drawer-open');
+      menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+
+    const title = document.createElement('strong');
+    title.textContent = 'LPC Builder';
+    title.style.marginRight = '8px';
+
+    // Ensure title remains at far left by DOM order; no spacer needed
+
+    const exportBtn = document.createElement('button');
+    exportBtn.id = 'exportButton';
+    exportBtn.textContent = 'Export';
+    exportBtn.setAttribute('aria-haspopup', 'true');
+    exportBtn.setAttribute('aria-expanded', 'false');
+
+    const importBtn = document.createElement('button');
+    importBtn.id = 'importButton';
+    importBtn.textContent = 'Import';
+    importBtn.addEventListener('click', () => {
+      document.querySelector('.importFromClipboard')?.click();
+    });
+
+    const previewLink = document.createElement('a');
+    previewLink.href = '#preview';
+    previewLink.setAttribute('role', 'button');
+    previewLink.textContent = 'Preview';
+
+    const helpLink = document.createElement('a');
+    helpLink.href = 'https://github.com/liberatedpixelcup/Universal-LPC-Spritesheet-Character-Generator#readme';
+    helpLink.target = '_blank';
+    helpLink.rel = 'noopener';
+    helpLink.setAttribute('role', 'button');
+    helpLink.textContent = 'Help';
+
+    topbar.appendChild(title);
+    topbar.appendChild(menuBtn);
+    topbar.appendChild(exportBtn);
+    topbar.appendChild(importBtn);
+    topbar.appendChild(previewLink);
+    topbar.appendChild(helpLink);
+    document.body.prepend(topbar);
+
+    const menu = document.createElement('div');
+    menu.id = 'export-menu';
+    menu.setAttribute('hidden', '');
+    menu.innerHTML = [
+      '<button id="action-export-png">Download spritesheet (PNG)</button>',
+      '<button id="action-export-zip-anims">Export split by animation (ZIP)</button>',
+      '<button id="action-export-zip-items">Export split by item (ZIP)</button>',
+      '<button id="action-export-zip-item-anims">Export by animation and item (ZIP)</button>',
+      '<hr>',
+      '<button id="action-export-credits-txt">Credits (text)</button>',
+      '<button id="action-export-credits-csv">Credits (CSV)</button>',
+      '<hr>',
+      '<button id="action-import">Import from Clipboard (JSON)</button>'
+    ].join('');
+    document.body.appendChild(menu);
+
+    const toggleMenu = (evt) => {
+      evt?.stopPropagation();
+      const isHidden = menu.hasAttribute('hidden');
+      if (isHidden) {
+        menu.removeAttribute('hidden');
+        exportBtn.setAttribute('aria-expanded', 'true');
+      } else {
+        menu.setAttribute('hidden', '');
+        exportBtn.setAttribute('aria-expanded', 'false');
+      }
+    };
+    exportBtn.addEventListener('click', toggleMenu);
+    document.addEventListener('click', (e) => {
+      if (!menu.contains(e.target) && e.target !== exportBtn) {
+        menu.setAttribute('hidden', '');
+        exportBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    document.getElementById('action-export-png')?.addEventListener('click', () => document.getElementById('saveAsPNG')?.click());
+    document.getElementById('action-export-zip-anims')?.addEventListener('click', () => document.querySelector('.exportSplitAnimations')?.click());
+    document.getElementById('action-export-zip-items')?.addEventListener('click', () => document.querySelector('.exportSplitItemSheets')?.click());
+    document.getElementById('action-export-zip-item-anims')?.addEventListener('click', () => document.querySelector('.exportSplitItemAnimations')?.click());
+    document.getElementById('action-export-credits-txt')?.addEventListener('click', () => document.querySelector('.generateSheetCreditsTxt')?.click());
+    document.getElementById('action-export-credits-csv')?.addEventListener('click', () => document.querySelector('.generateSheetCreditsCsv')?.click());
+    document.getElementById('action-import')?.addEventListener('click', () => document.querySelector('.importFromClipboard')?.click());
+  })();
+
+  // (removed) Custom scrollable customize bar; revert to original chooser
+
+  // Bottom animation strip synced to #whichAnim
+  (function buildAnimationStrip() {
+    if (document.getElementById('animation-strip')) return;
+    const strip = document.createElement('div');
+    strip.id = 'animation-strip';
+    strip.setAttribute('role', 'toolbar');
+    strip.setAttribute('aria-label', 'Animation selector');
+    document.body.appendChild(strip);
+
+    const whichAnim = document.getElementById('whichAnim');
+    if (!whichAnim) return;
+
+    const syncStrip = () => {
+      strip.innerHTML = '';
+      const opts = Array.from(whichAnim.options);
+      for (const opt of opts) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = opt.text;
+        btn.setAttribute('data-value', opt.value);
+        btn.setAttribute('aria-pressed', String(opt.selected));
+        btn.addEventListener('click', () => {
+          whichAnim.value = opt.value;
+          whichAnim.dispatchEvent(new Event('change', { bubbles: true }));
+          strip.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', 'false'));
+          btn.setAttribute('aria-pressed', 'true');
+        });
+        strip.appendChild(btn);
+      }
+    };
+    syncStrip();
+    whichAnim.addEventListener('change', syncStrip);
+  })();
+
+  // Add quick reset near preview to restore base character
+  (function addQuickReset() {
+    const box = document.getElementById('previewAnimationsBox');
+    if (!box || document.getElementById('quickReset')) return;
+    const btn = document.createElement('button');
+    btn.id = 'quickReset';
+    btn.type = 'button';
+    btn.textContent = 'Reset Character';
+    btn.addEventListener('click', () => {
+      $("#chooser input[type=radio]").prop('checked', false).attr('checked', false);
+      $("#sex-male").prop('checked', true).attr('checked', true);
+      params = {};
+      jHash.val(params);
+      selectDefaults();
+      interpretParams();
+      redraw();
+      showOrHideElements();
+    });
+    box.appendChild(btn);
+  })();
+
+  // Make Credits and Advanced collapsible
+  (function collapsibleSections() {
+    // Already handled in HTML; no JS wrapping to avoid content loss
+  })();
   let matchBodyColor = true;
   
   /** @type {ItemToDraw[]} */
@@ -205,6 +380,24 @@ $(document).ready(function () {
     $ul.toggle("slow").promise().done(drawPreviews);
     event.stopPropagation();
   });
+
+  // Make all h3 headings (e.g., Body, Head, Torso, etc.) collapsible wrappers
+  (function makeChooserHeadingsCollapsible() {
+    const chooser = document.getElementById('chooser');
+    if (!chooser) return;
+    const headings = Array.from(chooser.querySelectorAll('h3'));
+    headings.forEach((h3) => {
+      if (h3.nextElementSibling && h3.nextElementSibling.tagName === 'UL') {
+        const details = document.createElement('details');
+        details.open = true;
+        const summary = document.createElement('summary');
+        summary.textContent = h3.textContent.trim();
+        h3.replaceWith(details);
+        details.appendChild(summary);
+        details.appendChild(h3.nextElementSibling);
+      }
+    });
+  })();
 
   $("#collapse").click(function () {
     $("#chooser>details>ul ul").hide("slow");

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	<title>Universal LPC Sprite Sheet Character Generator</title>
+	<link rel="stylesheet" type="text/css" href="../sources/chargen.css">
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script type="text/javascript" src="../sources/jhash-2.2.min.js"></script>
+	<script type="text/javascript" src="../sources/custom-animations.js"></script>
+	<script type="text/javascript" src="../sources/jszip.min.js"></script>
+	<script type="text/javascript" src="../sources/copy-image.js"></script>
+	<script type="text/javascript" src="../sources/performance-profiler.js"></script>
+	<script type="module">
+		// make sure modern ESM library TinyGesture is loaded before chargen.js
+		import TinyGesture from 'https://cdn.jsdelivr.net/npm/tinygesture@3.0.0/+esm';
+		window.TinyGesture = TinyGesture;
+		const script = document.createElement('script');
+		script.src = '../sources/chargen.js';
+		document.body.appendChild(script);
+	</script>
+</head>
+<body>
+	<form id="customizeChar">
+		<section id="header-left" class="sticky">
+			<h1>Universal LPC Spritesheet Generator <a href="https://github.com/liberatedpixelcup/Universal-LPC-Spritesheet-Character-Generator"><img src="../sources/github-mark.png" alt="View on GitHub" style="width:24px;height:24px;"></a> </h1>
+			<p>Free/Libre pixel art from the <a href="https://lpc.opengameart.org">Liberated Pixel Cup</a></p>
+			<p>You must <a id="scroll-to-credits" href="#">credit the authors of this artwork.</a></p>
+		</section>
+		<section id="controls" class="sticky">
+			<details open>
+				<summary>Controls</summary>
+				<div>
+					<label class="control-label">Download:</label>
+					<a id="saveAsPNG"><input type="button" value="Spritesheet single image (PNG)"></a>
+					<button type="button" class="generateSheetCreditsTxt">Credits (text)</button>
+					<button type="button" class="generateSheetCreditsCsv">Credits (CSV)</button>
+				</div>
+				<div>
+					<label class="control-label">Download image pack with credits and JSON (ZIP):</label>
+					<button type="button" class="exportSplitAnimations">Split by animation</button>
+					<button type="button" class="exportSplitItemSheets">Split by item</button>
+					<button type="button" class="exportSplitItemAnimations">Split by animation and item</button>
+				</div>
+				<div>
+					<label class="control-label">Import/Export:</label>
+					<button type="button" class="exportToClipboard">Export to Clipboard (JSON)</button>
+					<button type="button" class="importFromClipboard">Import from Clipboard (JSON)</button>
+				</div>
+				<div>
+					<label class="control-label">Edit:</label>
+					<button type="button" id="resetAll">Reset all</button>
+					<button type="button" class="replacePinkMask">Replace Mask (pink)</button>
+					<label for="match_body-color">
+						<input type="checkbox" name="match_body-color" value="compact" id="match_body-color" checked>
+						Match body color
+					</label>
+				</div>
+				<div>
+					<label class="control-label">View:</label>
+					<button type="button" id="collapse">Collapse All</button>
+					<button type="button" id="expand">Expand Selected</button>
+					<label for="displayMode-compact"><input type="checkbox" name="displayMode" value="compact" id="displayMode-compact"> Compact Display</label>
+				</div>
+				<div>
+					<label class="control-label" for="searchbox">Search: </label>
+					<input type="search" id="searchbox" name="" placeholder="Search" />
+					<output id="matches"></output>
+				</div>
+			</details>
+		</section>
+		<section id="preview-animations" class="sticky" aria-label="Live preview">
+			<div id="previewAnimationsBox">
+				Preview
+				<select id="whichAnim">
+					<option value="spellcast" data-row="0" data-num="4" data-cycle="7">Spellcast</option>
+					<option value="thrust" data-row="4" data-num="4" data-cycle="8">Thrust</option>
+					<option value="walk" selected data-row="8" data-num="4" data-cycle="9">Walk</option>
+					<option value="slash" data-row="12" data-num="4" data-cycle="6">Slash</option>
+					<option value="shoot" data-row="16" data-num="4" data-cycle="13">Shoot</option>
+					<option value="hurt" data-row="20" data-num="1" data-cycle="6">Hurt</option>
+					<option value="climb" data-row="21" data-num="1" data-cycle="6">Climb</option>
+					<option value="idle" data-row="22" data-num="4" data-cycle-custom="0-0-1">Idle</option>
+					<option value="jump" data-row="26" data-num="4" data-cycle-custom="0-1-2-3-4-1">Jump</option>
+					<option value="sit" data-row="30" data-num="4" data-cycle-custom="0-0-0-0-0-1-1-1-1-1-2-2-2-2-2">Sit</option>
+					<option value="emote" data-row="34" data-num="4" data-cycle-custom="0-0-0-0-0-1-1-1-1-1-2-2-2-2-2">Emote</option>
+					<option value="run" data-row="38" data-num="4" data-cycle="8">Run</option>
+					<option value="watering" data-row="4" data-num="4" data-cycle="4" data-cycle-custom="0-1-4-4-4-4-5">Watering</option>
+					<option value="combat" data-row="42" data-num="4" data-cycle-custom="0-0-1">Combat Idle</option>
+					<option value="1h_slash" data-row="46" data-num="4" data-cycle-custom="0-1-2-3-4-5-6">1-Handed Slash</option>
+					<option value="1h_backslash" data-row="46" data-num="4" data-cycle-custom="0-1-2-3-4-5-7-8-9-10-11-12">1-Handed Backslash</option>
+					<option value="1h_halfslash" data-row="50" data-num="4" data-cycle="6">1-Handed Halfslash</option>
+				</select>
+				<code id="frame-cycle"></code>
+				<div>
+					<canvas id="previewAnimations" width="256" height="64"></canvas>
+				</div>
+			</div>
+		</section>
+		<section id="preview">
+			<details open>
+				<summary>Full Preview</summary>
+				<div class="instr">Complete sprite sheet (click to zoom in, double click to zoom out): </div>
+				<canvas id="spritesheet" width="832" height="1344">HTML5 Browser required.</canvas>
+			</details>
+		</section>
+		<section id="chooser">
+			<details open>
+				<summary>Customize Your Character</summary>
+				<!-- The full chooser markup is generated server-side in root index.html.
+				     For the lightweight Pages entry, we rely on dynamic behaviors in chargen.js
+				     and the existing DOM in this template to operate.  -->
+				<h3>Body</h3>
+				<ul>
+					<li>
+						<span class="expanded">Body type</span>
+						<ul style="display:block;">
+							<li class="noPreview">
+								<input type="radio" id="sex-male" name="sex" checked>
+								<label for="sex-male">Male</label>
+							</li>
+							<li class="noPreview">
+								<input type="radio" id="sex-female" name="sex">
+								<label for="sex-female">Female</label>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</details>
+		</section>
+	</form>
+	<details id="credits" open>
+		<summary>Credits</summary>
+		<p>You must credit the authors: <a href="https://github.com/liberatedpixelcup/Universal-LPC-Spritesheet-Character-Generator/blob/master/README.md">Detailed attribution instructions</a></p>
+		<p>Credit information for this composed spritesheet:</p>
+		<textarea id="creditsText" rows="20" cols="300" readonly>Credits</textarea>
+		<p><strong>Download: </strong>
+			<button type="button" class="generateSheetCreditsTxt">Credits for this sheet (text)</button>
+			<button type="button" class="generateSheetCreditsCsv">Credits for this sheet (CSV)</button>
+		</p>
+		<p>License information for all spritesheets in this generator is available <a href="https://github.com/liberatedpixelcup/Universal-LPC-Spritesheet-Character-Generator/raw/refs/heads/master/CREDITS.csv">here</a></p>
+	</details>
+	<details id="advanced" open>
+		<summary>Advanced Tools</summary>
+		<p>
+			<strong>Custom file: </strong><span>Draw local file with custom z-position:</span>
+			<input type="file" id="previewFile">
+			<span class="ZPOS">
+				<label for="ZPOS">Z-position:</label>
+				<input id="ZPOS" type="text" name="ZPOS">
+			</span>
+		</p>
+	</details>
+	<imgPrev></imgPrev>
+
+	<div id="animation-strip" role="toolbar" aria-label="Animation selector"></div>
+</body>
+</html>
