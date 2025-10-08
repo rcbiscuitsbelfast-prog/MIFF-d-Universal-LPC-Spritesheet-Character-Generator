@@ -42,6 +42,18 @@ const OUTDIR = path.join(ROOT, 'prefab');
 function ensureDir(dir){ if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true }); }
 
 function listPngs(dir){ try { return fs.readdirSync(dir).filter(f=>f.endsWith('.png')); } catch { return []; } }
+function listDirs(dir){ try { return fs.readdirSync(dir).map(f=>path.join(dir,f)).filter(p=>fs.existsSync(p)&&fs.statSync(p).isDirectory()); } catch { return []; } }
+function findDirsContainingWalkPngs(root){
+  const out = [];
+  const stack = [root];
+  while (stack.length){
+    const d = stack.pop();
+    const walkDir = path.join(d, 'walk');
+    if (exists(walkDir) && listPngs(walkDir).length>0){ out.push(d); continue; }
+    stack.push(...listDirs(d));
+  }
+  return out;
+}
 
 function exists(p){ try { fs.accessSync(p); return true; } catch { return false; } }
 
@@ -54,7 +66,7 @@ function compositeOnto(dst, src, y){ if (!exists(src)) return; exec(`magick comp
 function overlayAsset(dst, assetDir, file){
   for (const anim of animOrder){
     const y = baseAnimations[anim];
-    const p = path.join(assetDir, anim, file);
+    const p = typeof file === 'string' ? path.join(assetDir, anim, file) : path.join(file.dir || assetDir, anim, file.file);
     if (exists(p)) compositeOnto(dst, p, y);
   }
 }
@@ -62,43 +74,34 @@ function overlayAsset(dst, assetDir, file){
 // Curated modern selections
 function collectCandidates(){
   const c = {};
-  c.body = {
-    male: listPngs(path.join(SPRITES, 'body', 'bodies', 'male')), 
-    female: listPngs(path.join(SPRITES, 'body', 'bodies', 'female')),
-    teen: listPngs(path.join(SPRITES, 'body', 'bodies', 'teen')),
-    child: listPngs(path.join(SPRITES, 'body', 'bodies', 'child')),
-  };
-
-  c.head = listPngs(path.join(SPRITES, 'head', 'heads')).filter(f=>/human|male|female|child/i.test(f));
-
-  const torsoDir = path.join(SPRITES, 'torso', 'clothes');
-  c.torso = fs.readdirSync(torsoDir).flatMap(sub=>{
-    const d = path.join(torsoDir, sub);
-    if (!fs.statSync(d).isDirectory()) return [];
-    if (/armor|chainmail|robe|tabard|vest|cape|kimono|dress/i.test(sub)) return [];
-    return listPngs(d).map(f=>({ dir: d, file: f }));
-  });
-
-  const legsDir = path.join(SPRITES, 'legs');
-  c.legs = [];
-  for (const sub of ['pants','pants2','leggings','shorts','skirts_plain','skirt_straight']){
-    const d = fs.existsSync(path.join(legsDir, sub)) ? path.join(legsDir, sub) : null;
-    if (d) c.legs.push(...listPngs(d).map(f=>({ dir: d, file: f })));
+  c.body = {};
+  for (const sex of ['male','female','teen','child']){
+    const walkDir = path.join(SPRITES, 'body', 'bodies', sex, 'walk');
+    c.body[sex] = listPngs(walkDir).map(f=>({ dir: path.join(SPRITES,'body','bodies',sex), file: f }));
   }
 
-  const feetDir = path.join(SPRITES, 'feet');
-  c.feet = [];
-  for (const sub of ['shoes_basic','shoes_revised','boots_revised','sandals','socks']){
-    const d = fs.existsSync(path.join(feetDir, sub)) ? path.join(feetDir, sub) : null;
-    if (d) c.feet.push(...listPngs(d).map(f=>({ dir: d, file: f })));
-  }
+  // Heads (humans only), collect directories that contain per-animation subfolders
+  const headRoots = findDirsContainingWalkPngs(path.join(SPRITES, 'head', 'heads', 'human'));
+  c.head = headRoots.flatMap(d=> listPngs(path.join(d,'walk')).map(f=>({ dir: d, file: f })));
+  // Filter out weird colors
+  const badHead = /(zombie|green|lavender|pale_green|bright_green|fur_|alien|orc|troll|vampire|skeleton|minotaur|rabbit|rat|sheep|pig|mouse|boarman|goblin|wolf|lizard|jack|wartotaur)/i;
+  c.head = c.head.filter(h=>!badHead.test(h.file) && !badHead.test(h.dir));
 
-  const facialDir = path.join(SPRITES, 'facial');
-  c.glasses = [];
-  for (const sub of ['glasses','glasses_round','glasses_shades','glasses_secretary']){
-    const d = fs.existsSync(path.join(facialDir, sub)) ? path.join(facialDir, sub) : null;
-    if (d) c.glasses.push(...listPngs(d).map(f=>({ dir: d, file: f })));
-  }
+  const torsoRoot = path.join(SPRITES, 'torso', 'clothes');
+  const torsoDirs = findDirsContainingWalkPngs(torsoRoot).filter(d=>!/(armor|chainmail|robe|tabard|vest|cape|kimono|dress)/i.test(d));
+  c.torso = torsoDirs.flatMap(d=> listPngs(path.join(d,'walk')).map(f=>({ dir: d, file: f })));
+
+  const legsRoot = path.join(SPRITES, 'legs');
+  const legsDirs = findDirsContainingWalkPngs(legsRoot).filter(d=>/(pants|leggings|shorts|skirt)/i.test(d));
+  c.legs = legsDirs.flatMap(d=> listPngs(path.join(d,'walk')).map(f=>({ dir: d, file: f })));
+
+  const feetRoot = path.join(SPRITES, 'feet');
+  const feetDirs = findDirsContainingWalkPngs(feetRoot).filter(d=>/(shoes|boots|sandals|socks)/i.test(d));
+  c.feet = feetDirs.flatMap(d=> listPngs(path.join(d,'walk')).map(f=>({ dir: d, file: f })));
+
+  const facialRoot = path.join(SPRITES, 'facial');
+  const glassesDirs = findDirsContainingWalkPngs(facialRoot).filter(d=>/(glasses)/i.test(d));
+  c.glasses = glassesDirs.flatMap(d=> listPngs(path.join(d,'walk')).map(f=>({ dir: d, file: f })));
   return c;
 }
 
@@ -130,9 +133,8 @@ function generateOne(index, candidates, role, sex){
   newBlankCanvas(outPng);
 
   // Layer order: body, legs, feet, torso, head, glasses
-  const bodyDir = path.join(SPRITES, 'body', 'bodies', sex);
   const bodyFile = rand(candidates.body[sex] || []);
-  if (bodyFile) overlayAsset(outPng, bodyDir, bodyFile);
+  if (bodyFile) overlayAsset(outPng, bodyFile.dir, bodyFile);
 
   const leg = rand(candidates.legs);
   if (leg) overlayAsset(outPng, leg.dir, leg.file);
@@ -143,9 +145,8 @@ function generateOne(index, candidates, role, sex){
   const torso = rand(candidates.torso);
   if (torso) overlayAsset(outPng, torso.dir, torso.file);
 
-  const headDir = path.join(SPRITES, 'head', 'heads');
   const headFile = rand(candidates.head);
-  if (headFile) overlayAsset(outPng, headDir, headFile);
+  if (headFile) overlayAsset(outPng, headFile.dir, headFile);
 
   const glass = Math.random() < 0.3 ? rand(candidates.glasses) : null;
   if (glass) overlayAsset(outPng, glass.dir, glass.file);
