@@ -77,11 +77,15 @@ function collectCandidates(){
   c.body = {};
   for (const sex of ['male','female','teen','child']){
     const walkDir = path.join(SPRITES, 'body', 'bodies', sex, 'walk');
-    c.body[sex] = listPngs(walkDir).map(f=>({ dir: path.join(SPRITES,'body','bodies',sex), file: f }));
+    // filter to realistic skin tones
+    const ok = /^(light|tan|brown|dark|amber|bronze|taupe|olive)\.png$/i;
+    const files = listPngs(walkDir).filter(f=>ok.test(f));
+    c.body[sex] = files.map(f=>({ dir: path.join(SPRITES,'body','bodies',sex), file: f }));
   }
 
   // Heads (humans only), collect directories that contain per-animation subfolders
-  const headRoots = findDirsContainingWalkPngs(path.join(SPRITES, 'head', 'heads', 'human'));
+  const headHuman = path.join(SPRITES, 'head', 'heads', 'human');
+  const headRoots = findDirsContainingWalkPngs(headHuman);
   c.head = headRoots.flatMap(d=> listPngs(path.join(d,'walk')).map(f=>({ dir: d, file: f })));
   // Filter out weird colors
   const badHead = /(zombie|green|lavender|pale_green|bright_green|fur_|alien|orc|troll|vampire|skeleton|minotaur|rabbit|rat|sheep|pig|mouse|boarman|goblin|wolf|lizard|jack|wartotaur)/i;
@@ -144,7 +148,12 @@ function generateOne(index, candidates, role, sex){
   newBlankCanvas(outPng);
 
   // Layer order: body, legs, feet, torso, head, hair, glasses
-  const bodyFile = rand(candidates.body[sex] || []);
+  let bodyFile = rand(candidates.body[sex] || []);
+  if (!bodyFile) {
+    // Fallback to light skin
+    const fallback = { dir: path.join(SPRITES,'body','bodies',sex), file: 'light.png' };
+    bodyFile = exists(path.join(fallback.dir,'walk',fallback.file)) ? fallback : null;
+  }
   if (bodyFile) overlayAsset(outPng, bodyFile.dir, bodyFile);
 
   const leg = rand(candidates.legs);
@@ -156,10 +165,17 @@ function generateOne(index, candidates, role, sex){
   const torso = rand(candidates.torso);
   if (torso) overlayAsset(outPng, torso.dir, torso.file);
 
-  const headFile = rand(candidates.head);
+  // Prefer head directory matching sex bucket if available
+  const headChoices = candidates.head.filter(h=>h.dir.includes(`/human/${sex}`));
+  const headFile = (headChoices.length ? rand(headChoices) : rand(candidates.head));
   if (headFile) overlayAsset(outPng, headFile.dir, headFile);
 
-  const hair = Math.random() < 0.9 ? rand(candidates.hair) : null;
+  // Hair: for child, require a directory that contains /child/ variant to align correctly
+  let hair = null;
+  if (Math.random() < 0.9) {
+    const pool = sex === 'child' ? candidates.hair.filter(h=>/\/child\//i.test(h.dir)) : candidates.hair;
+    hair = pool.length ? rand(pool) : null;
+  }
   if (hair) overlayAsset(outPng, hair.dir, hair.file);
 
   const glass = Math.random() < 0.3 ? rand(candidates.glasses) : null;
