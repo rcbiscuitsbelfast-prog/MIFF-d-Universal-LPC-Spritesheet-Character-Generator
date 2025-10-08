@@ -194,7 +194,8 @@ function main(){
   const candidates = collectCandidates();
   const sexes = ['male','female','teen','child'];
   const generated = [];
-  for (let i=0;i<100;i++){
+  const COUNT = parseInt(process.env.COUNT || process.argv[2] || '100', 10);
+  for (let i=0;i<COUNT;i++){
     const role = roles[i % roles.length];
     const sex = sexes[i % sexes.length];
     generated.push(generateOne(i, candidates, role, sex));
