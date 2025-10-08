@@ -1,0 +1,86 @@
+{
+  "role": "Barista",
+  "creatureType": "Humanoid",
+  "frame": {
+    "frameSize": 64,
+    "sheetWidth": 832,
+    "sheetHeight": 3456
+  },
+  "animations": [
+    {
+      "tag": "spellcast",
+      "frames": 7,
+      "timingMs": 125
+    },
+    {
+      "tag": "thrust",
+      "frames": 8,
+      "timingMs": 125
+    },
+    {
+      "tag": "walk",
+      "frames": 9,
+      "timingMs": 125
+    },
+    {
+      "tag": "slash",
+      "frames": 6,
+      "timingMs": 125
+    },
+    {
+      "tag": "shoot",
+      "frames": 13,
+      "timingMs": 125
+    },
+    {
+      "tag": "hurt",
+      "frames": 6,
+      "timingMs": 125
+    },
+    {
+      "tag": "climb",
+      "frames": 6,
+      "timingMs": 125
+    },
+    {
+      "tag": "idle",
+      "frames": 2,
+      "timingMs": 125
+    },
+    {
+      "tag": "jump",
+      "frames": 5,
+      "timingMs": 125
+    },
+    {
+      "tag": "sit",
+      "frames": 3,
+      "timingMs": 125
+    },
+    {
+      "tag": "emote",
+      "frames": 3,
+      "timingMs": 125
+    },
+    {
+      "tag": "run",
+      "frames": 8,
+      "timingMs": 125
+    },
+    {
+      "tag": "combat_idle",
+      "frames": 2,
+      "timingMs": 125
+    },
+    {
+      "tag": "backslash",
+      "frames": 13,
+      "timingMs": 125
+    },
+    {
+      "tag": "halfslash",
+      "frames": 7,
+      "timingMs": 125
+    }
+  ]
+}

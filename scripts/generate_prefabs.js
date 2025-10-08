@@ -102,6 +102,11 @@ function collectCandidates(){
   const facialRoot = path.join(SPRITES, 'facial');
   const glassesDirs = findDirsContainingWalkPngs(facialRoot).filter(d=>/(glasses)/i.test(d));
   c.glasses = glassesDirs.flatMap(d=> listPngs(path.join(d,'walk')).map(f=>({ dir: d, file: f })));
+  
+  // Hair: choose a variety of styles, per sex/age buckets where available
+  const hairRoot = path.join(SPRITES, 'hair');
+  const hairDirs = findDirsContainingWalkPngs(hairRoot).filter(d=>!/(spiked_liberty|porcupine|wizard|helmet|hood)/i.test(d));
+  c.hair = hairDirs.flatMap(d=> listPngs(path.join(d,'walk')).map(f=>({ dir: d, file: f })));
   return c;
 }
 
@@ -109,11 +114,15 @@ function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
 function roleList(){
   return [
-    'shopkeeper','student','retiree','mechanic','teacher','parent','toddler','teenager',
-    'nurse','cashier','barista','driver','gardener','chef','delivery','clerk','coach','farmer','librarian','police',
-    'mail','firefighter','janitor','server','babysitter','artist','musician','carpenter','plumber','electrician',
-    'receptionist','security','groundskeeper','courier','volunteer','neighbor','friend','child','sibling','grandparent'
+    'Shopkeeper','Student','Retiree','Mechanic','Teacher','Parent','Toddler','Teenager',
+    'Nurse','Cashier','Barista','Driver','Gardener','Chef','Delivery','Clerk','Coach','Farmer','Librarian','Police',
+    'Mail','Firefighter','Janitor','Server','Babysitter','Artist','Musician','Carpenter','Plumber','Electrician',
+    'Receptionist','Security','Groundskeeper','Courier','Volunteer','Neighbor','Friend','Child','Sibling','Grandparent'
   ];
+}
+
+function firstNameList(){
+  return ['Alex','Avery','Bailey','Blake','Cameron','Casey','Charlie','Dakota','Drew','Elliot','Emerson','Finley','Harper','Hayden','Jamie','Jesse','Jordan','Jules','Kai','Logan','Max','Mica','Morgan','Noah','Parker','Quinn','Reese','Riley','Robin','Rowan','Sage','Sam','Shawn','Skyler','Taylor','Toby','Tyler','Wren','Zoe','Maya','Olivia','Emma','Liam','Noel','Nora','Hugo','Ivy','June','Eva','Luca','Leo','Milo','Ada','Ella','Isla','Mara','Gwen','Ruth','Sara','Owen','Oona','Asha','Aria','Ari','Cole','Evan','Ian','Nina','Iris','Kara','Kian','Ava','Asha','Arlo','Zara','Zane','Theo','Tess','Tia','Una','Vera','Violet','Wade','Wes','Yara','Yuri'];
 }
 
 function writeMetadata(filepath, meta){ fs.writeFileSync(filepath, JSON.stringify(meta, null, 2)); }
@@ -125,14 +134,16 @@ function buildMetadata(role){
 }
 
 function generateOne(index, candidates, role, sex){
-  const id = `prefab_${String(index+1).padStart(3,'0')}_${role}`;
+  const names = firstNameList();
+  const first = names[index % names.length];
+  const id = `prefab_${String(index+1).padStart(3,'0')}_${first}_${role}`;
   const outPng = path.join(OUTDIR, `${id}.png`);
   const outJson = path.join(OUTDIR, `${id}.json`);
 
   // Start fresh sheet
   newBlankCanvas(outPng);
 
-  // Layer order: body, legs, feet, torso, head, glasses
+  // Layer order: body, legs, feet, torso, head, hair, glasses
   const bodyFile = rand(candidates.body[sex] || []);
   if (bodyFile) overlayAsset(outPng, bodyFile.dir, bodyFile);
 
@@ -147,6 +158,9 @@ function generateOne(index, candidates, role, sex){
 
   const headFile = rand(candidates.head);
   if (headFile) overlayAsset(outPng, headFile.dir, headFile);
+
+  const hair = Math.random() < 0.9 ? rand(candidates.hair) : null;
+  if (hair) overlayAsset(outPng, hair.dir, hair.file);
 
   const glass = Math.random() < 0.3 ? rand(candidates.glasses) : null;
   if (glass) overlayAsset(outPng, glass.dir, glass.file);
