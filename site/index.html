@@ -106,10 +106,26 @@
           sync();
           whichAnim.addEventListener('change', sync);
         }
+
+        // Add Creature Type selector near the top of the chooser
+        const chooser = document.getElementById('customizeChar');
+        if (chooser && !document.getElementById('creatureType')){
+          const selWrap = document.createElement('p');
+          selWrap.innerHTML = '<label for="creatureType"><strong>Creature Type:</strong> </label>'+
+            '<select id="creatureType"><option>Humanoid</option><option>Quadruped</option><option>Flying</option><option>Crawling</option></select>';
+          chooser.prepend(selWrap);
+          selWrap.querySelector('select').addEventListener('change', (e)=>{
+            window.dispatchEvent(new CustomEvent('lpc-creature-type', { detail: { type: e.target.value }}));
+          });
+        }
       } catch (e) {
         console.error('Failed to mount chooser', e);
       }
     })();
+    // Update animation set when creature type changes
+    window.addEventListener('lpc-creature-type', (ev) => {
+      if (window.setCreatureType) window.setCreatureType(ev.detail.type);
+    });
     </script>
 </body>
 </html>

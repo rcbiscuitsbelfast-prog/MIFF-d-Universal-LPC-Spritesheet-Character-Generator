@@ -72,6 +72,9 @@ const profiler = new PerformanceProfiler({
 window.profiler = profiler;
 
 $(document).ready(function () {
+  // Detect base path for sprites when running from /site/
+  const SPRITES_BASE = window.location.pathname.includes('/site/') ? '../spritesheets/' : 'spritesheets/';
+  let CREATURE_TYPE = 'Humanoid';
   let matchBodyColor = true;
   
   /** @type {ItemToDraw[]} */
@@ -94,41 +97,94 @@ $(document).ready(function () {
   const universalSheetWidth = 832;
   const universalSheetHeight = 3456;
 
-  const base_animations = {
-    spellcast: 0,
-    thrust: 4 * universalFrameSize,
-    walk: 8 * universalFrameSize,
-    slash: 12 * universalFrameSize,
-    shoot: 16 * universalFrameSize,
-    hurt: 20 * universalFrameSize,
-    climb: 21 * universalFrameSize,
-    idle: 22 * universalFrameSize,
-    jump: 26 * universalFrameSize,
-    sit: 30 * universalFrameSize,
-    emote: 34 * universalFrameSize,
-    run: 38 * universalFrameSize,
-    combat_idle: 42 * universalFrameSize,
-    backslash: 46 * universalFrameSize,
-    halfslash: 50 * universalFrameSize,
+  // Animation sets per creature type (assets for non-humanoid may be incomplete; structure supports future expansion)
+  const ANIMATION_SETS = {
+    Humanoid: {
+      baseOffsets: {
+        spellcast: 0,
+        thrust: 4 * universalFrameSize,
+        walk: 8 * universalFrameSize,
+        slash: 12 * universalFrameSize,
+        shoot: 16 * universalFrameSize,
+        hurt: 20 * universalFrameSize,
+        climb: 21 * universalFrameSize,
+        idle: 22 * universalFrameSize,
+        jump: 26 * universalFrameSize,
+        sit: 30 * universalFrameSize,
+        emote: 34 * universalFrameSize,
+        run: 38 * universalFrameSize,
+        combat_idle: 42 * universalFrameSize,
+        backslash: 46 * universalFrameSize,
+        halfslash: 50 * universalFrameSize,
+      },
+      frameCounts: {
+        spellcast: 7,
+        thrust: 8,
+        walk: 9,
+        slash: 6,
+        shoot: 13,
+        hurt: 6,
+        climb: 6,
+        idle: 2,
+        jump: 5,
+        sit: 3,
+        emote: 3,
+        run: 8,
+        combat_idle: 2,
+        backslash: 13,
+        halfslash: 7
+      }
+    },
+    Quadruped: {
+      baseOffsets: {
+        idle: 0,
+        walk: 4 * universalFrameSize,
+        run: 8 * universalFrameSize,
+        jump: 12 * universalFrameSize,
+        attack: 16 * universalFrameSize,
+        hurt: 20 * universalFrameSize
+      },
+      frameCounts: { idle: 2, walk: 8, run: 8, jump: 6, attack: 6, hurt: 4 }
+    },
+    Flying: {
+      baseOffsets: {
+        idle: 0,
+        fly: 4 * universalFrameSize,
+        attack: 8 * universalFrameSize,
+        hurt: 12 * universalFrameSize
+      },
+      frameCounts: { idle: 2, fly: 8, attack: 6, hurt: 4 }
+    },
+    Crawling: {
+      baseOffsets: { idle: 0, crawl: 4 * universalFrameSize, attack: 8 * universalFrameSize, hurt: 12 * universalFrameSize },
+      frameCounts: { idle: 2, crawl: 8, attack: 6, hurt: 4 }
+    }
   };
-  
-  const animationFrameCounts = {
-	spellcast: 7,
-	thrust: 8,
-	walk: 9,
-	slash: 6,
-	shoot: 13,
-	hurt: 6,
-	climb: 6,
-	idle: 2,
-	jump: 5,
-	sit: 3,
-	emote: 3,
-	run: 8,
-	combat_idle: 2,
-	backslash: 13,
-	halfslash: 7
+
+  // Current animation mapping, defaults to Humanoid
+  let base_animations = ANIMATION_SETS[CREATURE_TYPE].baseOffsets;
+  let animationFrameCounts = ANIMATION_SETS[CREATURE_TYPE].frameCounts;
+
+  // Expose setter to site for changing creature type
+  window.setCreatureType = (type) => {
+    if (!ANIMATION_SETS[type]) return;
+    CREATURE_TYPE = type;
+    base_animations = ANIMATION_SETS[type].baseOffsets;
+    animationFrameCounts = ANIMATION_SETS[type].frameCounts;
+    // Reset preview animation selection to a sensible default per type
+    const which = document.getElementById('whichAnim');
+    if (which) {
+      const first = Object.keys(base_animations)[0];
+      const opt = Array.from(which.options).find(o => o.value === first || o.text.toLowerCase() === first);
+      if (opt) {
+        which.value = opt.value;
+        which.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+    redraw();
   };
+
+  // (moved above) base_animations and animationFrameCounts
 
   const sexes = ["male", "female", "teen", "child", "muscular", "pregnant"];
 
@@ -1217,7 +1273,7 @@ $(".exportSplitAnimations").click(async function() {
     itemsMeta = {
       bodyTypeName: bodyTypeName,
       url: window.location.href,
-      spritesheets: baseUrl + "/spritesheets/", // <- holds base URL to spritesheets (used to download them)
+      spritesheets: (window.location.pathname.includes('/site/') ? baseUrl + '/../spritesheets/' : baseUrl + '/spritesheets/'),
       version: 1, // <- to track future compatibilty breaking changes
       datetime: new Date().toLocaleString(),
       credits: "",
@@ -1760,7 +1816,7 @@ $(".exportSplitAnimations").click(async function() {
       profiler.mark(`image-load:${imgRef}:start`);
       if (DEBUG) console.log(`loading new image ${imgRef}`);
       const img = new Image();
-      img.src = "spritesheets/" + imgRef;
+      img.src = SPRITES_BASE + imgRef;
       img.onload = function() {
         profiler.mark(`image-load:${imgRef}:end`);
         profiler.measure(`image-load:${imgRef}`, `image-load:${imgRef}:start`, `image-load:${imgRef}:end`);
@@ -1798,7 +1854,7 @@ $(".exportSplitAnimations").click(async function() {
       return images[imgRef];
     } else {
       let img = new Image();
-      img.src = "spritesheets/" + imgRef;
+      img.src = SPRITES_BASE + imgRef;
       images[imgRef] = img;
       img.addEventListener("load", function () {
         callback(layers, prevctx);
