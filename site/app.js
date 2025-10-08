@@ -122,6 +122,7 @@ async function runBatchPrefabGeneration() {
     const accessories = ['glasses','glasses_round','earring_left','earring_right','none'];
 
     const uniq = new Set();
+    const records = [];
     const count = 100;
     for (let i = 0; i < count; i++) {
       // Choose role
@@ -163,9 +164,14 @@ async function runBatchPrefabGeneration() {
       // Save both files to root/prefab via in-browser download (stays in user Downloads). As a fallback, zip all.
       await saveAsFile(`${prefabDir}/${id}.png`, pngBlob);
       await saveAsFile(`${prefabDir}/${id}.json`, new Blob([JSON.stringify(meta, null, 2)], { type: 'application/json' }));
+
+      records.push({ id, role, sex, color, head, shirt, leg, foot, accessory });
     }
 
-    alert('Batch generation queued: 100 prefab files will download. Move the downloaded prefab folder into your repo main miff folder.');
+    const summary = buildBatchSummary(records);
+    console.log('Batch summary:', summary);
+    await saveAsFile(`${prefabDir}/prefab_report.json`, new Blob([JSON.stringify(summary, null, 2)], { type: 'application/json' }));
+    alert('Batch generation queued: 100 prefab files + report will download. Move the downloaded prefab folder into your repo main miff folder.');
   } catch (e) {
     console.error('Batch generation failed', e);
     alert('Batch generation failed: ' + e.message);
@@ -201,6 +207,21 @@ function buildMetadata(role){
   const anims = Object.keys(frameCounts).map(k=>({ tag: k, frames: frameCounts[k], timingMs: 125 }));
   const meta = { role, creatureType: (document.getElementById('creatureType')?.value)||'Humanoid', frame: dims, animations: anims };
   return meta;
+}
+
+function buildBatchSummary(records){
+  const counts = {
+    total: records.length,
+    sex: {},
+    roles: {},
+    colors: {},
+  };
+  for (const r of records){
+    counts.sex[r.sex] = (counts.sex[r.sex]||0)+1;
+    counts.roles[r.role] = (counts.roles[r.role]||0)+1;
+    counts.colors[r.color] = (counts.colors[r.color]||0)+1;
+  }
+  return { counts, records };
 }
 
 async function canvasToBlobPolyfill(canvas){
