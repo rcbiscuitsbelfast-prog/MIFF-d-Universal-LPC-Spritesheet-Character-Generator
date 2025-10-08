@@ -1,4 +1,78 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	<title>LPC Character Builder</title>
+	<link rel="stylesheet" href="styles.css">
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script type="text/javascript" src="../sources/jhash-2.2.min.js"></script>
+	<script type="text/javascript" src="../sources/custom-animations.js"></script>
+	<script type="text/javascript" src="../sources/jszip.min.js"></script>
+	<script type="text/javascript" src="../sources/copy-image.js"></script>
+	<script type="text/javascript" src="../sources/performance-profiler.js"></script>
+	<script type="module">
+		import TinyGesture from 'https://cdn.jsdelivr.net/npm/tinygesture@3.0.0/+esm';
+		window.TinyGesture = TinyGesture;
+	</script>
+</head>
+<body>
+	<header id="appbar">
+		<button id="menuBtn" aria-controls="sidebar" aria-expanded="false">☰</button>
+		<h1>LPC Character Builder</h1>
+		<div class="spacer"></div>
+		<nav>
+			<button id="navExport" type="button">Export</button>
+			<button id="navImport" type="button">Import</button>
+			<button id="navPreview" type="button">Preview</button>
+			<a id="navHelp" href="https://github.com/liberatedpixelcup/Universal-LPC-Spritesheet-Character-Generator#readme" target="_blank" rel="noopener">Help</a>
+		</nav>
+	</header>
+
+	<aside id="sidebar" aria-label="Customize" data-open="false">
+		<div id="sidebarHeader">
+			<strong>Customize</strong>
+			<label for="creatureType">Creature Type</label>
+			<select id="creatureType">
+				<option>Humanoid</option>
+				<option>Quadruped</option>
+				<option>Flying</option>
+				<option>Crawling</option>
+			</select>
+		</div>
+		<div id="customizeSections">
+			<!-- populated from source_index.html chooser -->
+		</div>
+	</aside>
+
+	<main id="stage">
+		<section id="live">
+			<canvas id="previewAnimations" width="256" height="64"></canvas>
+			<div class="previewControls">
+				<button id="resetCharacter" type="button">Reset</button>
+			</div>
+		</section>
+		<section id="sheet">
+			<details open>
+				<summary>Full Preview</summary>
+				<canvas id="spritesheet" width="832" height="1344">HTML5 Browser required.</canvas>
+			</details>
+		</section>
+	</main>
+
+	<footer id="animBar" role="toolbar" aria-label="Animation selector"></footer>
+
+	<script type="module" src="app.js"></script>
+	<script>
+		// Load generator
+		const script = document.createElement('script');
+		script.src = '../sources/chargen.js';
+		document.body.appendChild(script);
+	</script>
+</body>
+</html>
+<!DOCTYPE html>
 <html lang="en-us">
 <head>
 	<meta charset="utf-8">

@@ -1,0 +1,33 @@
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; font: 14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color: #121212; background: #fafafa; }
+
+#appbar { position: sticky; top: 0; z-index: 1000; display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #fff; border-bottom: 1px solid #eaeaea; }
+#appbar h1 { margin: 0; font-size: 16px; font-weight: 700; }
+#appbar nav { display: inline-flex; gap: 8px; }
+#appbar .spacer { flex: 1 1 auto; }
+#appbar button, #appbar a { padding: 8px 10px; border: 1px solid #ddd; border-radius: 10px; background: #f6f6f6; text-decoration: none; color: inherit; }
+
+#sidebar { position: fixed; top: 50px; bottom: 56px; left: 0; width: min(86vw, 420px); background: #fff; border-right: 1px solid #eee; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transform: translateX(-100%); transition: transform 0.2s ease; overflow: auto; }
+body.sidebar-open #sidebar { transform: translateX(0); }
+
+#sidebarHeader { position: sticky; top: 0; background: #fff; border-bottom: 1px solid #eee; padding: 10px 12px; display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
+#customizeSections details { border-bottom: 1px solid #f0f0f0; padding: 6px 12px; }
+#customizeSections summary { font-weight: 700; cursor: pointer; }
+
+#stage { display: grid; grid-template-rows: 1fr auto; min-height: calc(100vh - 50px - 56px); padding: 10px 12px; }
+#live { display: grid; place-items: center; padding: 10px; background: #fff; border: 1px solid #eee; border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.04); }
+.previewControls { margin-top: 8px; }
+.previewControls button { padding: 8px 10px; border: 1px solid #ddd; border-radius: 10px; background: #f6f6f6; }
+
+#sheet { margin-top: 10px; }
+#sheet details { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px; }
+
+#animBar { position: fixed; left: 0; right: 0; bottom: 0; height: 56px; background: #fff; border-top: 1px solid #eaeaea; display: flex; align-items: center; gap: 8px; padding: 8px 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+#animBar button { flex: 0 0 auto; padding: 8px 10px; border: 1px solid #ddd; border-radius: 999px; background: #f6f6f6; }
+#animBar button[aria-pressed="true"] { background: #121212; color: #fff; border-color: #121212; }
+
+@media (min-width: 960px) {
+  #sidebar { transform: translateX(0); width: 320px; }
+  body { padding-left: 320px; }
+}
