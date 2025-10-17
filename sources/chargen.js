@@ -72,6 +72,34 @@ const profiler = new PerformanceProfiler({
 window.profiler = profiler;
 
 $(document).ready(function () {
+  // Version switching functionality
+  $('.version-btn').click(function() {
+    const version = $(this).data('version');
+    $('.version-btn').removeClass('active');
+    $(this).addClass('active');
+    
+    // Store version preference
+    localStorage.setItem('preferredVersion', version);
+    
+    // Switch to different version
+    switch(version) {
+      case 'v1':
+        // Current mobile UI - do nothing, we're already here
+        break;
+      case 'v2':
+        // Load V2 with collapsible main headings
+        loadVersion2();
+        break;
+      case 'v3':
+        alert('V3 - Coming Soon!');
+        break;
+    }
+  });
+  
+  // Load preferred version on page load
+  const preferredVersion = localStorage.getItem('preferredVersion') || 'v1';
+  $(`.version-btn[data-version="${preferredVersion}"]`).click();
+
   // Ensure mobile viewport meta exists
   (function ensureViewport() {
     try {
@@ -2239,5 +2267,159 @@ $(".exportSplitAnimations").click(async function() {
         `Could not split to directory and file using path ${filePath}`
       );
     }
+  }
+
+  // Version 2 loading function
+  function loadVersion2() {
+    // Create V2 HTML structure with collapsible main headings
+    const v2HTML = `
+      <div id="v2-content" style="display: none;">
+        <section id="chooser-v2">
+          <details open>
+            <summary><h3>Filters</h3></summary>
+            <ul>
+              <li>
+                <span class="condensed">Licenses:</span>
+                <ul>
+                  <li>
+                    <input class="licenseCheckBox" type="checkbox" value="CC0" checked>
+                    <label>CC0</label>
+                    <a href="https://creativecommons.org/public-domain/cc0/">Show license</a>
+                  </li>
+                  <li>
+                    <input class="licenseCheckBox" type="checkbox" value="CC-BY-SA 3.0, CC-BY-SA 4.0" checked>
+                    <label>CC-BY-SA</label>
+                    <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.en">Show license (4.0)</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </details>
+          
+          <details open>
+            <summary><h3>Body</h3></summary>
+            <ul>
+              <li>
+                <span class="condensed">Body type</span>
+                <ul>
+                  <li class="noPreview">
+                    <input type="radio" id="sex-male-v2" name="sex" checked>
+                    <label for="sex-male-v2">Male</label>
+                  </li>
+                  <li class="noPreview">
+                    <input type="radio" id="sex-female-v2" name="sex">
+                    <label for="sex-female-v2">Female</label>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </details>
+          
+          <details open>
+            <summary><h3>Head</h3></summary>
+            <ul>
+              <li>
+                <span class="condensed">Heads</span>
+                <ul>
+                  <li class="noPreview">
+                    <input type="radio" id="head-none-v2" name="head">
+                    <label for="head-none-v2">No head</label>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </details>
+          
+          <details>
+            <summary><h3>Arms</h3></summary>
+            <ul>
+              <li>
+                <span class="condensed">Shoulders</span>
+                <ul>
+                  <li class="noPreview">
+                    <input type="radio" id="shoulders-none-v2" name="shoulders">
+                    <label for="shoulders-none-v2">No shoulders</label>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </details>
+          
+          <details>
+            <summary><h3>Torso</h3></summary>
+            <ul>
+              <li>
+                <span class="condensed">Shirts</span>
+                <ul>
+                  <li class="noPreview">
+                    <input type="radio" id="shirt-none-v2" name="shirt">
+                    <label for="shirt-none-v2">No shirt</label>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </details>
+          
+          <details>
+            <summary><h3>Legs</h3></summary>
+            <ul>
+              <li>
+                <span class="condensed">Pants</span>
+                <ul>
+                  <li class="noPreview">
+                    <input type="radio" id="pants-none-v2" name="pants">
+                    <label for="pants-none-v2">No pants</label>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </details>
+          
+          <details>
+            <summary><h3>Tools</h3></summary>
+            <ul>
+              <li>
+                <span class="condensed">Accessories</span>
+                <ul>
+                  <li class="noPreview">
+                    <input type="radio" id="tools-none-v2" name="tools">
+                    <label for="tools-none-v2">No tools</label>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </details>
+          
+          <details>
+            <summary><h3>Weapons</h3></summary>
+            <ul>
+              <li>
+                <span class="condensed">Weapons</span>
+                <ul>
+                  <li class="noPreview">
+                    <input type="radio" id="weapons-none-v2" name="weapons">
+                    <label for="weapons-none-v2">No weapons</label>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </details>
+        </section>
+      </div>
+    `;
+    
+    // Hide current content and show V2
+    $('#chooser').hide();
+    $('#v2-content').remove();
+    $('body').append(v2HTML);
+    $('#v2-content').show();
+    
+    // Apply collapsible functionality to V2
+    $("#chooser-v2 details>ul>li").click(function (event) {
+      $(this).children("span").toggleClass("condensed").toggleClass("expanded");
+      var $ul = $(this).children("ul");
+      $ul.toggle("slow");
+      event.stopPropagation();
+    });
   }
 });

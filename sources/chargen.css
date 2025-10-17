@@ -147,6 +147,87 @@ summary {
   display: none;
 }
 
+/* Version Selector Styles */
+#version-selector {
+  font-size: 14px;
+}
+
+.version-btn {
+  transition: all 0.2s ease;
+}
+
+.version-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.version-btn.active {
+  background: #007cba !important;
+  color: white !important;
+  border-color: #007cba !important;
+}
+
+.version-btn:not(.active) {
+  background: white !important;
+  color: #666 !important;
+  border-color: #ccc !important;
+}
+
+.version-btn:not(.active):hover {
+  background: #f8f9fa !important;
+  border-color: #007cba !important;
+  color: #007cba !important;
+}
+
+/* V2 Collapsible Main Headings */
+#chooser-v2 details {
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background: #f9f9f9;
+}
+
+#chooser-v2 details summary {
+  padding: 10px 15px;
+  cursor: pointer;
+  font-weight: bold;
+  background: #e9ecef;
+  border-radius: 5px 5px 0 0;
+  user-select: none;
+}
+
+#chooser-v2 details summary:hover {
+  background: #dee2e6;
+}
+
+#chooser-v2 details[open] summary {
+  border-radius: 5px 5px 0 0;
+  border-bottom: 1px solid #ddd;
+}
+
+#chooser-v2 details ul {
+  padding: 10px 15px;
+  margin: 0;
+  background: white;
+  border-radius: 0 0 5px 5px;
+}
+
+#chooser-v2 details summary h3 {
+  margin: 0;
+  display: inline;
+  font-size: 16px;
+}
+
+#chooser-v2 details summary::marker {
+  content: "▶ ";
+  font-size: 12px;
+  color: #666;
+}
+
+#chooser-v2 details[open] summary::marker {
+  content: "▼ ";
+}
+
 .ZPOS {
   white-space: nowrap;
 }
