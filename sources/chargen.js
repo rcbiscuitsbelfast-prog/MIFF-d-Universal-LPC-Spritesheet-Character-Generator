@@ -1,12 +1,20 @@
-// Mobile-First Character Builder JavaScript
+// Mobile-First Character Builder with Original LPC Integration
 
-$(document).ready(function () {
-	// Initialize mobile-first interface
-	initializeMobileInterface();
-	
-	// Initialize character generation (existing functionality)
-	initializeCharacterGeneration();
-});
+// Load the original character generation system
+const originalChargenScript = document.createElement('script');
+originalChargenScript.src = 'sources/original_chargen.js';
+document.head.appendChild(originalChargenScript);
+
+// Wait for original script to load, then initialize mobile interface
+originalChargenScript.onload = function() {
+	$(document).ready(function () {
+		// Initialize mobile-first interface
+		initializeMobileInterface();
+		
+		// Initialize character generation (existing functionality)
+		initializeCharacterGeneration();
+	});
+};
 
 function initializeMobileInterface() {
 	// Mobile menu toggle
@@ -35,7 +43,7 @@ function initializeMobileInterface() {
 		}
 	});
 	
-	// Export menu actions
+	// Export menu actions - connect to original functions
 	$('#export-png').click(() => $('#saveAsPNG').click());
 	$('#export-zip-anims').click(() => $('.exportSplitAnimations').click());
 	$('#export-zip-items').click(() => $('.exportSplitItemSheets').click());
@@ -100,27 +108,25 @@ function closeExportMenu() {
 }
 
 function initializeAnimationStrip() {
-	// This will be populated with actual animations from the character generator
-	const animations = [
-		{ id: 'idle', name: 'Idle', active: true },
-		{ id: 'walk', name: 'Walk', active: false },
-		{ id: 'jump', name: 'Jump', active: false },
-		{ id: 'attack', name: 'Attack', active: false },
-		{ id: 'cast', name: 'Cast', active: false },
-		{ id: 'hurt', name: 'Hurt', active: false },
-		{ id: 'die', name: 'Die', active: false }
-	];
-	
-	const container = $('.animation-buttons');
-	container.empty();
-	
-	animations.forEach(anim => {
-		const button = $(`<button class="animation-btn ${anim.active ? 'active' : ''}" data-animation="${anim.id}">${anim.name}</button>`);
-		button.click(function() {
-			selectAnimation(anim.id);
+	// Get animations from the original whichAnim select
+	const whichAnim = $('#whichAnim');
+	if (whichAnim.length) {
+		const container = $('.animation-buttons');
+		container.empty();
+		
+		whichAnim.find('option').each(function() {
+			const option = $(this);
+			const value = option.val();
+			const text = option.text();
+			const isSelected = option.prop('selected');
+			
+			const button = $(`<button class="animation-btn ${isSelected ? 'active' : ''}" data-animation="${value}">${text}</button>`);
+			button.click(function() {
+				selectAnimation(value);
+			});
+			container.append(button);
 		});
-		container.append(button);
-	});
+	}
 }
 
 function selectAnimation(animationId) {
@@ -128,106 +134,47 @@ function selectAnimation(animationId) {
 	$('.animation-btn').removeClass('active');
 	$(`.animation-btn[data-animation="${animationId}"]`).addClass('active');
 	
-	// Update character preview
-	updateCharacterPreview(animationId);
-}
-
-function updateCharacterPreview(animationId) {
-	// This will integrate with the existing character generation system
-	console.log('Switching to animation:', animationId);
-	// The actual implementation will depend on the existing character generation code
+	// Update the original whichAnim select
+	$('#whichAnim').val(animationId).trigger('change');
 }
 
 function initializeCharacterForm() {
-	// Create mobile-friendly character customization form
-	const form = $('#customizeChar');
-	
-	// Character customization groups
-	const groups = [
-		{
-			title: 'Body',
-			options: [
-				{ type: 'radio', name: 'sex', value: 'male', label: 'Male' },
-				{ type: 'radio', name: 'sex', value: 'female', label: 'Female' }
-			]
-		},
-		{
-			title: 'Head',
-			options: [
-				{ type: 'radio', name: 'head', value: 'none', label: 'No Head' },
-				{ type: 'radio', name: 'head', value: 'human', label: 'Human' },
-				{ type: 'radio', name: 'head', value: 'elf', label: 'Elf' }
-			]
-		},
-		{
-			title: 'Clothing',
-			options: [
-				{ type: 'radio', name: 'shirt', value: 'none', label: 'No Shirt' },
-				{ type: 'radio', name: 'shirt', value: 'basic', label: 'Basic Shirt' },
-				{ type: 'radio', name: 'shirt', value: 'fancy', label: 'Fancy Shirt' }
-			]
-		},
-		{
-			title: 'Weapons',
-			options: [
-				{ type: 'radio', name: 'weapon', value: 'none', label: 'No Weapon' },
-				{ type: 'radio', name: 'weapon', value: 'sword', label: 'Sword' },
-				{ type: 'radio', name: 'weapon', value: 'bow', label: 'Bow' }
-			]
-		}
-	];
-	
-	groups.forEach(group => {
-		const groupElement = $(`
-			<details class="customization-group" open>
-				<summary>${group.title}</summary>
-				<div class="group-content">
-					<div class="option-list">
-						${group.options.map(option => `
-							<div class="option-item">
-								<input type="${option.type}" name="${option.name}" value="${option.value}" id="${option.name}-${option.value}" ${option.value === 'none' ? 'checked' : ''}>
-								<label for="${option.name}-${option.value}">${option.label}</label>
-								<div class="option-preview"></div>
-							</div>
-						`).join('')}
-					</div>
-				</div>
-			</details>
-		`);
+	// Move the original form content to our mobile form
+	const originalForm = $('#customizeChar').first();
+	if (originalForm.length) {
+		// Move all the original form content to our side menu
+		$('#customizeChar').html(originalForm.html());
 		
-		form.append(groupElement);
-	});
-	
-	// Add event listeners for form changes
-	form.on('change', 'input[type="radio"], input[type="checkbox"]', function() {
-		updateCharacterPreview();
-	});
+		// Hide the original form
+		originalForm.hide();
+	}
 }
 
 function initializeCharacterGeneration() {
-	// This is where the existing character generation logic will be integrated
-	// For now, we'll set up the basic structure
+	// The original character generation system will handle the rest
+	// We just need to ensure our mobile interface works with it
 	
-	// Move existing form elements to hidden form for compatibility
-	const existingForm = $('form').first();
-	if (existingForm.length && existingForm.attr('id') !== 'customizeChar') {
-		existingForm.attr('id', 'hidden-form').hide();
-	}
+	// Update preview when form changes
+	$('#customizeChar').on('change', 'input, select', function() {
+		// Trigger the original character update
+		$(this).trigger('change');
+	});
 	
-	// Initialize the character preview canvas
-	const canvas = document.getElementById('previewAnimations');
-	if (canvas) {
-		const ctx = canvas.getContext('2d');
-		// Set up canvas for character rendering
-		ctx.fillStyle = '#f8f9fa';
-		ctx.fillRect(0, 0, canvas.width, canvas.height);
-		
-		// Draw placeholder character
-		ctx.fillStyle = '#6c757d';
-		ctx.font = '12px Arial';
-		ctx.textAlign = 'center';
-		ctx.fillText('Character', canvas.width/2, canvas.height/2 - 6);
-		ctx.fillText('Preview', canvas.width/2, canvas.height/2 + 6);
+	// Handle window resize for responsive behavior
+	$(window).resize(function() {
+		if (window.innerWidth >= 1024) {
+			// Desktop view - show side menu by default
+			$('#side-menu').addClass('open');
+			$('#menu-overlay').removeClass('show');
+		} else {
+			// Mobile view - hide side menu by default
+			$('#side-menu').removeClass('open');
+		}
+	});
+	
+	// Set initial state based on screen size
+	if (window.innerWidth >= 1024) {
+		$('#side-menu').addClass('open');
 	}
 }
 
@@ -239,23 +186,3 @@ function isMobile() {
 function isTouchDevice() {
 	return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 }
-
-// Handle window resize
-$(window).resize(function() {
-	if (window.innerWidth >= 1024) {
-		// Desktop view - show side menu by default
-		$('#side-menu').addClass('open');
-		$('#menu-overlay').removeClass('show');
-	} else {
-		// Mobile view - hide side menu by default
-		$('#side-menu').removeClass('open');
-	}
-});
-
-// Initialize on page load
-$(document).ready(function() {
-	// Set initial state based on screen size
-	if (window.innerWidth >= 1024) {
-		$('#side-menu').addClass('open');
-	}
-});

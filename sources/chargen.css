@@ -303,13 +303,15 @@ body {
 	gap: 20px;
 }
 
-.customization-group {
+/* Original form elements styling for mobile */
+#customizeChar details {
 	border: 1px solid #e1e5e9;
 	border-radius: 8px;
 	overflow: hidden;
+	margin-bottom: 16px;
 }
 
-.customization-group summary {
+#customizeChar details summary {
 	padding: 16px;
 	background: #f8f9fa;
 	border-bottom: 1px solid #e1e5e9;
@@ -320,61 +322,104 @@ body {
 	user-select: none;
 }
 
-.customization-group summary:hover {
+#customizeChar details summary:hover {
 	background: #e9ecef;
 }
 
-.customization-group[open] summary {
+#customizeChar details[open] summary {
 	border-bottom: 1px solid #e1e5e9;
 }
 
-.customization-group .group-content {
+#customizeChar details > div {
 	padding: 16px;
 	background: #fff;
 }
 
-.option-list {
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
+#customizeChar ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
 }
 
-.option-item {
+#customizeChar li {
 	display: flex;
 	align-items: center;
 	gap: 12px;
 	padding: 8px;
 	border-radius: 6px;
 	transition: background 0.2s ease;
+	margin-bottom: 8px;
 }
 
-.option-item:hover {
+#customizeChar li:hover {
 	background: #f8f9fa;
 }
 
-.option-item input[type="radio"],
-.option-item input[type="checkbox"] {
+#customizeChar input[type="radio"],
+#customizeChar input[type="checkbox"] {
 	margin: 0;
 }
 
-.option-item label {
+#customizeChar label {
 	flex: 1;
 	cursor: pointer;
 	font-size: 14px;
 	color: #495057;
 }
 
-.option-preview {
-	width: 32px;
-	height: 32px;
+#customizeChar .condensed {
+	font-weight: 600;
+	color: #2c3e50;
+}
+
+#customizeChar .expanded {
+	font-weight: 600;
+	color: #007bff;
+}
+
+/* Mobile-friendly form controls */
+#customizeChar .control-label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 8px;
+	color: #2c3e50;
+}
+
+#customizeChar input[type="search"] {
+	width: 100%;
+	padding: 8px 12px;
 	border: 1px solid #e1e5e9;
-	border-radius: 4px;
+	border-radius: 6px;
+	font-size: 14px;
+}
+
+#customizeChar button {
+	padding: 8px 12px;
+	border: 1px solid #e1e5e9;
+	border-radius: 6px;
 	background: #f8f9fa;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 12px;
-	color: #6c757d;
+	color: #495057;
+	font-size: 14px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	margin: 4px;
+}
+
+#customizeChar button:hover {
+	background: #e9ecef;
+	border-color: #adb5bd;
+}
+
+/* Hide original preview section in mobile */
+#preview-animations {
+	display: none;
+}
+
+/* Show original preview section on desktop */
+@media (min-width: 1024px) {
+	#preview-animations {
+		display: block;
+	}
 }
 
 /* Responsive Design */
