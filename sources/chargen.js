@@ -2321,16 +2321,9 @@ function initializeCharacterDresser() {
       title: 'Body',
       subcategories: [
         { 
-          id: 'body_type', 
+          id: 'sex', 
           title: 'Body Type', 
-          selector: 'input[name="body"]',
-          subsubcategories: [
-            { id: 'body_color', title: 'Body Color', selector: 'input[name="bodycolor"]' },
-            { id: 'special', title: 'Special', selector: 'input[name="special"]' },
-            { id: 'zombie', title: 'Zombie', selector: 'input[name="zombie"]' },
-            { id: 'skeleton', title: 'Skeleton', selector: 'input[name="skeleton"]' },
-            { id: 'wounds', title: 'Wounds', selector: 'input[name="wounds"]' }
-          ]
+          selector: 'input[name="sex"]'
         },
         { 
           id: 'shadow', 
@@ -2338,39 +2331,24 @@ function initializeCharacterDresser() {
           selector: 'input[name="shadow"]' 
         },
         { 
+          id: 'body', 
+          title: 'Body Color', 
+          selector: 'input[name="body"]' 
+        },
+        { 
           id: 'prostheses', 
           title: 'Prostheses', 
-          selector: 'input[name="prostheses"]',
-          subsubcategories: [
-            { id: 'hook_hand', title: 'Hook Hand', selector: 'input[name="hookhand"]' },
-            { id: 'peg_leg', title: 'Peg Leg', selector: 'input[name="pegleg"]' },
-            { id: 'wheelchair', title: 'Wheelchair', selector: 'input[name="wheelchair"]' }
-          ]
+          selector: 'input[name="prostheses"]'
         },
         { 
           id: 'tails', 
           title: 'Tails', 
-          selector: 'input[name="tails"]',
-          subsubcategories: [
-            { id: 'wolf_tail', title: 'Wolf Tail', selector: 'input[name="wolftail"]' },
-            { id: 'fluffy_wolf_tail', title: 'Fluffy Wolf Tail', selector: 'input[name="fluffywolftail"]' },
-            { id: 'cat_tail', title: 'Cat Tail', selector: 'input[name="cattail"]' },
-            { id: 'lizard_tail', title: 'Lizard Tail', selector: 'input[name="lizardtail"]' }
-          ]
+          selector: 'input[name="tails"]'
         },
         { 
           id: 'wings', 
           title: 'Wings', 
-          selector: 'input[name="wings"]',
-          subsubcategories: [
-            { id: 'feathered_wings', title: 'Feathered Wings', selector: 'input[name="featheredwings"]' },
-            { id: 'bat_wings', title: 'Bat Wings', selector: 'input[name="batwings"]' },
-            { id: 'lizard_wings', title: 'Lizard Wings', selector: 'input[name="lizardwings"]' },
-            { id: 'monarch_wings', title: 'Monarch Wings', selector: 'input[name="monarchwings"]' },
-            { id: 'pixie_wings', title: 'Pixie Wings', selector: 'input[name="pixiewings"]' },
-            { id: 'lunar_wings', title: 'Lunar Wings', selector: 'input[name="lunarwings"]' },
-            { id: 'dragonfly_wings', title: 'Dragonfly Wings', selector: 'input[name="dragonflywings"]' }
-          ]
+          selector: 'input[name="wings"]'
         }
       ]
     },
@@ -2379,63 +2357,24 @@ function initializeCharacterDresser() {
       title: 'Head',
       subcategories: [
         { 
-          id: 'heads', 
+          id: 'head', 
           title: 'Heads', 
-          selector: 'input[name="head"]',
-          subsubcategories: [
-            { id: 'human_female', title: 'Human Female', selector: 'input[name="humanfemale"]' },
-            { id: 'human_male', title: 'Human Male', selector: 'input[name="humanmale"]' },
-            { id: 'human_female_elderly', title: 'Human Female Elderly', selector: 'input[name="humanfemaleelderly"]' },
-            { id: 'human_male_elderly', title: 'Human Male Elderly', selector: 'input[name="humanmaleelderly"]' },
-            { id: 'boarman', title: 'Boarman', selector: 'input[name="boarman"]' },
-            { id: 'pig', title: 'Pig', selector: 'input[name="pig"]' },
-            { id: 'sheep', title: 'Sheep', selector: 'input[name="sheep"]' },
-            { id: 'minotaur', title: 'Minotaur', selector: 'input[name="minotaur"]' },
-            { id: 'wolf', title: 'Wolf', selector: 'input[name="wolf"]' },
-            { id: 'rabbit', title: 'Rabbit', selector: 'input[name="rabbit"]' },
-            { id: 'rat', title: 'Rat', selector: 'input[name="rat"]' },
-            { id: 'mouse', title: 'Mouse', selector: 'input[name="mouse"]' },
-            { id: 'lizard', title: 'Lizard', selector: 'input[name="lizard"]' },
-            { id: 'orc', title: 'Orc', selector: 'input[name="orc"]' },
-            { id: 'goblin', title: 'Goblin', selector: 'input[name="goblin"]' },
-            { id: 'alien', title: 'Alien', selector: 'input[name="alien"]' },
-            { id: 'troll', title: 'Troll', selector: 'input[name="troll"]' },
-            { id: 'skeleton', title: 'Skeleton', selector: 'input[name="skeleton"]' },
-            { id: 'zombie', title: 'Zombie', selector: 'input[name="zombie"]' },
-            { id: 'jack_o_lantern', title: 'Jack O Lantern', selector: 'input[name="jackolantern"]' },
-            { id: 'vampire', title: 'Vampire', selector: 'input[name="vampire"]' },
-            { id: 'frankenstein', title: 'Frankenstein', selector: 'input[name="frankenstein"]' }
-          ]
+          selector: 'input[name="head"]'
         },
         { 
           id: 'face', 
           title: 'Face', 
-          selector: 'input[name="face"]',
-          subsubcategories: [
-            { id: 'neutral', title: 'Neutral', selector: 'input[name="neutral"]' },
-            { id: 'closing_eyes', title: 'Closing Eyes', selector: 'input[name="closingeyes"]' },
-            { id: 'closed_eyes', title: 'Closed Eyes', selector: 'input[name="closedeyes"]' },
-            { id: 'looking_right', title: 'Looking Right', selector: 'input[name="lookingright"]' },
-            { id: 'looking_left', title: 'Looking Left', selector: 'input[name="lookingleft"]' },
-            { id: 'rolling_eyes', title: 'Rolling Eyes', selector: 'input[name="rollingeyes"]' },
-            { id: 'shock', title: 'Shock', selector: 'input[name="shock"]' },
-            { id: 'angry', title: 'Angry', selector: 'input[name="angry"]' },
-            { id: 'sad', title: 'Sad', selector: 'input[name="sad"]' },
-            { id: 'happy', title: 'Happy', selector: 'input[name="happy"]' },
-            { id: 'blush', title: 'Blush', selector: 'input[name="blush"]' },
-            { id: 'shame', title: 'Shame', selector: 'input[name="shame"]' },
-            { id: 'tears', title: 'Tears', selector: 'input[name="tears"]' }
-          ]
+          selector: 'input[name="face"]'
         },
         { 
           id: 'eye_color', 
           title: 'Eye Color', 
-          selector: 'input[name="eyecolor"]' 
+          selector: 'input[name="eye_color"]' 
         },
         { 
           id: 'other_eyes', 
           title: 'Other Eyes', 
-          selector: 'input[name="othereyes"]' 
+          selector: 'input[name="other_eyes"]' 
         },
         { 
           id: 'ears', 
@@ -2445,97 +2384,47 @@ function initializeCharacterDresser() {
         { 
           id: 'nose', 
           title: 'Nose', 
-          selector: 'input[name="nose"]',
-          subsubcategories: [
-            { id: 'big_nose', title: 'Big Nose', selector: 'input[name="bignose"]' },
-            { id: 'button_nose', title: 'Button Nose', selector: 'input[name="buttonnose"]' },
-            { id: 'straight_nose', title: 'Straight Nose', selector: 'input[name="straightnose"]' },
-            { id: 'elderly_nose', title: 'Elderly Nose', selector: 'input[name="elderlynose"]' },
-            { id: 'large_nose', title: 'Large Nose', selector: 'input[name="largenose"]' }
-          ]
+          selector: 'input[name="nose"]'
         },
         { 
           id: 'eyebrows', 
           title: 'Eyebrows', 
-          selector: 'input[name="eyebrows"]',
-          subsubcategories: [
-            { id: 'thick_eyebrows', title: 'Thick Eyebrows', selector: 'input[name="thickeyebrows"]' },
-            { id: 'thin_eyebrows', title: 'Thin Eyebrows', selector: 'input[name="thineyebrows"]' },
-            { id: 'wrinkles', title: 'Wrinkles', selector: 'input[name="wrinkles"]' }
-          ]
+          selector: 'input[name="eyebrows"]'
         },
         { 
           id: 'beards', 
           title: 'Beards', 
-          selector: 'input[name="beard"]' 
+          selector: 'input[name="beards"]' 
         },
         { 
           id: 'mustaches', 
           title: 'Mustaches', 
-          selector: 'input[name="mustache"]' 
+          selector: 'input[name="mustaches"]' 
         },
         { 
           id: 'hair', 
           title: 'Hair', 
-          selector: 'input[name="hair"]',
-          subsubcategories: [
-            { id: 'afro', title: 'Afro', selector: 'input[name="afro"]' },
-            { id: 'curly', title: 'Curly', selector: 'input[name="curly"]' },
-            { id: 'bald', title: 'Bald/Shaved', selector: 'input[name="bald"]' },
-            { id: 'short', title: 'Short', selector: 'input[name="shorthair"]' },
-            { id: 'plain', title: 'Plain', selector: 'input[name="plain"]' },
-            { id: 'pixie', title: 'Pixie', selector: 'input[name="pixie"]' },
-            { id: 'page', title: 'Page', selector: 'input[name="page"]' },
-            { id: 'mop', title: 'Mop', selector: 'input[name="mop"]' },
-            { id: 'parted', title: 'Parted', selector: 'input[name="parted"]' },
-            { id: 'messy', title: 'Messy', selector: 'input[name="messy"]' },
-            { id: 'bedhead', title: 'Bedhead', selector: 'input[name="bedhead"]' },
-            { id: 'bangs', title: 'Bangs', selector: 'input[name="bangs"]' },
-            { id: 'swoop', title: 'Swoop', selector: 'input[name="swoop"]' },
-            { id: 'spiky', title: 'Spiky', selector: 'input[name="spiky"]' },
-            { id: 'pigtails', title: 'Pigtails', selector: 'input[name="pigtails"]' },
-            { id: 'bob', title: 'Bob', selector: 'input[name="bob"]' },
-            { id: 'braids', title: 'Braids', selector: 'input[name="braids"]' },
-            { id: 'long', title: 'Long', selector: 'input[name="longhair"]' },
-            { id: 'very_long', title: 'Very Long', selector: 'input[name="verylong"]' }
-          ]
+          selector: 'input[name="hair"]'
         },
         { 
           id: 'hair_extensions', 
           title: 'Hair Extensions', 
-          selector: 'input[name="hairextensions"]' 
+          selector: 'input[name="hair_extensions"]' 
         },
         { 
           id: 'appendages', 
           title: 'Appendages', 
-          selector: 'input[name="appendages"]',
-          subsubcategories: [
-            { id: 'backwards_horns', title: 'Backwards Horns', selector: 'input[name="backwardshorns"]' },
-            { id: 'curled_horns', title: 'Curled Horns', selector: 'input[name="curledhorns"]' },
-            { id: 'fin', title: 'Fin', selector: 'input[name="fin"]' },
-            { id: 'short_fin', title: 'Short Fin', selector: 'input[name="shortfin"]' }
-          ]
+          selector: 'input[name="appendages"]'
         },
         { 
           id: 'head_coverings', 
           title: 'Head Coverings', 
-          selector: 'input[name="headcoverings"]',
-          subsubcategories: [
-            { id: 'hats', title: 'Hats', selector: 'input[name="hats"]' },
-            { id: 'helmets', title: 'Helmets', selector: 'input[name="helmets"]' }
-          ]
+          selector: 'input[name="head_coverings"]'
         },
         { 
           id: 'accessories', 
           title: 'Accessories', 
-          selector: 'input[name="accessories"]',
-          subsubcategories: [
-            { id: 'glasses', title: 'Glasses', selector: 'input[name="glasses"]' },
-            { id: 'monocle', title: 'Monocle', selector: 'input[name="monocle"]' },
-            { id: 'eyepatches', title: 'Eyepatches', selector: 'input[name="eyepatches"]' },
-            { id: 'plain_mask', title: 'Plain Mask', selector: 'input[name="plainmask"]' },
-            { id: 'earrings', title: 'Earrings', selector: 'input[name="earrings"]' }
-          ]
+          selector: 'input[name="accessories"]'
         }
       ]
     },
@@ -2561,12 +2450,7 @@ function initializeCharacterDresser() {
         { 
           id: 'sleeves', 
           title: 'Sleeves', 
-          selector: 'input[name="sleeves"]',
-          subsubcategories: [
-            { id: 'longsleeve', title: 'Long Sleeve', selector: 'input[name="longsleeve"]' },
-            { id: 'shortsleeve', title: 'Short Sleeve', selector: 'input[name="shortsleeve"]' },
-            { id: 'sleeveless', title: 'Sleeveless', selector: 'input[name="sleeveless"]' }
-          ]
+          selector: 'input[name="sleeves"]'
         },
         { 
           id: 'aprons', 
@@ -2627,20 +2511,12 @@ function initializeCharacterDresser() {
         { 
           id: 'armour', 
           title: 'Armour', 
-          selector: 'input[name="legarmour"]' 
+          selector: 'input[name="leg_armour"]' 
         },
         { 
           id: 'pants', 
           title: 'Pants', 
-          selector: 'input[name="pants"]',
-          subsubcategories: [
-            { id: 'long_pants', title: 'Long Pants', selector: 'input[name="longpants"]' },
-            { id: 'cuffed_pants', title: 'Cuffed Pants', selector: 'input[name="cuffedpants"]' },
-            { id: 'pantaloons', title: 'Pantaloons', selector: 'input[name="pantaloons"]' },
-            { id: 'formal_pants', title: 'Formal Pants', selector: 'input[name="formalpants"]' },
-            { id: 'striped_formal_pants', title: 'Striped Formal Pants', selector: 'input[name="stripedformalpants"]' },
-            { id: 'fur_pants', title: 'Fur Pants', selector: 'input[name="furpants"]' }
-          ]
+          selector: 'input[name="pants"]'
         },
         { 
           id: 'leggings', 
@@ -2671,18 +2547,12 @@ function initializeCharacterDresser() {
         { 
           id: 'armour', 
           title: 'Armour', 
-          selector: 'input[name="footarmour"]' 
+          selector: 'input[name="foot_armour"]' 
         },
         { 
           id: 'shoes', 
           title: 'Shoes', 
-          selector: 'input[name="shoes"]',
-          subsubcategories: [
-            { id: 'basic_shoes', title: 'Basic Shoes', selector: 'input[name="basicshoes"]' },
-            { id: 'revised_shoes', title: 'Revised Shoes', selector: 'input[name="revisedshoes"]' },
-            { id: 'sara_shoes', title: 'Sara Shoes', selector: 'input[name="sarashoes"]' },
-            { id: 'ghillies', title: 'Ghillies', selector: 'input[name="ghillies"]' }
-          ]
+          selector: 'input[name="shoes"]'
         },
         { 
           id: 'boots', 
@@ -2692,7 +2562,7 @@ function initializeCharacterDresser() {
         { 
           id: 'shoe_accessory', 
           title: 'Shoe Accessory', 
-          selector: 'input[name="shoeaccessory"]' 
+          selector: 'input[name="shoe_accessory"]' 
         },
         { 
           id: 'socks', 
@@ -2749,79 +2619,32 @@ function initializeCharacterDresser() {
         { 
           id: 'shield', 
           title: 'Shield', 
-          selector: 'input[name="shield"]',
-          subsubcategories: [
-            { id: 'kite', title: 'Kite', selector: 'input[name="kiteshield"]' },
-            { id: 'spartan_shield', title: 'Spartan Shield', selector: 'input[name="spartanshield"]' },
-            { id: 'two_engrailed_shield', title: 'Two-engrailed Shield', selector: 'input[name="twoengrailedshield"]' },
-            { id: 'scutum_shield', title: 'Scutum Shield', selector: 'input[name="scutumshield"]' },
-            { id: 'heater_shield', title: 'Heater Shield', selector: 'input[name="heatershield"]' }
-          ]
+          selector: 'input[name="shield"]'
         },
         { 
           id: 'ranged', 
           title: 'Ranged', 
-          selector: 'input[name="ranged"]',
-          subsubcategories: [
-            { id: 'crossbow', title: 'Crossbow', selector: 'input[name="crossbow"]' },
-            { id: 'slingshot', title: 'Slingshot', selector: 'input[name="slingshot"]' },
-            { id: 'boomerang', title: 'Boomerang', selector: 'input[name="boomerang"]' },
-            { id: 'bow', title: 'Bow', selector: 'input[name="bow"]' }
-          ]
+          selector: 'input[name="ranged"]'
         },
         { 
           id: 'sword', 
           title: 'Sword', 
-          selector: 'input[name="sword"]',
-          subsubcategories: [
-            { id: 'dagger', title: 'Dagger', selector: 'input[name="dagger"]' },
-            { id: 'glowsword', title: 'Glowsword', selector: 'input[name="glowsword"]' },
-            { id: 'longsword', title: 'Longsword', selector: 'input[name="longsword"]' },
-            { id: 'rapier', title: 'Rapier', selector: 'input[name="rapier"]' },
-            { id: 'saber', title: 'Saber', selector: 'input[name="saber"]' },
-            { id: 'katana', title: 'Katana', selector: 'input[name="katana"]' },
-            { id: 'scimitar', title: 'Scimitar', selector: 'input[name="scimitar"]' },
-            { id: 'arming_sword', title: 'Arming Sword', selector: 'input[name="armingsword"]' }
-          ]
+          selector: 'input[name="sword"]'
         },
         { 
           id: 'blunt', 
           title: 'Blunt', 
-          selector: 'input[name="blunt"]',
-          subsubcategories: [
-            { id: 'flail', title: 'Flail', selector: 'input[name="flail"]' },
-            { id: 'mace', title: 'Mace', selector: 'input[name="mace"]' },
-            { id: 'waraxe', title: 'Waraxe', selector: 'input[name="waraxe"]' },
-            { id: 'club', title: 'Club', selector: 'input[name="club"]' }
-          ]
+          selector: 'input[name="blunt"]'
         },
         { 
           id: 'polearm', 
           title: 'Polearm', 
-          selector: 'input[name="polearm"]',
-          subsubcategories: [
-            { id: 'cane', title: 'Cane', selector: 'input[name="cane"]' },
-            { id: 'spear', title: 'Spear', selector: 'input[name="spear"]' },
-            { id: 'scythe', title: 'Scythe', selector: 'input[name="scythe"]' },
-            { id: 'halberd', title: 'Halberd', selector: 'input[name="halberd"]' },
-            { id: 'long_spear', title: 'Long Spear', selector: 'input[name="longspear"]' },
-            { id: 'dragon_spear', title: 'Dragon Spear', selector: 'input[name="dragonspear"]' },
-            { id: 'trident', title: 'Trident', selector: 'input[name="trident"]' }
-          ]
+          selector: 'input[name="polearm"]'
         },
         { 
           id: 'magic', 
           title: 'Magic', 
-          selector: 'input[name="magic"]',
-          subsubcategories: [
-            { id: 'simple_staff', title: 'Simple Staff', selector: 'input[name="simplestaff"]' },
-            { id: 'loop_staff', title: 'Loop Staff', selector: 'input[name="loopstaff"]' },
-            { id: 'diamond_staff', title: 'Diamond Staff', selector: 'input[name="diamondstaff"]' },
-            { id: 'gnarled_staff', title: 'Gnarled Staff', selector: 'input[name="gnarledstaff"]' },
-            { id: 's_staff', title: 'S Staff', selector: 'input[name="sstaff"]' },
-            { id: 'crystal', title: 'Crystal', selector: 'input[name="crystal"]' },
-            { id: 'wand', title: 'Wand', selector: 'input[name="wand"]' }
-          ]
+          selector: 'input[name="magic"]'
         }
       ]
     }

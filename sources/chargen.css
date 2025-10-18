@@ -718,11 +718,11 @@ a {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 8px 16px;
+    padding: 12px 16px;
     background: #f8f9fa;
     flex: 1;
-    min-height: 0;
-    overflow: hidden;
+    min-height: 80px;
+    overflow: visible;
   }
 
   #previewAnimationsBox {
@@ -732,11 +732,11 @@ a {
     justify-content: center;
     height: 100%;
     width: 100%;
-    max-width: 200px;
+    max-width: 250px;
   }
 
   #previewAnimations {
-    display: block;
+    display: block !important;
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
@@ -745,7 +745,7 @@ a {
     background: #fff;
     width: 100%;
     height: auto;
-    max-height: 120px;
+    max-height: 150px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
 
@@ -754,6 +754,54 @@ a {
     background: #fff;
     flex-shrink: 0;
     border-top: 1px solid #e9ecef;
+    min-height: 50px;
+  }
+
+  .animation-buttons {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+
+  .animation-buttons::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .animation-buttons::-webkit-scrollbar-track {
+    background: #f1f3f4;
+    border-radius: 2px;
+  }
+
+  .animation-buttons::-webkit-scrollbar-thumb {
+    background: #c1c8cd;
+    border-radius: 2px;
+  }
+
+  .animation-buttons button {
+    flex: 0 0 auto;
+    padding: 8px 16px;
+    border: 1px solid #e1e5e9;
+    border-radius: 20px;
+    background: #f8f9fa;
+    color: #495057;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .animation-buttons button:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+  }
+
+  .animation-buttons button.active {
+    background: #007bff;
+    border-color: #007bff;
+    color: #fff;
   }
 
   /* Desktop view adjustments */
