@@ -2458,6 +2458,15 @@ function initializeCharacterDresser() {
     const categoryId = parts[0];
     const subcategoryId = parts.slice(1).join('-');
     
+    // Skip certain categories that should be subcategories
+    if (title.includes('Human') || title.includes('Elf') || title.includes('Dwarf') || 
+        title.includes('Orc') || title.includes('Goblin') || title.includes('Troll') ||
+        title.includes('Arm') || title.includes('Leg') || title.includes('Head') ||
+        title.includes('Body') || title.includes('Wound') || title.includes('Ear') ||
+        title.includes('Eye') || title.includes('Nose') || title.includes('Mouth')) {
+      return; // Skip these as they should be subcategories
+    }
+    
     // Find or create category
     let category = categories.find(c => c.id === categoryId);
     if (!category) {
@@ -2640,10 +2649,11 @@ function initializeItemsGrid(category, chooser) {
     // Clean up the label - remove "on" and get the actual item name
     const cleanLabel = cleanItemLabel(label, value);
     
+    const imagePath = getImagePathFromInput(input);
     const itemElement = $(`
       <div class="item-thumbnail ${isChecked ? 'selected' : ''}" data-category="${subcategory.id}" data-value="${value}">
         <div class="item-image">
-          ${getItemThumbnail(subcategory.id, value)}
+          ${getItemThumbnail(subcategory.id, value, imagePath)}
         </div>
         <div class="item-name">${cleanLabel}</div>
       </div>
@@ -2654,8 +2664,8 @@ function initializeItemsGrid(category, chooser) {
       $(`.item-thumbnail[data-category="${subcategory.id}"]`).removeClass('selected');
       $(this).addClass('selected');
       
-      // Update the original form input
-      input.prop('checked', true).trigger('change');
+      // Update the original form input and trigger click event
+      input.prop('checked', true).click();
     });
     
     itemsGrid.append(itemElement);
@@ -2683,10 +2693,25 @@ function cleanItemLabel(label, value) {
   return cleanLabel;
 }
 
-function getItemThumbnail(category, value) {
-  // For now, use a simple emoji-based approach
-  const icon = getItemIcon(category, value);
-  return `<div class="placeholder" style="font-size: 20px; color: #6c757d;">${icon}</div>`;
+function getImagePathFromInput(input) {
+  const dataAttributes = input[0].attributes;
+  for (let i = 0; i < dataAttributes.length; i++) {
+    const attr = dataAttributes[i];
+    if (attr.name.startsWith('data-layer_1_') && attr.value && attr.value.endsWith('.png')) {
+      return attr.value;
+    }
+  }
+  return null;
+}
+
+function getItemThumbnail(category, value, imagePath) {
+  if (imagePath) {
+    return `<img src="${imagePath}" alt="${value}" style="width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+             <div class="placeholder" style="font-size: 20px; color: #6c757d; display: none; align-items: center; justify-content: center; width: 100%; height: 100%;">${getItemIcon(category, value)}</div>`;
+  } else {
+    const icon = getItemIcon(category, value);
+    return `<div class="placeholder" style="font-size: 20px; color: #6c757d; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">${icon}</div>`;
+  }
 }
 
 function getItemIcon(category, value) {
