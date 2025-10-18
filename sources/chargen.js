@@ -2120,73 +2120,109 @@ function selectMobileAnimation(animationId) {
 }
 
 function initializeCharacterDresser() {
-  // Create character dresser categories
+  // Get the original form content and organize it into categories
+  const chooser = $('#chooser');
+  if (!chooser.length) return;
+
+  const dresserGrid = $('.dresser-grid');
+  dresserGrid.empty();
+
+  // Create categories based on the original form structure
   const categories = [
     {
       id: 'body',
       title: 'Body',
       icon: '👤',
-      items: [
-        { value: 'male', label: 'Male', preview: '♂' },
-        { value: 'female', label: 'Female', preview: '♀' }
-      ]
+      selector: 'input[name="body"]'
     },
     {
       id: 'head',
       title: 'Head',
       icon: '🎭',
-      items: [
-        { value: 'none', label: 'No Head', preview: '🚫' },
-        { value: 'human', label: 'Human', preview: '👤' },
-        { value: 'elf', label: 'Elf', preview: '🧝' }
-      ]
+      selector: 'input[name="head"]'
     },
     {
-      id: 'clothing',
-      title: 'Clothing',
+      id: 'torso',
+      title: 'Torso',
       icon: '👕',
-      items: [
-        { value: 'none', label: 'No Shirt', preview: '🚫' },
-        { value: 'basic', label: 'Basic Shirt', preview: '👕' },
-        { value: 'fancy', label: 'Fancy Shirt', preview: '👔' }
-      ]
+      selector: 'input[name="torso"]'
     },
     {
-      id: 'weapons',
-      title: 'Weapons',
-      icon: '⚔️',
-      items: [
-        { value: 'none', label: 'No Weapon', preview: '🚫' },
-        { value: 'sword', label: 'Sword', preview: '⚔️' },
-        { value: 'bow', label: 'Bow', preview: '🏹' }
-      ]
+      id: 'legs',
+      title: 'Legs',
+      icon: '👖',
+      selector: 'input[name="legs"]'
     },
     {
-      id: 'accessories',
-      title: 'Accessories',
-      icon: '🎒',
-      items: [
-        { value: 'none', label: 'No Accessories', preview: '🚫' },
-        { value: 'hat', label: 'Hat', preview: '🎩' },
-        { value: 'glasses', label: 'Glasses', preview: '👓' }
-      ]
-    },
-    {
-      id: 'shoes',
-      title: 'Shoes',
+      id: 'feet',
+      title: 'Feet',
       icon: '👟',
-      items: [
-        { value: 'none', label: 'No Shoes', preview: '🚫' },
-        { value: 'boots', label: 'Boots', preview: '👢' },
-        { value: 'sneakers', label: 'Sneakers', preview: '👟' }
-      ]
+      selector: 'input[name="feet"]'
+    },
+    {
+      id: 'hair',
+      title: 'Hair',
+      icon: '💇',
+      selector: 'input[name="hair"]'
+    },
+    {
+      id: 'beard',
+      title: 'Beard',
+      icon: '🧔',
+      selector: 'input[name="beard"]'
+    },
+    {
+      id: 'weapon',
+      title: 'Weapon',
+      icon: '⚔️',
+      selector: 'input[name="weapon"]'
+    },
+    {
+      id: 'shield',
+      title: 'Shield',
+      icon: '🛡️',
+      selector: 'input[name="shield"]'
+    },
+    {
+      id: 'helmet',
+      title: 'Helmet',
+      icon: '⛑️',
+      selector: 'input[name="helmet"]'
+    },
+    {
+      id: 'gloves',
+      title: 'Gloves',
+      icon: '🧤',
+      selector: 'input[name="gloves"]'
+    },
+    {
+      id: 'cape',
+      title: 'Cape',
+      icon: '🦸',
+      selector: 'input[name="cape"]'
     }
   ];
 
-  const dresserGrid = $('.dresser-grid');
-  dresserGrid.empty();
-
   categories.forEach(category => {
+    const inputs = chooser.find(category.selector);
+    if (inputs.length === 0) return;
+
+    const items = [];
+    inputs.each(function() {
+      const input = $(this);
+      const value = input.val();
+      const label = input.next('label').text() || value;
+      const isChecked = input.is(':checked');
+      
+      items.push({
+        value: value,
+        label: label,
+        checked: isChecked
+      });
+    });
+
+    if (items.length === 0) return;
+
     const categoryElement = $(`
       <div class="dresser-category" data-category="${category.id}">
         <div class="category-header">
@@ -2194,9 +2230,9 @@ function initializeCharacterDresser() {
           <h3 class="category-title">${category.title}</h3>
         </div>
         <div class="items-grid">
-          ${category.items.map(item => `
-            <div class="item-option" data-category="${category.id}" data-value="${item.value}">
-              <div class="item-preview">${item.preview}</div>
+          ${items.map(item => `
+            <div class="item-option ${item.checked ? 'selected' : ''}" data-category="${category.id}" data-value="${item.value}">
+              <div class="item-preview">${getItemPreview(category.id, item.value)}</div>
               <div class="item-label">${item.label}</div>
             </div>
           `).join('')}
@@ -2216,22 +2252,48 @@ function initializeCharacterDresser() {
     $(`.item-option[data-category="${category}"]`).removeClass('selected');
     $(this).addClass('selected');
     
-    // Update character (this will connect to the original character generation system)
-    updateCharacterSelection(category, value);
+    // Update the original form input
+    const input = chooser.find(`input[name="${category}"][value="${value}"]`);
+    if (input.length) {
+      input.prop('checked', true).trigger('change');
+    }
   });
-
-  // Set default selections
-  $('.item-option[data-value="none"]').addClass('selected');
 }
 
-function updateCharacterSelection(category, value) {
-  // This function will connect to the original character generation system
-  // For now, we'll just log the selection
-  console.log(`Selected ${category}: ${value}`);
+function getItemPreview(category, value) {
+  // Return appropriate emoji or text based on category and value
+  const previews = {
+    'none': '🚫',
+    'male': '♂️',
+    'female': '♀️',
+    'human': '👤',
+    'elf': '🧝',
+    'dwarf': '🧙',
+    'orc': '👹',
+    'basic': '👕',
+    'fancy': '👔',
+    'armor': '🛡️',
+    'robe': '👘',
+    'pants': '👖',
+    'shorts': '🩳',
+    'boots': '👢',
+    'sneakers': '👟',
+    'sandals': '🩴',
+    'blonde': '👱',
+    'brown': '👨',
+    'black': '👤',
+    'red': '👨‍🦰',
+    'white': '👨‍🦳',
+    'sword': '⚔️',
+    'bow': '🏹',
+    'staff': '🪄',
+    'axe': '🪓',
+    'hat': '🎩',
+    'helmet': '⛑️',
+    'gloves': '🧤',
+    'cape': '🦸'
+  };
   
-  // Find the corresponding form element and update it
-  const formElement = $(`input[name="${category}"][value="${value}"]`);
-  if (formElement.length) {
-    formElement.prop('checked', true).trigger('change');
-  }
+  return previews[value] || '📦';
 }
+
