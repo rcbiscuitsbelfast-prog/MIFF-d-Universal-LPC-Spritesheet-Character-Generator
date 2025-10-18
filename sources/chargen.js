@@ -2481,13 +2481,33 @@ function initializeCharacterDresser() {
     });
   });
 
-  // Sort categories by a logical order
-  const categoryOrder = ['body', 'head', 'torso', 'legs', 'feet', 'tools', 'weapons'];
-  categories.sort((a, b) => {
-    const aIndex = categoryOrder.indexOf(a.id);
-    const bIndex = categoryOrder.indexOf(b.id);
-    return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
+  // Group similar categories and sort by logical order
+  const groupedCategories = [];
+  const categoryGroups = {
+    'body': { title: 'Body & Head', categories: ['body', 'head'] },
+    'clothing': { title: 'Clothing', categories: ['torso', 'legs', 'feet'] },
+    'equipment': { title: 'Equipment', categories: ['tools', 'weapons'] }
+  };
+  
+  // Group categories
+  Object.keys(categoryGroups).forEach(groupKey => {
+    const group = categoryGroups[groupKey];
+    const groupCategories = categories.filter(cat => group.categories.includes(cat.id));
+    if (groupCategories.length > 0) {
+      groupedCategories.push({
+        id: groupKey,
+        title: group.title,
+        subcategories: groupCategories.flatMap(cat => cat.subcategories)
+      });
+    }
   });
+  
+  // Add any remaining categories
+  const usedIds = Object.values(categoryGroups).flatMap(g => g.categories);
+  const remainingCategories = categories.filter(cat => !usedIds.includes(cat.id));
+  groupedCategories.push(...remainingCategories);
+  
+  categories = groupedCategories;
 
   // Initialize category tabs
   initializeCategoryTabs(categories);
@@ -2639,12 +2659,18 @@ function initializeItemsGrid(category, chooser) {
     const inputId = input.attr('id');
     const isChecked = input.is(':checked');
     
-    // Get the label text - it's in the label element that contains this input
+    // Get the label text - it's in the span element inside the label
     const parentLabel = input.closest('label');
     let labelText = '';
     if (parentLabel.length) {
-      // Get text content but exclude the input element itself
-      labelText = parentLabel.clone().children().remove().end().text().trim();
+      // Look for span element with the actual text
+      const span = parentLabel.find('span');
+      if (span.length) {
+        labelText = span.text().trim();
+      } else {
+        // Fallback: get text content but exclude the input element itself
+        labelText = parentLabel.clone().children().remove().end().text().trim();
+      }
     }
     
     // If no label found, try to extract from ID
@@ -2674,7 +2700,15 @@ function initializeItemsGrid(category, chooser) {
       $(this).addClass('selected');
       
       // Update the original form input
-      input.prop('checked', true).trigger('change');
+      input.prop('checked', true);
+      
+      // Trigger the original character generator's update system
+      if (typeof redraw === 'function') {
+        redraw();
+      }
+      if (typeof showOrHideElements === 'function') {
+        showOrHideElements();
+      }
     });
     
     itemsGrid.append(itemElement);

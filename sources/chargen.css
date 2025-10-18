@@ -705,7 +705,7 @@ a {
     bottom: 0;
     left: 0;
     right: 0;
-    height: calc(33vh + 20px);
+    height: calc(40vh + 20px);
     background: #fff;
     border-top: 1px solid #e1e5e9;
     box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
@@ -717,22 +717,24 @@ a {
   .preview-container {
     display: flex;
     justify-content: center;
-    align-items: center;
-    padding: 16px;
+    align-items: flex-start;
+    padding: 8px 16px;
     background: #f8f9fa;
     flex: 1;
     min-height: 120px;
     overflow: visible;
+    padding-top: 20px;
   }
 
   #previewAnimationsBox {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     height: 100%;
     width: 100%;
-    max-width: 300px;
+    max-width: 400px;
+    padding-top: 10px;
   }
 
   #previewAnimations {
@@ -745,8 +747,8 @@ a {
     background: #fff;
     width: 100%;
     height: auto;
-    max-height: 200px;
-    min-height: 100px;
+    max-height: 250px;
+    min-height: 120px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     cursor: grab;
     user-select: none;
