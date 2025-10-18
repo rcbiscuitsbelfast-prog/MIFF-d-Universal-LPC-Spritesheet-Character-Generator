@@ -2314,341 +2314,49 @@ function initializeCharacterDresser() {
   const chooser = $('#chooser');
   if (!chooser.length) return;
 
-  // Create comprehensive categories with full hierarchy
-  const categories = [
-    {
-      id: 'body',
-      title: 'Body',
-      subcategories: [
-        { 
-          id: 'sex', 
-          title: 'Body Type', 
-          selector: 'input[name="sex"]'
-        },
-        { 
-          id: 'shadow', 
-          title: 'Shadow', 
-          selector: 'input[name="shadow"]' 
-        },
-        { 
-          id: 'body', 
-          title: 'Body Color', 
-          selector: 'input[name="body"]' 
-        },
-        { 
-          id: 'prostheses', 
-          title: 'Prostheses', 
-          selector: 'input[name="prostheses"]'
-        },
-        { 
-          id: 'tails', 
-          title: 'Tails', 
-          selector: 'input[name="tails"]'
-        },
-        { 
-          id: 'wings', 
-          title: 'Wings', 
-          selector: 'input[name="wings"]'
-        }
-      ]
-    },
-    {
-      id: 'head',
-      title: 'Head',
-      subcategories: [
-        { 
-          id: 'head', 
-          title: 'Heads', 
-          selector: 'input[name="head"]'
-        },
-        { 
-          id: 'face', 
-          title: 'Face', 
-          selector: 'input[name="face"]'
-        },
-        { 
-          id: 'eye_color', 
-          title: 'Eye Color', 
-          selector: 'input[name="eye_color"]' 
-        },
-        { 
-          id: 'other_eyes', 
-          title: 'Other Eyes', 
-          selector: 'input[name="other_eyes"]' 
-        },
-        { 
-          id: 'ears', 
-          title: 'Ears', 
-          selector: 'input[name="ears"]' 
-        },
-        { 
-          id: 'nose', 
-          title: 'Nose', 
-          selector: 'input[name="nose"]'
-        },
-        { 
-          id: 'eyebrows', 
-          title: 'Eyebrows', 
-          selector: 'input[name="eyebrows"]'
-        },
-        { 
-          id: 'beards', 
-          title: 'Beards', 
-          selector: 'input[name="beards"]' 
-        },
-        { 
-          id: 'mustaches', 
-          title: 'Mustaches', 
-          selector: 'input[name="mustaches"]' 
-        },
-        { 
-          id: 'hair', 
-          title: 'Hair', 
-          selector: 'input[name="hair"]'
-        },
-        { 
-          id: 'hair_extensions', 
-          title: 'Hair Extensions', 
-          selector: 'input[name="hair_extensions"]' 
-        },
-        { 
-          id: 'appendages', 
-          title: 'Appendages', 
-          selector: 'input[name="appendages"]'
-        },
-        { 
-          id: 'head_coverings', 
-          title: 'Head Coverings', 
-          selector: 'input[name="head_coverings"]'
-        },
-        { 
-          id: 'accessories', 
-          title: 'Accessories', 
-          selector: 'input[name="accessories"]'
-        }
-      ]
-    },
-    {
-      id: 'torso',
-      title: 'Torso',
-      subcategories: [
-        { 
-          id: 'dresses', 
-          title: 'Dresses', 
-          selector: 'input[name="dresses"]' 
-        },
-        { 
-          id: 'kimono', 
-          title: 'Kimono', 
-          selector: 'input[name="kimono"]' 
-        },
-        { 
-          id: 'shirts', 
-          title: 'Shirts', 
-          selector: 'input[name="shirts"]' 
-        },
-        { 
-          id: 'sleeves', 
-          title: 'Sleeves', 
-          selector: 'input[name="sleeves"]'
-        },
-        { 
-          id: 'aprons', 
-          title: 'Aprons', 
-          selector: 'input[name="aprons"]' 
-        },
-        { 
-          id: 'overalls', 
-          title: 'Overalls', 
-          selector: 'input[name="overalls"]' 
-        },
-        { 
-          id: 'suspenders', 
-          title: 'Suspenders', 
-          selector: 'input[name="suspenders"]' 
-        },
-        { 
-          id: 'bandages', 
-          title: 'Bandages', 
-          selector: 'input[name="bandages"]' 
-        },
-        { 
-          id: 'chainmail', 
-          title: 'Chainmail', 
-          selector: 'input[name="chainmail"]' 
-        },
-        { 
-          id: 'jacket', 
-          title: 'Jacket', 
-          selector: 'input[name="jacket"]' 
-        },
-        { 
-          id: 'armour', 
-          title: 'Armour', 
-          selector: 'input[name="armour"]' 
-        },
-        { 
-          id: 'cape', 
-          title: 'Cape', 
-          selector: 'input[name="cape"]' 
-        },
-        { 
-          id: 'backpack', 
-          title: 'Backpack', 
-          selector: 'input[name="backpack"]' 
-        },
-        { 
-          id: 'waist', 
-          title: 'Waist', 
-          selector: 'input[name="waist"]' 
-        }
-      ]
-    },
-    {
-      id: 'legs',
-      title: 'Legs',
-      subcategories: [
-        { 
-          id: 'armour', 
-          title: 'Armour', 
-          selector: 'input[name="leg_armour"]' 
-        },
-        { 
-          id: 'pants', 
-          title: 'Pants', 
-          selector: 'input[name="pants"]'
-        },
-        { 
-          id: 'leggings', 
-          title: 'Leggings', 
-          selector: 'input[name="leggings"]' 
-        },
-        { 
-          id: 'hose', 
-          title: 'Hose', 
-          selector: 'input[name="hose"]' 
-        },
-        { 
-          id: 'shorts', 
-          title: 'Shorts', 
-          selector: 'input[name="shorts"]' 
-        },
-        { 
-          id: 'skirts', 
-          title: 'Skirts', 
-          selector: 'input[name="skirts"]' 
-        }
-      ]
-    },
-    {
-      id: 'feet',
-      title: 'Feet',
-      subcategories: [
-        { 
-          id: 'armour', 
-          title: 'Armour', 
-          selector: 'input[name="foot_armour"]' 
-        },
-        { 
-          id: 'shoes', 
-          title: 'Shoes', 
-          selector: 'input[name="shoes"]'
-        },
-        { 
-          id: 'boots', 
-          title: 'Boots', 
-          selector: 'input[name="boots"]' 
-        },
-        { 
-          id: 'shoe_accessory', 
-          title: 'Shoe Accessory', 
-          selector: 'input[name="shoe_accessory"]' 
-        },
-        { 
-          id: 'socks', 
-          title: 'Socks', 
-          selector: 'input[name="socks"]' 
-        },
-        { 
-          id: 'slippers', 
-          title: 'Slippers', 
-          selector: 'input[name="slippers"]' 
-        },
-        { 
-          id: 'sandals', 
-          title: 'Sandals', 
-          selector: 'input[name="sandals"]' 
-        },
-        { 
-          id: 'hoofs', 
-          title: 'Hoofs', 
-          selector: 'input[name="hoofs"]' 
-        }
-      ]
-    },
-    {
-      id: 'tools',
-      title: 'Tools',
-      subcategories: [
-        { 
-          id: 'rod', 
-          title: 'Rod', 
-          selector: 'input[name="rod"]' 
-        },
-        { 
-          id: 'smash', 
-          title: 'Smash', 
-          selector: 'input[name="smash"]' 
-        },
-        { 
-          id: 'thrust', 
-          title: 'Thrust', 
-          selector: 'input[name="thrust"]' 
-        },
-        { 
-          id: 'whip', 
-          title: 'Whip', 
-          selector: 'input[name="whip"]' 
-        }
-      ]
-    },
-    {
-      id: 'weapons',
-      title: 'Weapons',
-      subcategories: [
-        { 
-          id: 'shield', 
-          title: 'Shield', 
-          selector: 'input[name="shield"]'
-        },
-        { 
-          id: 'ranged', 
-          title: 'Ranged', 
-          selector: 'input[name="ranged"]'
-        },
-        { 
-          id: 'sword', 
-          title: 'Sword', 
-          selector: 'input[name="sword"]'
-        },
-        { 
-          id: 'blunt', 
-          title: 'Blunt', 
-          selector: 'input[name="blunt"]'
-        },
-        { 
-          id: 'polearm', 
-          title: 'Polearm', 
-          selector: 'input[name="polearm"]'
-        },
-        { 
-          id: 'magic', 
-          title: 'Magic', 
-          selector: 'input[name="magic"]'
-        }
-      ]
+  // Build categories dynamically from the actual form structure
+  const categories = [];
+  
+  // Find all variant-list containers and build categories from them
+  chooser.find('.variant-list').each(function() {
+    const $container = $(this);
+    const containerId = $container.attr('id');
+    const title = $container.find('.condensed').text().trim();
+    
+    if (!containerId || !title) return;
+    
+    // Extract category and subcategory from ID (e.g., "head-Human_female" -> "head", "Human_female")
+    const parts = containerId.split('-');
+    const categoryId = parts[0];
+    const subcategoryId = parts.slice(1).join('-');
+    
+    // Find or create category
+    let category = categories.find(c => c.id === categoryId);
+    if (!category) {
+      category = {
+        id: categoryId,
+        title: categoryId.charAt(0).toUpperCase() + categoryId.slice(1),
+        subcategories: []
+      };
+      categories.push(category);
     }
-  ];
+    
+    // Add subcategory
+    category.subcategories.push({
+      id: subcategoryId,
+      title: title,
+      containerId: containerId,
+      selector: `#${containerId} input[type="radio"]`
+    });
+  });
+
+  // Sort categories by a logical order
+  const categoryOrder = ['body', 'head', 'torso', 'legs', 'feet', 'tools', 'weapons'];
+  categories.sort((a, b) => {
+    const aIndex = categoryOrder.indexOf(a.id);
+    const bIndex = categoryOrder.indexOf(b.id);
+    return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
+  });
 
   // Initialize category tabs
   initializeCategoryTabs(categories);
@@ -2774,20 +2482,23 @@ function initializeItemsGrid(category, chooser) {
   // Get the first subcategory (or the category itself if no subcategories)
   let subcategory = category.subcategories ? category.subcategories[0] : category;
   
-  // If we have sub-subcategories, get the first one
-  if (subcategory.subsubcategories && subcategory.subsubcategories.length > 0) {
-    subcategory = subcategory.subsubcategories[0];
+  // Use the containerId to find the actual form elements
+  const containerId = subcategory.containerId;
+  if (!containerId) {
+    itemsGrid.html('<div style="text-align: center; padding: 20px; color: #6c757d;">No items available for this category</div>');
+    return;
   }
   
-  const inputs = chooser.find(subcategory.selector);
+  const container = chooser.find(`#${containerId}`);
+  if (!container.length) {
+    itemsGrid.html('<div style="text-align: center; padding: 20px; color: #6c757d;">No items available for this category</div>');
+    return;
+  }
+  
+  const inputs = container.find('input[type="radio"]');
   
   if (inputs.length === 0) {
-    // If no inputs found, try to find any inputs that might match
-    const allInputs = chooser.find('input[type="radio"], input[type="checkbox"]');
-    if (allInputs.length > 0) {
-      // Show a message that no items are available for this category
-      itemsGrid.html('<div style="text-align: center; padding: 20px; color: #6c757d;">No items available for this category</div>');
-    }
+    itemsGrid.html('<div style="text-align: center; padding: 20px; color: #6c757d;">No items available for this category</div>');
     return;
   }
 
