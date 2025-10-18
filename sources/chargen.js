@@ -2020,19 +2020,6 @@ $(".exportSplitAnimations").click(async function() {
 });
 
 function initializeMobileInterface() {
-  // Mobile menu toggle
-  $('#mobile-menu-toggle').click(function() {
-    toggleMobileSideMenu();
-  });
-  
-  $('#mobile-close-menu').click(function() {
-    closeMobileSideMenu();
-  });
-  
-  $('#mobile-menu-overlay').click(function() {
-    closeMobileSideMenu();
-  });
-  
   // Export menu toggle
   $('#mobile-export-btn').click(function(e) {
     e.stopPropagation();
@@ -2056,60 +2043,32 @@ function initializeMobileInterface() {
   $('#mobile-import-clipboard').click(() => $('.importFromClipboard').click());
   $('#mobile-import-btn').click(() => $('.importFromClipboard').click());
   
-  // Preview button
-  $('#mobile-preview-btn').click(function() {
-    $('#previewAnimationsBox')[0].scrollIntoView({ behavior: 'smooth' });
-  });
+  // Initialize character dresser
+  initializeCharacterDresser();
   
   // Initialize animation strip
   initializeMobileAnimationStrip();
-  
-  // Move original form content to mobile side menu
-  moveFormToMobileMenu();
   
   // Handle window resize
   $(window).resize(function() {
     if (window.innerWidth >= 1025) {
       // Desktop view - hide mobile interface
-      $('#mobile-topbar, #mobile-side-menu, #mobile-menu-overlay, #mobile-animation-strip').hide();
+      $('#mobile-topbar, #character-dresser, #character-preview-section').hide();
       $('#header-left, #controls, #preview-animations, #chooser, #preview').show();
     } else {
       // Mobile view - show mobile interface
-      $('#mobile-topbar, #mobile-animation-strip').show();
+      $('#mobile-topbar, #character-dresser, #character-preview-section').show();
       $('#header-left, #controls, #preview-animations, #chooser, #preview').hide();
     }
   });
   
   // Set initial state based on screen size
   if (window.innerWidth < 1025) {
-    $('#mobile-topbar, #mobile-animation-strip').show();
+    $('#mobile-topbar, #character-dresser, #character-preview-section').show();
     $('#header-left, #controls, #preview-animations, #chooser, #preview').hide();
   }
 }
 
-function toggleMobileSideMenu() {
-  const menu = $('#mobile-side-menu');
-  const overlay = $('#mobile-menu-overlay');
-  const toggle = $('#mobile-menu-toggle');
-  
-  menu.toggleClass('open');
-  overlay.toggleClass('show');
-  toggle.attr('aria-expanded', menu.hasClass('open'));
-  
-  // Prevent body scroll when menu is open
-  if (menu.hasClass('open')) {
-    $('body').css('overflow', 'hidden');
-  } else {
-    $('body').css('overflow', '');
-  }
-}
-
-function closeMobileSideMenu() {
-  $('#mobile-side-menu').removeClass('open');
-  $('#mobile-menu-overlay').removeClass('show');
-  $('#mobile-menu-toggle').attr('aria-expanded', 'false');
-  $('body').css('overflow', '');
-}
 
 function toggleMobileExportMenu() {
   const menu = $('#mobile-export-menu');
@@ -2160,10 +2119,119 @@ function selectMobileAnimation(animationId) {
   $('#whichAnim').val(animationId).trigger('change');
 }
 
-function moveFormToMobileMenu() {
-  // Move the original chooser content to mobile side menu
-  const chooser = $('#chooser');
-  if (chooser.length) {
-    $('.side-menu-content').html(chooser.html());
+function initializeCharacterDresser() {
+  // Create character dresser categories
+  const categories = [
+    {
+      id: 'body',
+      title: 'Body',
+      icon: '👤',
+      items: [
+        { value: 'male', label: 'Male', preview: '♂' },
+        { value: 'female', label: 'Female', preview: '♀' }
+      ]
+    },
+    {
+      id: 'head',
+      title: 'Head',
+      icon: '🎭',
+      items: [
+        { value: 'none', label: 'No Head', preview: '🚫' },
+        { value: 'human', label: 'Human', preview: '👤' },
+        { value: 'elf', label: 'Elf', preview: '🧝' }
+      ]
+    },
+    {
+      id: 'clothing',
+      title: 'Clothing',
+      icon: '👕',
+      items: [
+        { value: 'none', label: 'No Shirt', preview: '🚫' },
+        { value: 'basic', label: 'Basic Shirt', preview: '👕' },
+        { value: 'fancy', label: 'Fancy Shirt', preview: '👔' }
+      ]
+    },
+    {
+      id: 'weapons',
+      title: 'Weapons',
+      icon: '⚔️',
+      items: [
+        { value: 'none', label: 'No Weapon', preview: '🚫' },
+        { value: 'sword', label: 'Sword', preview: '⚔️' },
+        { value: 'bow', label: 'Bow', preview: '🏹' }
+      ]
+    },
+    {
+      id: 'accessories',
+      title: 'Accessories',
+      icon: '🎒',
+      items: [
+        { value: 'none', label: 'No Accessories', preview: '🚫' },
+        { value: 'hat', label: 'Hat', preview: '🎩' },
+        { value: 'glasses', label: 'Glasses', preview: '👓' }
+      ]
+    },
+    {
+      id: 'shoes',
+      title: 'Shoes',
+      icon: '👟',
+      items: [
+        { value: 'none', label: 'No Shoes', preview: '🚫' },
+        { value: 'boots', label: 'Boots', preview: '👢' },
+        { value: 'sneakers', label: 'Sneakers', preview: '👟' }
+      ]
+    }
+  ];
+
+  const dresserGrid = $('.dresser-grid');
+  dresserGrid.empty();
+
+  categories.forEach(category => {
+    const categoryElement = $(`
+      <div class="dresser-category" data-category="${category.id}">
+        <div class="category-header">
+          <div class="category-icon">${category.icon}</div>
+          <h3 class="category-title">${category.title}</h3>
+        </div>
+        <div class="items-grid">
+          ${category.items.map(item => `
+            <div class="item-option" data-category="${category.id}" data-value="${item.value}">
+              <div class="item-preview">${item.preview}</div>
+              <div class="item-label">${item.label}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `);
+    
+    dresserGrid.append(categoryElement);
+  });
+
+  // Add click handlers for item selection
+  $('.item-option').click(function() {
+    const category = $(this).data('category');
+    const value = $(this).data('value');
+    
+    // Update visual selection
+    $(`.item-option[data-category="${category}"]`).removeClass('selected');
+    $(this).addClass('selected');
+    
+    // Update character (this will connect to the original character generation system)
+    updateCharacterSelection(category, value);
+  });
+
+  // Set default selections
+  $('.item-option[data-value="none"]').addClass('selected');
+}
+
+function updateCharacterSelection(category, value) {
+  // This function will connect to the original character generation system
+  // For now, we'll just log the selection
+  console.log(`Selected ${category}: ${value}`);
+  
+  // Find the corresponding form element and update it
+  const formElement = $(`input[name="${category}"][value="${value}"]`);
+  if (formElement.length) {
+    formElement.prop('checked', true).trigger('change');
   }
 }
