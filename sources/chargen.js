@@ -2053,19 +2053,22 @@ function initializeMobileInterface() {
   $(window).resize(function() {
     if (window.innerWidth >= 1025) {
       // Desktop view - hide mobile interface
-      $('#mobile-topbar, #character-dresser, #character-preview-section').hide();
+      $('#mobile-topbar, #avatar-editor, #character-preview-section').hide();
       $('#header-left, #controls, #preview-animations, #chooser, #preview').show();
     } else {
       // Mobile view - show mobile interface
-      $('#mobile-topbar, #character-dresser, #character-preview-section').show();
+      $('#mobile-topbar, #avatar-editor, #character-preview-section').show();
       $('#header-left, #controls, #preview-animations, #chooser, #preview').hide();
     }
   });
   
   // Set initial state based on screen size
   if (window.innerWidth < 1025) {
-    $('#mobile-topbar, #character-dresser, #character-preview-section').show();
+    $('#mobile-topbar, #avatar-editor, #character-preview-section').show();
     $('#header-left, #controls, #preview-animations, #chooser, #preview').hide();
+  } else {
+    $('#mobile-topbar, #avatar-editor, #character-preview-section').hide();
+    $('#header-left, #controls, #preview-animations, #chooser, #preview').show();
   }
 }
 
@@ -2461,12 +2464,15 @@ function initializeItemsGrid(category, chooser) {
     const label = input.next('label').text() || value;
     const isChecked = input.is(':checked');
     
+    // Clean up the label - remove "on" and get the actual item name
+    const cleanLabel = cleanItemLabel(label, value);
+    
     const itemElement = $(`
       <div class="item-thumbnail ${isChecked ? 'selected' : ''}" data-category="${subcategory.id}" data-value="${value}">
         <div class="item-image">
           ${getItemThumbnail(subcategory.id, value)}
         </div>
-        <div class="item-name">${label}</div>
+        <div class="item-name">${cleanLabel}</div>
       </div>
     `);
     
@@ -2483,22 +2489,110 @@ function initializeItemsGrid(category, chooser) {
   });
 }
 
-function getItemThumbnail(category, value) {
-  // Try to get a real thumbnail image first
-  const thumbnailPath = getThumbnailPath(category, value);
-  if (thumbnailPath) {
-    return `<img src="${thumbnailPath}" alt="${value}" onerror="this.parentNode.innerHTML='<div class=\\"placeholder\\">${getItemPreview(category, value)}</div>'" />`;
+function cleanItemLabel(label, value) {
+  // Remove common prefixes and clean up the label
+  let cleanLabel = label;
+  
+  // Remove "on" at the end
+  cleanLabel = cleanLabel.replace(/\s+on\s*$/i, '');
+  
+  // Remove common prefixes
+  cleanLabel = cleanLabel.replace(/^(body|head|torso|legs|feet|hair|beard|weapon|shield|helmet|gloves|cape|shadow)\s*/i, '');
+  
+  // Capitalize first letter
+  cleanLabel = cleanLabel.charAt(0).toUpperCase() + cleanLabel.slice(1);
+  
+  // If still empty or just "on", use the value
+  if (!cleanLabel || cleanLabel.toLowerCase() === 'on') {
+    cleanLabel = value.charAt(0).toUpperCase() + value.slice(1);
   }
   
-  // Fallback to placeholder
-  return `<div class="placeholder">${getItemPreview(category, value)}</div>`;
+  return cleanLabel;
 }
 
-function getThumbnailPath(category, value) {
-  // This would be the path to actual thumbnail images
-  // For now, we'll return null to use placeholders
-  // In a real implementation, you'd have actual thumbnail images
-  return null;
+function getItemThumbnail(category, value) {
+  // For now, use a simple emoji-based approach
+  const icon = getItemIcon(category, value);
+  return `<div class="placeholder" style="font-size: 20px; color: #6c757d;">${icon}</div>`;
+}
+
+function getItemIcon(category, value) {
+  const icons = {
+    'body': {
+      'male': '♂',
+      'female': '♀'
+    },
+    'head': {
+      'human': '👤',
+      'elf': '🧝',
+      'dwarf': '🧙',
+      'orc': '👹'
+    },
+    'torso': {
+      'none': '🚫',
+      'shirt': '👕',
+      'armor': '🛡️',
+      'robe': '👘'
+    },
+    'legs': {
+      'none': '🚫',
+      'pants': '👖',
+      'shorts': '🩳'
+    },
+    'feet': {
+      'none': '🚫',
+      'boots': '👢',
+      'sneakers': '👟',
+      'sandals': '🩴'
+    },
+    'hair': {
+      'none': '🚫',
+      'blonde': '👱',
+      'brown': '👨',
+      'black': '👤',
+      'red': '👨‍🦰',
+      'white': '👨‍🦳'
+    },
+    'beard': {
+      'none': '🚫',
+      'short': '🧔',
+      'long': '🧔‍♂️'
+    },
+    'weapon': {
+      'none': '🚫',
+      'sword': '⚔️',
+      'bow': '🏹',
+      'staff': '🪄',
+      'axe': '🪓'
+    },
+    'shield': {
+      'none': '🚫',
+      'round': '🛡️',
+      'kite': '🛡️'
+    },
+    'helmet': {
+      'none': '🚫',
+      'basic': '⛑️',
+      'full': '🪖'
+    },
+    'gloves': {
+      'none': '🚫',
+      'leather': '🧤',
+      'plate': '🧤'
+    },
+    'cape': {
+      'none': '🚫',
+      'short': '🦸',
+      'long': '🦸‍♂️'
+    },
+    'shadow': {
+      'none': '🚫',
+      'soft': '🌫️',
+      'hard': '⚫'
+    }
+  };
+  
+  return icons[category]?.[value] || '📦';
 }
 
 function getItemPreview(category, value) {
