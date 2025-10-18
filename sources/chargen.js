@@ -2664,8 +2664,19 @@ function initializeItemsGrid(category, chooser) {
       $(`.item-thumbnail[data-category="${subcategory.id}"]`).removeClass('selected');
       $(this).addClass('selected');
       
-      // Update the original form input and trigger click event
-      input.prop('checked', true).click();
+      // Update the original form input and trigger the original system
+      input.prop('checked', true);
+      
+      // Call the original character generator functions
+      if (typeof setParams === 'function') {
+        setParams();
+      }
+      if (typeof redraw === 'function') {
+        redraw();
+      }
+      if (typeof showOrHideElements === 'function') {
+        showOrHideElements();
+      }
     });
     
     itemsGrid.append(itemElement);
@@ -2695,6 +2706,16 @@ function cleanItemLabel(label, value) {
 
 function getImagePathFromInput(input) {
   const dataAttributes = input[0].attributes;
+  const bodyTypeName = getBodyTypeName();
+  
+  // First try to get the specific body type image
+  const bodyTypeKey = `data-layer_1_${bodyTypeName}`;
+  const bodyTypeImage = input.attr(bodyTypeKey);
+  if (bodyTypeImage && bodyTypeImage.endsWith('.png')) {
+    return bodyTypeImage;
+  }
+  
+  // Fallback: look for any data-layer_1_* attribute
   for (let i = 0; i < dataAttributes.length; i++) {
     const attr = dataAttributes[i];
     if (attr.name.startsWith('data-layer_1_') && attr.value && attr.value.endsWith('.png')) {
