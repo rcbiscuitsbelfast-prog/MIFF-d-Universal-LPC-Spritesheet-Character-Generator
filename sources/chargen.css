@@ -514,7 +514,7 @@ a {
     top: 60px;
     left: 0;
     right: 0;
-    height: calc(50vh - 20px);
+    height: calc(67vh - 20px);
     background: #f8f9fa;
     display: flex;
     flex-direction: column;
@@ -705,7 +705,7 @@ a {
     bottom: 0;
     left: 0;
     right: 0;
-    height: calc(50vh + 20px);
+    height: calc(33vh + 20px);
     background: #fff;
     border-top: 1px solid #e1e5e9;
     box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
@@ -717,24 +717,22 @@ a {
   .preview-container {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    padding: 4px 16px;
+    align-items: center;
+    padding: 8px 16px;
     background: #f8f9fa;
     flex: 1;
     min-height: 120px;
     overflow: visible;
-    padding-top: 4px;
   }
 
   #previewAnimationsBox {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     height: 100%;
     width: 100%;
-    max-width: 400px;
-    padding-top: 0px;
+    max-width: 300px;
   }
 
   #previewAnimations {
@@ -747,8 +745,8 @@ a {
     background: #fff;
     width: 100%;
     height: auto;
-    max-height: 300px;
-    min-height: 150px;
+    max-height: 200px;
+    min-height: 100px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     cursor: grab;
     user-select: none;
