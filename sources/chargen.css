@@ -748,6 +748,18 @@ a {
     max-height: 200px;
     min-height: 100px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    cursor: grab;
+    user-select: none;
+    transition: transform 0.1s ease;
+  }
+
+  #previewAnimations:active {
+    cursor: grabbing;
+  }
+
+  #previewAnimations.zoomed {
+    transform: scale(2);
+    cursor: grab;
   }
 
   .animation-controls {

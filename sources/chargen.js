@@ -2049,6 +2049,9 @@ function initializeMobileInterface() {
   // Initialize animation strip
   initializeMobileAnimationStrip();
   
+  // Initialize preview zoom and drag
+  initializePreviewInteraction();
+  
   // Handle window resize
   $(window).resize(function() {
     if (window.innerWidth >= 1025) {
@@ -2309,6 +2312,131 @@ function selectMobileAnimation(animationId) {
   $('#whichAnim').val(animationId).trigger('change');
 }
 
+function initializePreviewInteraction() {
+  const preview = $('#previewAnimations');
+  if (!preview.length) return;
+
+  let isDragging = false;
+  let startX, startY;
+  let currentX = 0, currentY = 0;
+  let scale = 1;
+  let lastTouchDistance = 0;
+
+  // Mouse events
+  preview.on('mousedown', function(e) {
+    isDragging = true;
+    startX = e.clientX - currentX;
+    startY = e.clientY - currentY;
+    preview.css('cursor', 'grabbing');
+    e.preventDefault();
+  });
+
+  $(document).on('mousemove', function(e) {
+    if (isDragging) {
+      currentX = e.clientX - startX;
+      currentY = e.clientY - startY;
+      preview.css('transform', `translate(${currentX}px, ${currentY}px) scale(${scale})`);
+    }
+  });
+
+  $(document).on('mouseup', function() {
+    isDragging = false;
+    preview.css('cursor', 'grab');
+  });
+
+  // Touch events for pinch-to-zoom and drag
+  preview.on('touchstart', function(e) {
+    e.preventDefault();
+    
+    if (e.touches.length === 1) {
+      // Single touch - drag
+      isDragging = true;
+      startX = e.touches[0].clientX - currentX;
+      startY = e.touches[0].clientY - currentY;
+    } else if (e.touches.length === 2) {
+      // Two touches - pinch to zoom
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      lastTouchDistance = Math.sqrt(
+        Math.pow(touch2.clientX - touch1.clientX, 2) +
+        Math.pow(touch2.clientY - touch1.clientY, 2)
+      );
+    }
+  });
+
+  preview.on('touchmove', function(e) {
+    e.preventDefault();
+    
+    if (e.touches.length === 1 && isDragging) {
+      // Single touch drag
+      currentX = e.touches[0].clientX - startX;
+      currentY = e.touches[0].clientY - startY;
+      preview.css('transform', `translate(${currentX}px, ${currentY}px) scale(${scale})`);
+    } else if (e.touches.length === 2) {
+      // Pinch to zoom
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const currentDistance = Math.sqrt(
+        Math.pow(touch2.clientX - touch1.clientX, 2) +
+        Math.pow(touch2.clientY - touch1.clientY, 2)
+      );
+      
+      if (lastTouchDistance > 0) {
+        const scaleChange = currentDistance / lastTouchDistance;
+        scale = Math.max(0.5, Math.min(3, scale * scaleChange));
+        preview.css('transform', `translate(${currentX}px, ${currentY}px) scale(${scale})`);
+      }
+      
+      lastTouchDistance = currentDistance;
+    }
+  });
+
+  preview.on('touchend', function(e) {
+    if (e.touches.length === 0) {
+      isDragging = false;
+    }
+  });
+
+  // Double tap to reset zoom
+  preview.on('dblclick', function() {
+    scale = 1;
+    currentX = 0;
+    currentY = 0;
+    preview.css('transform', 'translate(0px, 0px) scale(1)');
+  });
+
+  // Add zoom controls
+  const zoomControls = $(`
+    <div class="zoom-controls" style="position: absolute; top: 10px; right: 10px; z-index: 1000;">
+      <button class="zoom-btn" data-action="zoom-in" style="margin: 2px; padding: 8px; border: 1px solid #ccc; background: white; border-radius: 4px;">+</button>
+      <button class="zoom-btn" data-action="zoom-out" style="margin: 2px; padding: 8px; border: 1px solid #ccc; background: white; border-radius: 4px;">-</button>
+      <button class="zoom-btn" data-action="reset" style="margin: 2px; padding: 8px; border: 1px solid #ccc; background: white; border-radius: 4px;">Reset</button>
+    </div>
+  `);
+  
+  preview.parent().css('position', 'relative').append(zoomControls);
+  
+  zoomControls.on('click', '.zoom-btn', function() {
+    const action = $(this).data('action');
+    
+    switch(action) {
+      case 'zoom-in':
+        scale = Math.min(3, scale * 1.2);
+        break;
+      case 'zoom-out':
+        scale = Math.max(0.5, scale / 1.2);
+        break;
+      case 'reset':
+        scale = 1;
+        currentX = 0;
+        currentY = 0;
+        break;
+    }
+    
+    preview.css('transform', `translate(${currentX}px, ${currentY}px) scale(${scale})`);
+  });
+}
+
 function initializeCharacterDresser() {
   // Get the original form content and organize it into categories
   const chooser = $('#chooser');
@@ -2505,7 +2633,8 @@ function initializeItemsGrid(category, chooser) {
   inputs.each(function() {
     const input = $(this);
     const value = input.val();
-    const label = input.next('label').text() || value;
+    const parentLabel = input.closest('label');
+    const label = parentLabel.length ? parentLabel.text().trim() : input.attr('id') || value;
     const isChecked = input.is(':checked');
     
     // Clean up the label - remove "on" and get the actual item name
