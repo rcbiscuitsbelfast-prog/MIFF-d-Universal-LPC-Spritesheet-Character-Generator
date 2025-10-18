@@ -2014,4 +2014,156 @@ $(".exportSplitAnimations").click(async function() {
       );
     }
   }
+
+  // Mobile-First Interface Functions
+  initializeMobileInterface();
 });
+
+function initializeMobileInterface() {
+  // Mobile menu toggle
+  $('#mobile-menu-toggle').click(function() {
+    toggleMobileSideMenu();
+  });
+  
+  $('#mobile-close-menu').click(function() {
+    closeMobileSideMenu();
+  });
+  
+  $('#mobile-menu-overlay').click(function() {
+    closeMobileSideMenu();
+  });
+  
+  // Export menu toggle
+  $('#mobile-export-btn').click(function(e) {
+    e.stopPropagation();
+    toggleMobileExportMenu();
+  });
+  
+  // Close export menu when clicking outside
+  $(document).click(function(e) {
+    if (!$(e.target).closest('#mobile-export-menu, #mobile-export-btn').length) {
+      closeMobileExportMenu();
+    }
+  });
+  
+  // Export menu actions - connect to original functions
+  $('#mobile-export-png').click(() => $('#saveAsPNG').click());
+  $('#mobile-export-zip-anims').click(() => $('.exportSplitAnimations').click());
+  $('#mobile-export-zip-items').click(() => $('.exportSplitItemSheets').click());
+  $('#mobile-export-zip-item-anims').click(() => $('.exportSplitItemAnimations').click());
+  $('#mobile-export-credits-txt').click(() => $('.generateSheetCreditsTxt').click());
+  $('#mobile-export-credits-csv').click(() => $('.generateSheetCreditsCsv').click());
+  $('#mobile-import-clipboard').click(() => $('.importFromClipboard').click());
+  $('#mobile-import-btn').click(() => $('.importFromClipboard').click());
+  
+  // Preview button
+  $('#mobile-preview-btn').click(function() {
+    $('#previewAnimationsBox')[0].scrollIntoView({ behavior: 'smooth' });
+  });
+  
+  // Initialize animation strip
+  initializeMobileAnimationStrip();
+  
+  // Move original form content to mobile side menu
+  moveFormToMobileMenu();
+  
+  // Handle window resize
+  $(window).resize(function() {
+    if (window.innerWidth >= 1025) {
+      // Desktop view - hide mobile interface
+      $('#mobile-topbar, #mobile-side-menu, #mobile-menu-overlay, #mobile-animation-strip').hide();
+      $('#header-left, #controls, #preview-animations, #chooser, #preview').show();
+    } else {
+      // Mobile view - show mobile interface
+      $('#mobile-topbar, #mobile-animation-strip').show();
+      $('#header-left, #controls, #preview-animations, #chooser, #preview').hide();
+    }
+  });
+  
+  // Set initial state based on screen size
+  if (window.innerWidth < 1025) {
+    $('#mobile-topbar, #mobile-animation-strip').show();
+    $('#header-left, #controls, #preview-animations, #chooser, #preview').hide();
+  }
+}
+
+function toggleMobileSideMenu() {
+  const menu = $('#mobile-side-menu');
+  const overlay = $('#mobile-menu-overlay');
+  const toggle = $('#mobile-menu-toggle');
+  
+  menu.toggleClass('open');
+  overlay.toggleClass('show');
+  toggle.attr('aria-expanded', menu.hasClass('open'));
+  
+  // Prevent body scroll when menu is open
+  if (menu.hasClass('open')) {
+    $('body').css('overflow', 'hidden');
+  } else {
+    $('body').css('overflow', '');
+  }
+}
+
+function closeMobileSideMenu() {
+  $('#mobile-side-menu').removeClass('open');
+  $('#mobile-menu-overlay').removeClass('show');
+  $('#mobile-menu-toggle').attr('aria-expanded', 'false');
+  $('body').css('overflow', '');
+}
+
+function toggleMobileExportMenu() {
+  const menu = $('#mobile-export-menu');
+  const btn = $('#mobile-export-btn');
+  
+  if (menu.attr('hidden')) {
+    menu.removeAttr('hidden');
+    btn.attr('aria-expanded', 'true');
+  } else {
+    menu.attr('hidden', 'true');
+    btn.attr('aria-expanded', 'false');
+  }
+}
+
+function closeMobileExportMenu() {
+  $('#mobile-export-menu').attr('hidden', 'true');
+  $('#mobile-export-btn').attr('aria-expanded', 'false');
+}
+
+function initializeMobileAnimationStrip() {
+  // Get animations from the original whichAnim select
+  const whichAnim = $('#whichAnim');
+  if (whichAnim.length) {
+    const container = $('.animation-buttons');
+    container.empty();
+    
+    whichAnim.find('option').each(function() {
+      const option = $(this);
+      const value = option.val();
+      const text = option.text();
+      const isSelected = option.prop('selected');
+      
+      const button = $(`<button class="animation-btn ${isSelected ? 'active' : ''}" data-animation="${value}">${text}</button>`);
+      button.click(function() {
+        selectMobileAnimation(value);
+      });
+      container.append(button);
+    });
+  }
+}
+
+function selectMobileAnimation(animationId) {
+  // Update active state
+  $('.animation-btn').removeClass('active');
+  $(`.animation-btn[data-animation="${animationId}"]`).addClass('active');
+  
+  // Update the original whichAnim select
+  $('#whichAnim').val(animationId).trigger('change');
+}
+
+function moveFormToMobileMenu() {
+  // Move the original chooser content to mobile side menu
+  const chooser = $('#chooser');
+  if (chooser.length) {
+    $('.side-menu-content').html(chooser.html());
+  }
+}
