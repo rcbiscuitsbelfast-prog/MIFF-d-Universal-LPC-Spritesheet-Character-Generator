@@ -2049,6 +2049,9 @@ function initializeMobileInterface() {
   // Initialize animation strip
   initializeMobileAnimationStrip();
   
+  // Initialize preview interaction
+  initializePreviewInteraction();
+  
   // Initialize preview zoom and drag
   initializePreviewInteraction();
   
@@ -2633,17 +2636,33 @@ function initializeItemsGrid(category, chooser) {
   inputs.each(function() {
     const input = $(this);
     const value = input.val();
-    const parentLabel = input.closest('label');
-    const label = parentLabel.length ? parentLabel.text().trim() : input.attr('id') || value;
+    const inputId = input.attr('id');
     const isChecked = input.is(':checked');
     
-    // Clean up the label - remove "on" and get the actual item name
-    const cleanLabel = cleanItemLabel(label, value);
+    // Get the label text - it's in the label element that contains this input
+    const parentLabel = input.closest('label');
+    let labelText = '';
+    if (parentLabel.length) {
+      // Get text content but exclude the input element itself
+      labelText = parentLabel.clone().children().remove().end().text().trim();
+    }
+    
+    // If no label found, try to extract from ID
+    if (!labelText && inputId) {
+      const parts = inputId.split('_');
+      labelText = parts[parts.length - 1] || value;
+    }
+    
+    // Clean up the label
+    const cleanLabel = cleanItemLabel(labelText, value);
+    
+    // Get the actual image path from data attributes
+    const imagePath = getImagePathFromInput(input);
     
     const itemElement = $(`
       <div class="item-thumbnail ${isChecked ? 'selected' : ''}" data-category="${subcategory.id}" data-value="${value}">
         <div class="item-image">
-          ${getItemThumbnail(subcategory.id, value)}
+          ${getItemThumbnail(subcategory.id, value, imagePath)}
         </div>
         <div class="item-name">${cleanLabel}</div>
       </div>
@@ -2664,7 +2683,7 @@ function initializeItemsGrid(category, chooser) {
 
 function cleanItemLabel(label, value) {
   // Remove common prefixes and clean up the label
-  let cleanLabel = label;
+  let cleanLabel = label || '';
   
   // Remove "on" at the end
   cleanLabel = cleanLabel.replace(/\s+on\s*$/i, '');
@@ -2672,21 +2691,40 @@ function cleanItemLabel(label, value) {
   // Remove common prefixes
   cleanLabel = cleanLabel.replace(/^(body|head|torso|legs|feet|hair|beard|weapon|shield|helmet|gloves|cape|shadow)\s*/i, '');
   
+  // Remove variant prefixes (light, dark, etc.)
+  cleanLabel = cleanLabel.replace(/^(light|dark|amber|olive|taupe|bronze|brown|black|lavender|blue|green|red|yellow|purple|orange|pink|gray|grey|white)\s*/i, '');
+  
   // Capitalize first letter
   cleanLabel = cleanLabel.charAt(0).toUpperCase() + cleanLabel.slice(1);
   
   // If still empty or just "on", use the value
-  if (!cleanLabel || cleanLabel.toLowerCase() === 'on') {
+  if (!cleanLabel || cleanLabel.toLowerCase() === 'on' || cleanLabel.length < 2) {
     cleanLabel = value.charAt(0).toUpperCase() + value.slice(1);
   }
   
   return cleanLabel;
 }
 
-function getItemThumbnail(category, value) {
-  // For now, use a simple emoji-based approach
-  const icon = getItemIcon(category, value);
-  return `<div class="placeholder" style="font-size: 20px; color: #6c757d;">${icon}</div>`;
+function getItemThumbnail(category, value, imagePath) {
+  if (imagePath) {
+    return `<img src="${imagePath}" alt="${value}" style="width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+             <div class="placeholder" style="font-size: 20px; color: #6c757d; display: none; align-items: center; justify-content: center; width: 100%; height: 100%;">${getItemIcon(category, value)}</div>`;
+  } else {
+    const icon = getItemIcon(category, value);
+    return `<div class="placeholder" style="font-size: 20px; color: #6c757d; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">${icon}</div>`;
+  }
+}
+
+function getImagePathFromInput(input) {
+  // Try to get the image path from data-layer_1_* attributes
+  const dataAttributes = input[0].attributes;
+  for (let i = 0; i < dataAttributes.length; i++) {
+    const attr = dataAttributes[i];
+    if (attr.name.startsWith('data-layer_1_') && attr.value && attr.value.endsWith('.png')) {
+      return attr.value;
+    }
+  }
+  return null;
 }
 
 function getItemIcon(category, value) {
