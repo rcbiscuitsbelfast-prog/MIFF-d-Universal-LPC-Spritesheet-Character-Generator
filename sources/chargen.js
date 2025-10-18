@@ -2095,13 +2095,200 @@ function initializeMobileAnimationStrip() {
     const container = $('.animation-buttons');
     container.empty();
     
+    // Animation labels mapping
+    const animationLabels = {
+      'spellcast': 'Cast',
+      'thrust': 'Attack',
+      'walk': 'Walk',
+      'slash': 'Slash',
+      'shoot': 'Shoot',
+      'hurt': 'Hurt',
+      'climb': 'Climb',
+      'idle': 'Idle',
+      'jump': 'Jump',
+      'sit': 'Sit',
+      'emote': 'Emote',
+      'run': 'Run',
+      'die': 'Die',
+      'sleep': 'Sleep',
+      'swim': 'Swim',
+      'fly': 'Fly',
+      'crawl': 'Crawl',
+      'dance': 'Dance',
+      'laugh': 'Laugh',
+      'cry': 'Cry',
+      'wave': 'Wave',
+      'point': 'Point',
+      'cheer': 'Cheer',
+      'shrug': 'Shrug',
+      'bow': 'Bow',
+      'kneel': 'Kneel',
+      'pray': 'Pray',
+      'meditate': 'Meditate',
+      'read': 'Read',
+      'write': 'Write',
+      'eat': 'Eat',
+      'drink': 'Drink',
+      'smoke': 'Smoke',
+      'work': 'Work',
+      'play': 'Play',
+      'rest': 'Rest',
+      'stretch': 'Stretch',
+      'yawn': 'Yawn',
+      'sneeze': 'Sneeze',
+      'cough': 'Cough',
+      'blow': 'Blow',
+      'kiss': 'Kiss',
+      'hug': 'Hug',
+      'shake': 'Shake',
+      'nod': 'Nod',
+      'shake_head': 'No',
+      'thumbs_up': 'Thumbs Up',
+      'thumbs_down': 'Thumbs Down',
+      'clap': 'Clap',
+      'snap': 'Snap',
+      'whistle': 'Whistle',
+      'sing': 'Sing',
+      'play_instrument': 'Play',
+      'conduct': 'Conduct',
+      'paint': 'Paint',
+      'sculpt': 'Sculpt',
+      'build': 'Build',
+      'repair': 'Repair',
+      'clean': 'Clean',
+      'cook': 'Cook',
+      'garden': 'Garden',
+      'fish': 'Fish',
+      'hunt': 'Hunt',
+      'mine': 'Mine',
+      'farm': 'Farm',
+      'craft': 'Craft',
+      'enchant': 'Enchant',
+      'alchemy': 'Alchemy',
+      'smith': 'Smith',
+      'tailor': 'Tailor',
+      'leatherwork': 'Leather',
+      'jewelry': 'Jewelry',
+      'pottery': 'Pottery',
+      'weaving': 'Weave',
+      'basket': 'Basket',
+      'rope': 'Rope',
+      'paper': 'Paper',
+      'book': 'Book',
+      'scroll': 'Scroll',
+      'map': 'Map',
+      'compass': 'Compass',
+      'telescope': 'Scope',
+      'microscope': 'Micro',
+      'scale': 'Scale',
+      'balance': 'Balance',
+      'clock': 'Clock',
+      'hourglass': 'Hourglass',
+      'calendar': 'Calendar',
+      'abacus': 'Abacus',
+      'calculator': 'Calc',
+      'computer': 'Computer',
+      'robot': 'Robot',
+      'cyborg': 'Cyborg',
+      'android': 'Android',
+      'alien': 'Alien',
+      'monster': 'Monster',
+      'demon': 'Demon',
+      'angel': 'Angel',
+      'ghost': 'Ghost',
+      'zombie': 'Zombie',
+      'vampire': 'Vampire',
+      'werewolf': 'Werewolf',
+      'dragon': 'Dragon',
+      'phoenix': 'Phoenix',
+      'unicorn': 'Unicorn',
+      'pegasus': 'Pegasus',
+      'griffin': 'Griffin',
+      'sphinx': 'Sphinx',
+      'centaur': 'Centaur',
+      'minotaur': 'Minotaur',
+      'satyr': 'Satyr',
+      'faun': 'Faun',
+      'nymph': 'Nymph',
+      'dryad': 'Dryad',
+      'naga': 'Naga',
+      'mermaid': 'Mermaid',
+      'triton': 'Triton',
+      'kraken': 'Kraken',
+      'leviathan': 'Leviathan',
+      'behemoth': 'Behemoth',
+      'titan': 'Titan',
+      'giant': 'Giant',
+      'dwarf': 'Dwarf',
+      'elf': 'Elf',
+      'halfling': 'Halfling',
+      'gnome': 'Gnome',
+      'goblin': 'Goblin',
+      'orc': 'Orc',
+      'troll': 'Troll',
+      'ogre': 'Ogre',
+      'hobgoblin': 'Hobgoblin',
+      'bugbear': 'Bugbear',
+      'kobold': 'Kobold',
+      'lizardfolk': 'Lizard',
+      'dragonborn': 'Dragonborn',
+      'tiefling': 'Tiefling',
+      'aasimar': 'Aasimar',
+      'genasi': 'Genasi',
+      'goliath': 'Goliath',
+      'firbolg': 'Firbolg',
+      'kenku': 'Kenku',
+      'tabaxi': 'Tabaxi',
+      'triton': 'Triton',
+      'yuan-ti': 'Yuan-ti',
+      'aarakocra': 'Aarakocra',
+      'gith': 'Gith',
+      'kalashtar': 'Kalashtar',
+      'shifter': 'Shifter',
+      'warforged': 'Warforged',
+      'changelings': 'Changeling',
+      'simic': 'Simic',
+      'vedalken': 'Vedalken',
+      'loxodon': 'Loxodon',
+      'minotaur': 'Minotaur',
+      'centaur': 'Centaur',
+      'satyr': 'Satyr',
+      'leonin': 'Leonin',
+      'aasimar': 'Aasimar',
+      'tiefling': 'Tiefling',
+      'dragonborn': 'Dragonborn',
+      'genasi': 'Genasi',
+      'goliath': 'Goliath',
+      'firbolg': 'Firbolg',
+      'kenku': 'Kenku',
+      'tabaxi': 'Tabaxi',
+      'triton': 'Triton',
+      'yuan-ti': 'Yuan-ti',
+      'aarakocra': 'Aarakocra',
+      'gith': 'Gith',
+      'kalashtar': 'Kalashtar',
+      'shifter': 'Shifter',
+      'warforged': 'Warforged',
+      'changelings': 'Changeling',
+      'simic': 'Simic',
+      'vedalken': 'Vedalken',
+      'loxodon': 'Loxodon',
+      'minotaur': 'Minotaur',
+      'centaur': 'Centaur',
+      'satyr': 'Satyr',
+      'leonin': 'Leonin'
+    };
+    
     whichAnim.find('option').each(function() {
       const option = $(this);
       const value = option.val();
       const text = option.text();
       const isSelected = option.prop('selected');
       
-      const button = $(`<button class="animation-btn ${isSelected ? 'active' : ''}" data-animation="${value}">${text}</button>`);
+      // Use mapped label or fallback to original text
+      const label = animationLabels[value] || text;
+      
+      const button = $(`<button class="animation-btn ${isSelected ? 'active' : ''}" data-animation="${value}">${label}</button>`);
       button.click(function() {
         selectMobileAnimation(value);
       });
@@ -2124,140 +2311,194 @@ function initializeCharacterDresser() {
   const chooser = $('#chooser');
   if (!chooser.length) return;
 
-  const dresserGrid = $('.dresser-grid');
-  dresserGrid.empty();
-
-  // Create categories based on the original form structure
+  // Create Roblox-style categories with subcategories
   const categories = [
     {
       id: 'body',
       title: 'Body',
-      icon: '👤',
-      selector: 'input[name="body"]'
+      subcategories: [
+        { id: 'body_type', title: 'Type', selector: 'input[name="body"]' },
+        { id: 'body_shadow', title: 'Shadow', selector: 'input[name="shadow"]' }
+      ]
     },
     {
       id: 'head',
       title: 'Head',
-      icon: '🎭',
-      selector: 'input[name="head"]'
+      subcategories: [
+        { id: 'head_type', title: 'Type', selector: 'input[name="head"]' }
+      ]
     },
     {
       id: 'torso',
-      title: 'Torso',
-      icon: '👕',
-      selector: 'input[name="torso"]'
+      title: 'Shirts',
+      subcategories: [
+        { id: 'torso_type', title: 'Type', selector: 'input[name="torso"]' }
+      ]
     },
     {
       id: 'legs',
-      title: 'Legs',
-      icon: '👖',
-      selector: 'input[name="legs"]'
+      title: 'Pants',
+      subcategories: [
+        { id: 'legs_type', title: 'Type', selector: 'input[name="legs"]' }
+      ]
     },
     {
       id: 'feet',
-      title: 'Feet',
-      icon: '👟',
-      selector: 'input[name="feet"]'
+      title: 'Shoes',
+      subcategories: [
+        { id: 'feet_type', title: 'Type', selector: 'input[name="feet"]' }
+      ]
     },
     {
       id: 'hair',
       title: 'Hair',
-      icon: '💇',
-      selector: 'input[name="hair"]'
+      subcategories: [
+        { id: 'hair_type', title: 'Type', selector: 'input[name="hair"]' }
+      ]
     },
     {
-      id: 'beard',
-      title: 'Beard',
-      icon: '🧔',
-      selector: 'input[name="beard"]'
+      id: 'accessories',
+      title: 'Accessories',
+      subcategories: [
+        { id: 'beard_type', title: 'Beard', selector: 'input[name="beard"]' },
+        { id: 'helmet_type', title: 'Helmet', selector: 'input[name="helmet"]' },
+        { id: 'gloves_type', title: 'Gloves', selector: 'input[name="gloves"]' },
+        { id: 'cape_type', title: 'Cape', selector: 'input[name="cape"]' }
+      ]
     },
     {
-      id: 'weapon',
-      title: 'Weapon',
-      icon: '⚔️',
-      selector: 'input[name="weapon"]'
-    },
-    {
-      id: 'shield',
-      title: 'Shield',
-      icon: '🛡️',
-      selector: 'input[name="shield"]'
-    },
-    {
-      id: 'helmet',
-      title: 'Helmet',
-      icon: '⛑️',
-      selector: 'input[name="helmet"]'
-    },
-    {
-      id: 'gloves',
-      title: 'Gloves',
-      icon: '🧤',
-      selector: 'input[name="gloves"]'
-    },
-    {
-      id: 'cape',
-      title: 'Cape',
-      icon: '🦸',
-      selector: 'input[name="cape"]'
+      id: 'weapons',
+      title: 'Weapons',
+      subcategories: [
+        { id: 'weapon_type', title: 'Weapon', selector: 'input[name="weapon"]' },
+        { id: 'shield_type', title: 'Shield', selector: 'input[name="shield"]' }
+      ]
     }
   ];
 
-  categories.forEach(category => {
-    const inputs = chooser.find(category.selector);
-    if (inputs.length === 0) return;
+  // Initialize category tabs
+  initializeCategoryTabs(categories);
+  
+  // Initialize items grid
+  initializeItemsGrid(categories[0], chooser);
+}
 
-    const items = [];
-    inputs.each(function() {
-      const input = $(this);
-      const value = input.val();
-      const label = input.next('label').text() || value;
-      const isChecked = input.is(':checked');
+function initializeCategoryTabs(categories) {
+  const tabsContainer = $('.category-tabs-container');
+  tabsContainer.empty();
+
+  categories.forEach((category, index) => {
+    const tab = $(`
+      <button class="category-tab ${index === 0 ? 'active' : ''}" data-category="${category.id}">
+        ${category.title}
+      </button>
+    `);
+    
+    tab.click(function() {
+      // Update active tab
+      $('.category-tab').removeClass('active');
+      $(this).addClass('active');
       
-      items.push({
-        value: value,
-        label: label,
-        checked: isChecked
-      });
+      // Show/hide subcategories and items
+      const categoryId = $(this).data('category');
+      const categoryData = categories.find(cat => cat.id === categoryId);
+      
+      if (categoryData.subcategories.length > 1) {
+        initializeSubcategoryTabs(categoryData.subcategories);
+        $('#subcategory-tabs').show();
+      } else {
+        $('#subcategory-tabs').hide();
+        initializeItemsGrid(categoryData, $('#chooser'));
+      }
     });
+    
+    tabsContainer.append(tab);
+  });
+}
 
-    if (items.length === 0) return;
+function initializeSubcategoryTabs(subcategories) {
+  const subTabsContainer = $('.subcategory-tabs-container');
+  subTabsContainer.empty();
 
-    const categoryElement = $(`
-      <div class="dresser-category" data-category="${category.id}">
-        <div class="category-header">
-          <div class="category-icon">${category.icon}</div>
-          <h3 class="category-title">${category.title}</h3>
+  subcategories.forEach((subcategory, index) => {
+    const tab = $(`
+      <button class="subcategory-tab ${index === 0 ? 'active' : ''}" data-subcategory="${subcategory.id}">
+        ${subcategory.title}
+      </button>
+    `);
+    
+    tab.click(function() {
+      // Update active subcategory tab
+      $('.subcategory-tab').removeClass('active');
+      $(this).addClass('active');
+      
+      // Load items for this subcategory
+      const subcategoryId = $(this).data('subcategory');
+      const subcategoryData = subcategories.find(sub => sub.id === subcategoryId);
+      
+      if (subcategoryData) {
+        initializeItemsGrid({ subcategories: [subcategoryData] }, $('#chooser'));
+      }
+    });
+    
+    subTabsContainer.append(tab);
+  });
+}
+
+function initializeItemsGrid(category, chooser) {
+  const itemsGrid = $('.items-grid');
+  itemsGrid.empty();
+
+  // Get the first subcategory (or the category itself if no subcategories)
+  const subcategory = category.subcategories ? category.subcategories[0] : category;
+  const inputs = chooser.find(subcategory.selector);
+  
+  if (inputs.length === 0) return;
+
+  inputs.each(function() {
+    const input = $(this);
+    const value = input.val();
+    const label = input.next('label').text() || value;
+    const isChecked = input.is(':checked');
+    
+    const itemElement = $(`
+      <div class="item-thumbnail ${isChecked ? 'selected' : ''}" data-category="${subcategory.id}" data-value="${value}">
+        <div class="item-image">
+          ${getItemThumbnail(subcategory.id, value)}
         </div>
-        <div class="items-grid">
-          ${items.map(item => `
-            <div class="item-option ${item.checked ? 'selected' : ''}" data-category="${category.id}" data-value="${item.value}">
-              <div class="item-preview">${getItemPreview(category.id, item.value)}</div>
-              <div class="item-label">${item.label}</div>
-            </div>
-          `).join('')}
-        </div>
+        <div class="item-name">${label}</div>
       </div>
     `);
     
-    dresserGrid.append(categoryElement);
-  });
-
-  // Add click handlers for item selection
-  $('.item-option').click(function() {
-    const category = $(this).data('category');
-    const value = $(this).data('value');
-    
-    // Update visual selection
-    $(`.item-option[data-category="${category}"]`).removeClass('selected');
-    $(this).addClass('selected');
-    
-    // Update the original form input
-    const input = chooser.find(`input[name="${category}"][value="${value}"]`);
-    if (input.length) {
+    itemElement.click(function() {
+      // Update visual selection
+      $(`.item-thumbnail[data-category="${subcategory.id}"]`).removeClass('selected');
+      $(this).addClass('selected');
+      
+      // Update the original form input
       input.prop('checked', true).trigger('change');
-    }
+    });
+    
+    itemsGrid.append(itemElement);
   });
+}
+
+function getItemThumbnail(category, value) {
+  // Try to get a real thumbnail image first
+  const thumbnailPath = getThumbnailPath(category, value);
+  if (thumbnailPath) {
+    return `<img src="${thumbnailPath}" alt="${value}" onerror="this.parentNode.innerHTML='<div class=\\"placeholder\\">${getItemPreview(category, value)}</div>'" />`;
+  }
+  
+  // Fallback to placeholder
+  return `<div class="placeholder">${getItemPreview(category, value)}</div>`;
+}
+
+function getThumbnailPath(category, value) {
+  // This would be the path to actual thumbnail images
+  // For now, we'll return null to use placeholders
+  // In a real implementation, you'd have actual thumbnail images
+  return null;
 }
 
 function getItemPreview(category, value) {
