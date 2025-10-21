@@ -399,7 +399,7 @@ a {
 }
 
 /* Mobile-First Roblox-Style Avatar Editor */
-@media (max-width: 1024px) {
+@media (max-width: 1024px), .force-mobile {
   /* Hide desktop interface on mobile */
   #header-left,
   #controls,

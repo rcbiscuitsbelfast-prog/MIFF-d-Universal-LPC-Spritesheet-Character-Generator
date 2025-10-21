@@ -2851,3 +2851,39 @@ function getItemPreview(category, value) {
   return previews[value] || '📦';
 }
 
+// Force mobile view for testing
+function toggleMobileView() {
+  const isMobile = document.body.classList.contains('force-mobile');
+  
+  if (isMobile) {
+    // Switch to desktop view
+    document.body.classList.remove('force-mobile');
+    document.getElementById('mobile-topbar').style.display = 'none';
+    document.getElementById('avatar-editor').style.display = 'none';
+    document.getElementById('character-preview-section').style.display = 'none';
+    document.getElementById('header-left').style.display = 'block';
+    document.getElementById('controls').style.display = 'block';
+    document.getElementById('preview-animations').style.display = 'block';
+    document.getElementById('chooser').style.display = 'block';
+    document.getElementById('preview').style.display = 'block';
+  } else {
+    // Switch to mobile view
+    document.body.classList.add('force-mobile');
+    document.getElementById('mobile-topbar').style.display = 'flex';
+    document.getElementById('avatar-editor').style.display = 'block';
+    document.getElementById('character-preview-section').style.display = 'block';
+    document.getElementById('header-left').style.display = 'none';
+    document.getElementById('controls').style.display = 'none';
+    document.getElementById('preview-animations').style.display = 'none';
+    document.getElementById('chooser').style.display = 'none';
+    document.getElementById('preview').style.display = 'none';
+    
+    // Initialize mobile interface
+    setTimeout(() => {
+      initializeCharacterDresser();
+      initializeMobileAnimationStrip();
+      initializePreviewInteraction();
+    }, 100);
+  }
+}
+

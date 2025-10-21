@@ -26,6 +26,8 @@
 	<!-- Roblox-Style Avatar Editor Interface -->
 	<!-- Top Navigation Bar -->
 	<nav id="mobile-topbar" style="display: none;">
+		<!-- Force mobile view for testing - remove this button in production -->
+		<button id="force-mobile-btn" onclick="toggleMobileView()" style="position: fixed; top: 10px; left: 10px; z-index: 9999; background: #007bff; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-size: 12px;">Mobile View</button>
 		<h1>Avatar Editor</h1>
 		<div class="topbar-actions">
 			<button id="mobile-export-btn" aria-haspopup="true" aria-expanded="false">Export</button>
