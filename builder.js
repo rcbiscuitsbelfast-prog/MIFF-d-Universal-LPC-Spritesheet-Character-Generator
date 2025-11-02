@@ -28,10 +28,10 @@ const CONFIG = {
   },
   
   bodyTypes: {
-    male: { path: 'body/bodies/male', headPath: 'head/heads/human/male', color: 'light', headColor: 'light' },
-    female: { path: 'body/bodies/female', headPath: 'head/heads/human/female', color: 'light', headColor: 'light' },
-    child: { path: 'body/bodies/child', headPath: 'head/heads/human/child', color: 'light', headColor: null },
-    teen: { path: 'body/bodies/teen', headPath: 'head/heads/human/male', color: 'light', headColor: 'light' }
+    male: { path: 'body/bodies/male', headPath: 'head/heads/human/male', bodyColor: 'light', headColor: 'light' },
+    female: { path: 'body/bodies/female', headPath: 'head/heads/human/female', bodyColor: 'light', headColor: 'light' },
+    child: { path: 'body/bodies/child', headPath: 'head/heads/human/child', bodyColor: 'light', headColor: null },
+    teen: { path: 'body/bodies/teen', headPath: 'head/heads/human/male', bodyColor: 'light', headColor: 'light' }
   }
 };
 
@@ -123,16 +123,16 @@ async function loadCharacter(gender, animation) {
   
   // Load body sprite for this animation
   const bodyPaths = [
-    `/spritesheets/${bodyType.path}/${animDir}/${bodyType.color}.png`,
+    `/spritesheets/${bodyType.path}/${animDir}/${bodyType.bodyColor}.png`,
     `/spritesheets/${bodyType.path}/${animDir}.png`,
-    `/spritesheets/${bodyType.path}/${bodyType.color}.png`
+    `/spritesheets/${bodyType.path}/${bodyType.bodyColor}.png`
   ];
   
-  console.log('Loading body:', bodyPaths[0]);
+  console.log(`?? Loading ${gender} ${animation}...`);
+  console.log('Body paths:', bodyPaths);
   
   try {
     state.bodySprite = await loadImageWithFallback(bodyPaths);
-    console.log('Body loaded!');
   } catch (e) {
     console.error('Body failed:', e);
     state.bodySprite = null;
@@ -140,7 +140,7 @@ async function loadCharacter(gender, animation) {
   }
   
   // Try to load head sprite
-  // Child heads have different structure: no subdirectory, no color suffix
+  // Child heads have different structure: flat files with no color subdirectory
   const headPaths = bodyType.headColor 
     ? [
         `/spritesheets/${bodyType.headPath}/${animDir}/${bodyType.headColor}.png`,
@@ -149,14 +149,13 @@ async function loadCharacter(gender, animation) {
       ]
     : [
         `/spritesheets/${bodyType.headPath}/${animDir}.png`,
-        `/spritesheets/${bodyType.headPath}/${animDir}/${bodyType.color}.png`
+        `/spritesheets/${bodyType.headPath}/${animDir}/${bodyType.bodyColor}.png`
       ];
   
-  console.log('Loading head:', headPaths[0]);
+  console.log('Head paths:', headPaths);
   
   try {
     state.headSprite = await loadImageWithFallback(headPaths);
-    console.log('Head loaded!');
   } catch (e) {
     console.warn('Head not found, using body only');
     state.headSprite = null;
@@ -169,18 +168,24 @@ function loadImageWithFallback(paths) {
     
     const tryNext = () => {
       if (index >= paths.length) {
+        console.error('? All paths failed:', paths);
         reject(new Error('All paths failed'));
         return;
       }
       
       const img = new Image();
-      img.onload = () => resolve(img);
+      img.onload = () => {
+        console.log(`? Loaded: ${paths[index]} (${img.width}x${img.height})`);
+        resolve(img);
+      };
       img.onerror = () => {
+        console.warn(`? Failed: ${paths[index]}`);
         index++;
         if (index < paths.length) {
-          console.log('Trying fallback:', paths[index]);
+          console.log('?? Trying fallback:', paths[index]);
           tryNext();
         } else {
+          console.error('? All paths failed:', paths);
           reject(new Error('All paths failed'));
         }
       };
