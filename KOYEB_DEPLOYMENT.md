@@ -103,6 +103,9 @@ koyeb service create lpc-avatar-builder \
 # Ensure all files are committed
 git status
 
+# Generate package-lock.json (REQUIRED by Koyeb)
+npm install --package-lock-only
+
 # Initialize submodules locally (test)
 git submodule init
 git submodule update --recursive
@@ -112,9 +115,13 @@ npm install
 npm start
 curl http://localhost:3000/health
 
-# Push to GitHub
+# Commit lockfile and push to GitHub
+git add package-lock.json
+git commit -m "Add package-lock.json for Koyeb"
 git push origin master
 ```
+
+?? **Critical:** Koyeb's buildpack requires a lockfile (`package-lock.json`, `yarn.lock`, or `pnpm-lock.yaml`) for reproducible builds. Without it, the build will fail.
 
 ### 2. Create Koyeb Account
 

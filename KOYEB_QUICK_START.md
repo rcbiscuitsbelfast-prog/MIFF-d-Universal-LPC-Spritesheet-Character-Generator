@@ -7,11 +7,17 @@ Deploy your LPC Avatar Builder to Koyeb in 5 minutes!
 ### 1. Prepare Repository
 
 ```bash
+# Generate package-lock.json (REQUIRED by Koyeb)
+npm install --package-lock-only
+
 # Ensure everything is committed
+git add package-lock.json package.json
 git add .
 git commit -m "Ready for Koyeb deployment"
 git push origin master
 ```
+
+?? **Important:** Koyeb requires `package-lock.json` for reproducible builds. Make sure it's committed!
 
 ### 2. Deploy to Koyeb
 
