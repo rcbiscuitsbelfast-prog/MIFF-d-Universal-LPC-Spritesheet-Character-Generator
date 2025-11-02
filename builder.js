@@ -1,6 +1,5 @@
 /**
- * LPC Character Builder - FIXED VERSION
- * With head layer and per-animation sprite loading
+ * LPC Character Builder - v2 WITH ANIMATION SWITCHING FIX
  */
 
 const CONFIG = {
@@ -101,6 +100,9 @@ function setupEventListeners() {
       const animation = e.currentTarget.dataset.animation;
       if (animation === state.currentAnimation) return;
       
+      // Store previous animation in case we need to revert
+      const previousAnimation = state.currentAnimation;
+      
       document.querySelectorAll('[data-animation]').forEach(btn => btn.classList.remove('active'));
       e.currentTarget.classList.add('active');
       
@@ -109,10 +111,26 @@ function setupEventListeners() {
       
       const animText = document.getElementById('current-animation');
       if (animText) {
-        animText.textContent = animation.charAt(0).toUpperCase() + animation.slice(1);
+        animText.textContent = animation.charAt(0).toUpperCase() + animation.slice(1).replace('_', ' ');
       }
       
-      await loadCharacter(state.currentGender, animation);
+      // Try to load the new animation
+      const success = await loadCharacter(state.currentGender, animation);
+      
+      // If load failed, revert to previous animation
+      if (success === false) {
+        console.log(`?? Reverting to ${previousAnimation}`);
+        state.currentAnimation = previousAnimation;
+        state.currentFrame = 0;
+        
+        // Revert button states
+        document.querySelectorAll('[data-animation]').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`[data-animation="${previousAnimation}"]`)?.classList.add('active');
+        
+        if (animText) {
+          animText.textContent = previousAnimation.charAt(0).toUpperCase() + previousAnimation.slice(1).replace('_', ' ');
+        }
+      }
     });
   });
   
@@ -129,6 +147,8 @@ async function loadCharacter(gender, animation) {
   const animConfig = CONFIG.animations[animation];
   const animDir = animConfig.dir;
   
+  console.log(`?? Loading ${gender} ${animation}...`);
+  
   // Load body sprite for this animation
   const bodyPaths = [
     `/spritesheets/${bodyType.path}/${animDir}/${bodyType.bodyColor}.png`,
@@ -136,23 +156,25 @@ async function loadCharacter(gender, animation) {
     `/spritesheets/${bodyType.path}/${bodyType.bodyColor}.png`
   ];
   
-  console.log(`?? Loading ${gender} ${animation}...`);
   console.log('Body paths:', bodyPaths);
   
+  let newBodySprite;
   try {
-    state.bodySprite = await loadImageWithFallback(bodyPaths);
+    newBodySprite = await loadImageWithFallback(bodyPaths);
   } catch (e) {
-    console.error('Body failed:', e);
-    state.bodySprite = null;
-    return;
+    console.error(`? Animation "${animation}" not available for ${gender}`);
+    return false; // Signal failure, keep current sprite
   }
+  
+  // Only update state if load was successful
+  state.bodySprite = newBodySprite;
   
   // Try to load head sprite (if needed)
   // Child body includes head, so skip loading separate head
   if (!bodyType.loadHead) {
     console.log('?? Skipping head load (body includes head)');
     state.headSprite = null;
-    return;
+    return true; // Success
   }
   
   const headPaths = bodyType.headColor 
@@ -171,9 +193,11 @@ async function loadCharacter(gender, animation) {
   try {
     state.headSprite = await loadImageWithFallback(headPaths);
   } catch (e) {
-    console.warn('Head not found, using body only');
+    console.warn('?? Head not found, using body only');
     state.headSprite = null;
   }
+  
+  return true; // Success
 }
 
 function loadImageWithFallback(paths) {
@@ -261,7 +285,7 @@ function render() {
     canvas.width, canvas.height
   );
   
-  // Draw head on top if available
+  // Draw head if available
   if (state.headSprite) {
     ctx.drawImage(
       state.headSprite,
@@ -273,8 +297,4 @@ function render() {
   }
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
+document.addEventListener('DOMContentLoaded', init);
