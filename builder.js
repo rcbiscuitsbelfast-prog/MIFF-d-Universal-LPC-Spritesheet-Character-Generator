@@ -37,7 +37,6 @@ const CONFIG = {
   bodyTypes: {
     male: { path: 'body/bodies/male', headPath: 'head/heads/human/male', bodyColor: 'light', headColor: 'light', loadHead: true },
     female: { path: 'body/bodies/female', headPath: 'head/heads/human/female', bodyColor: 'light', headColor: 'light', loadHead: true },
-    child: { path: 'body/bodies/child', headPath: null, bodyColor: 'light', headColor: null, loadHead: false },
     teen: { path: 'body/bodies/teen', headPath: 'head/heads/human/male', bodyColor: 'light', headColor: 'light', loadHead: true }
   }
 };
@@ -155,7 +154,14 @@ function setupEventListeners() {
   const btnHelp = document.getElementById('btn-help');
   if (btnHelp) {
     btnHelp.addEventListener('click', () => {
-      alert('LPC Character Builder\n\nSelect body type and animation.\nHead layer will be added next!');
+      alert('LPC Character Builder v3\n\n1. Select body type\n2. Choose animation\n3. Pick direction\n4. Click Customize for more options!');
+    });
+  }
+  
+  const btnNext = document.getElementById('next-customize');
+  if (btnNext) {
+    btnNext.addEventListener('click', () => {
+      alert('Customization coming soon!\n\nNext features:\n- Hair styles\n- Clothing\n- Weapons\n- Accessories\n- Skin tones');
     });
   }
 }

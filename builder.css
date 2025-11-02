@@ -496,3 +496,68 @@ body {
   outline: 3px solid var(--primary);
   outline-offset: 2px;
 }
+
+/* Direction controls under sprite */
+.direction-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.dir-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.dir-arrow {
+  width: 48px;
+  height: 48px;
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  font-size: 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dir-arrow:hover {
+  background: rgba(102, 126, 234, 0.2);
+  border-color: rgba(102, 126, 234, 0.5);
+  transform: scale(1.05);
+}
+
+.dir-arrow.active {
+  background: rgba(102, 126, 234, 0.3);
+  border-color: var(--primary);
+  box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+}
+
+/* Next/Customize button */
+.next-btn {
+  width: 100%;
+  max-width: 280px;
+  padding: 1rem 2rem;
+  margin-top: 1rem;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.next-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.next-btn:active {
+  transform: translateY(0);
+}

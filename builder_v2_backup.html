@@ -52,7 +52,7 @@
   <div id="app" class="hidden">
     <!-- Top navigation bar -->
     <header class="top-nav">
-      <h1>?? LPC Builder <span style="font-size: 0.6em; opacity: 0.8;">v3</span></h1>
+      <h1>?? LPC Builder <span style="font-size: 0.6em; opacity: 0.8;">v2</span></h1>
       <div class="nav-actions">
         <button class="nav-btn" id="btn-export" aria-label="Export character">
           <span class="icon">??</span>
@@ -78,24 +78,9 @@
           <span id="current-animation">Walk</span>
           <span id="current-direction">Down</span>
         </div>
-        
-        <!-- Direction arrows directly under sprite -->
-        <div class="direction-controls">
-          <button class="dir-arrow" data-direction="up" aria-label="Face Up">??</button>
-          <div class="dir-row">
-            <button class="dir-arrow" data-direction="left" aria-label="Face Left">??</button>
-            <button class="dir-arrow active" data-direction="down" aria-label="Face Down">??</button>
-            <button class="dir-arrow" data-direction="right" aria-label="Face Right">??</button>
-          </div>
-        </div>
-
-        <!-- Next button for customization -->
-        <button class="next-btn" id="next-customize">
-          Customize ?
-        </button>
       </div>
 
-      <!-- Body Type selector -->
+      <!-- Gender selector (Phase 1) -->
       <div class="gender-selector">
         <h2>Body Type</h2>
         <div class="option-grid">
@@ -107,9 +92,36 @@
             <span class="icon">??</span>
             <span>Female</span>
           </button>
+          <button class="option-btn" data-gender="child">
+            <span class="icon">??</span>
+            <span>Child</span>
+          </button>
           <button class="option-btn" data-gender="teen">
             <span class="icon">?????</span>
             <span>Teen</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Direction selector -->
+      <div class="gender-selector">
+        <h2>Direction</h2>
+        <div class="option-grid">
+          <button class="option-btn" data-direction="up">
+            <span class="icon">??</span>
+            <span>Up</span>
+          </button>
+          <button class="option-btn" data-direction="left">
+            <span class="icon">??</span>
+            <span>Left</span>
+          </button>
+          <button class="option-btn active" data-direction="down">
+            <span class="icon">??</span>
+            <span>Down</span>
+          </button>
+          <button class="option-btn" data-direction="right">
+            <span class="icon">??</span>
+            <span>Right</span>
           </button>
         </div>
       </div>
