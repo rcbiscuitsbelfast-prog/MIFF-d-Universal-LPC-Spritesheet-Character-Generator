@@ -1,0 +1,25 @@
+{
+  "name": "Village Merchant",
+  "sprite": {
+    "body": {
+      "type": "male",
+      "color": "tanned"
+    },
+    "clothes": {
+      "torso": "torso/tunic/green.png"
+    },
+    "hair": {
+      "style": "short",
+      "color": "brown"
+    },
+    "weapon": null
+  },
+  "path": [],
+  "dialogue": [
+    "Looking to buy or sell?",
+    "I have the finest wares in the region!",
+    "Special discount today - just for you!"
+  ],
+  "behavior": "static",
+  "speed": 0
+}
