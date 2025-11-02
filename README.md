@@ -1,14 +1,20 @@
 LPC Spritesheet Character Generator
 =============================================
 
-**[🚀 Try the Mobile-Friendly Version](https://rcbiscuitsbelfast-prog.github.io/MIFF-d-Universal-LPC-Spritesheet-Character-Generator/)** - Enhanced with mobile viewport fixes and improved UI
+**[🚀 Try the Live Mobile Builder](https://lpc-avatar-builder-rcbiscuitsbelfast-prog.koyeb.app/builder.html)** - NEW! Mobile-first character builder with live animation
+
+**[📱 Try the Original Generator](https://rcbiscuitsbelfast-prog.github.io/MIFF-d-Universal-LPC-Spritesheet-Character-Generator/)** - Full desktop version with all features
 
 #### Translations
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/liberatedpixelcup/Universal-LPC-Spritesheet-Character-Generator/blob/master/README.md) [![zh](https://img.shields.io/badge/lang-zh-green.svg)](https://github.com/liberatedpixelcup/Universal-LPC-Spritesheet-Character-Generator/blob/master/lang/zh/README_ZH.md)
 
 This generator attempts to include all [LPC](https://lpc.opengameart.org) created character art up to now.
 
-Try it [here](https://liberatedpixelcup.github.io/Universal-LPC-Spritesheet-Character-Generator/).
+## 🚀 Live Versions
+
+- **[Mobile Builder (NEW!)](https://lpc-avatar-builder-rcbiscuitsbelfast-prog.koyeb.app/builder.html)** - Touch-friendly, mobile-first character builder with live animation preview
+- **[Original Generator](https://liberatedpixelcup.github.io/Universal-LPC-Spritesheet-Character-Generator/)** - Full desktop version with all features
+- **[API Documentation](https://lpc-avatar-builder-rcbiscuitsbelfast-prog.koyeb.app/health)** - RESTful API for programmatic access
 
 The Liberated Pixel Effort is a collaborative effort from a number of different great artists who helped produce sprites for the project.
 **If you wish to use LPC sprites in your project, you will need to credit everyone who helped contribute to the LPC sprites you are using.** See [below](#licensing-and-attribution-credits) for how to do this.
