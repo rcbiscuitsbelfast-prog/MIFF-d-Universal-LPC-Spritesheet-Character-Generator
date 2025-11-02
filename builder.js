@@ -10,21 +10,21 @@ const CONFIG = {
   scale: 3,
   
   animations: {
-    walk: { row: 0, frames: 9, fps: 12, dir: 'walk' },
-    idle: { row: 0, frames: 1, fps: 1, dir: 'idle' },
-    slash: { row: 0, frames: 6, fps: 12, dir: 'slash' },
-    halfslash: { row: 0, frames: 6, fps: 12, dir: 'halfslash' },
-    backslash: { row: 0, frames: 6, fps: 12, dir: 'backslash' },
-    spellcast: { row: 0, frames: 7, fps: 12, dir: 'spellcast' },
-    shoot: { row: 0, frames: 13, fps: 12, dir: 'shoot' },
-    thrust: { row: 0, frames: 8, fps: 12, dir: 'thrust' },
-    hurt: { row: 0, frames: 6, fps: 8, dir: 'hurt' },
-    jump: { row: 0, frames: 4, fps: 8, dir: 'jump' },
-    run: { row: 0, frames: 8, fps: 12, dir: 'run' },
-    sit: { row: 0, frames: 1, fps: 1, dir: 'sit' },
-    climb: { row: 0, frames: 4, fps: 8, dir: 'climb' },
-    combat_idle: { row: 0, frames: 4, fps: 4, dir: 'combat_idle' },
-    emote: { row: 0, frames: 4, fps: 6, dir: 'emote' }
+    walk: { row: 0, frames: 9, fps: 12, dir: 'walk', singleDirection: false },
+    idle: { row: 0, frames: 1, fps: 1, dir: 'idle', singleDirection: false },
+    slash: { row: 0, frames: 6, fps: 12, dir: 'slash', singleDirection: false },
+    halfslash: { row: 0, frames: 6, fps: 12, dir: 'halfslash', singleDirection: false },
+    backslash: { row: 0, frames: 6, fps: 12, dir: 'backslash', singleDirection: false },
+    spellcast: { row: 0, frames: 7, fps: 12, dir: 'spellcast', singleDirection: false },
+    shoot: { row: 0, frames: 13, fps: 12, dir: 'shoot', singleDirection: false },
+    thrust: { row: 0, frames: 8, fps: 12, dir: 'thrust', singleDirection: false },
+    hurt: { row: 0, frames: 6, fps: 8, dir: 'hurt', singleDirection: true },
+    jump: { row: 0, frames: 4, fps: 8, dir: 'jump', singleDirection: false },
+    run: { row: 0, frames: 8, fps: 12, dir: 'run', singleDirection: false },
+    sit: { row: 0, frames: 3, fps: 4, dir: 'sit', singleDirection: false },
+    climb: { row: 0, frames: 6, fps: 8, dir: 'climb', singleDirection: true },
+    combat_idle: { row: 0, frames: 2, fps: 4, dir: 'combat_idle', singleDirection: false },
+    emote: { row: 0, frames: 3, fps: 6, dir: 'emote', singleDirection: false }
   },
   
   directions: {
@@ -92,6 +92,24 @@ function setupEventListeners() {
       state.currentFrame = 0;
       
       await loadCharacter(gender, state.currentAnimation);
+    });
+  });
+  
+  document.querySelectorAll('[data-direction]').forEach(button => {
+    button.addEventListener('click', (e) => {
+      const direction = e.currentTarget.dataset.direction;
+      if (direction === state.currentDirection) return;
+      
+      document.querySelectorAll('[data-direction]').forEach(btn => btn.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      
+      state.currentDirection = direction;
+      state.currentFrame = 0;
+      
+      const dirText = document.getElementById('current-direction');
+      if (dirText) {
+        dirText.textContent = direction.charAt(0).toUpperCase() + direction.slice(1);
+      }
     });
   });
   
@@ -266,7 +284,9 @@ function render() {
   
   const { ctx, canvas } = elements;
   const animConfig = CONFIG.animations[state.currentAnimation];
-  const directionOffset = CONFIG.directions[state.currentDirection];
+  
+  // Single-direction animations (hurt, climb) only have 1 row
+  const directionOffset = animConfig.singleDirection ? 0 : CONFIG.directions[state.currentDirection];
   
   const row = animConfig.row + directionOffset;
   const col = state.currentFrame;
