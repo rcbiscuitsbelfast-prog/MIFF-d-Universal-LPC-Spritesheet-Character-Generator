@@ -17,10 +17,10 @@ const PORT = process.env.PORT || 3000;
 const config = {
   assetsPath: process.env.ASSETS_PATH || path.join(__dirname, 'assets/lpc'),
   spritesheetsPath: process.env.SPRITESHEETS_PATH || path.join(__dirname, 'spritesheets'),
-  uploadsPath: process.env.UPLOADS_PATH || '/opt/render/project/uploads',
-  persistentDisk: process.env.PERSISTENT_DISK_PATH || '/opt/render/project/data',
-  maxFileSize: 5 * 1024 * 1024, // 5MB
-  allowedFormats: ['.png', '.json']
+  uploadsPath: process.env.UPLOADS_PATH || path.join(process.env.PERSISTENT_DISK_PATH || __dirname, 'uploads'),
+  persistentDisk: process.env.PERSISTENT_DISK_PATH || path.join(__dirname, 'data'),
+  maxFileSize: parseInt(process.env.MAX_FILE_SIZE || '5242880', 10), // 5MB default
+  allowedFormats: process.env.ALLOWED_FORMATS?.split(',') || ['.png', '.json']
 };
 
 // Middleware
@@ -409,11 +409,41 @@ process.on('SIGTERM', () => {
   });
 });
 
+// Initialize on startup
+(async () => {
+  try {
+    // Create symlink for spritesheets if needed
+    const symlinkPath = path.join(__dirname, 'spritesheets');
+    const targetPath = path.join(__dirname, 'assets/lpc/spritesheets');
+    
+    try {
+      await fs.access(symlinkPath);
+    } catch {
+      // Symlink doesn't exist, try to create it
+      try {
+        await fs.access(targetPath);
+        await fs.symlink(targetPath, symlinkPath);
+        logger.info('Created symlink', { from: symlinkPath, to: targetPath });
+      } catch (error) {
+        logger.warn('Could not create symlink', { error: error.message });
+      }
+    }
+    
+    // Ensure upload directory exists
+    const uploadDir = path.join(config.persistentDisk, 'uploads');
+    await fs.mkdir(uploadDir, { recursive: true });
+    logger.info('Upload directory ready', { path: uploadDir });
+  } catch (error) {
+    logger.error('Initialization error', error);
+  }
+})();
+
 // Start server
 const server = app.listen(PORT, '0.0.0.0', () => {
   logger.info('LPC Avatar Builder server started', {
     port: PORT,
     env: process.env.NODE_ENV || 'production',
+    platform: process.env.KOYEB ? 'Koyeb' : (process.env.RENDER ? 'Render' : 'Other'),
     assetsPath: config.assetsPath,
     spritesheetsPath: config.spritesheetsPath,
     persistentDisk: config.persistentDisk
