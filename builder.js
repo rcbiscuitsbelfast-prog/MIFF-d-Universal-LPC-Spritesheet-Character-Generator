@@ -11,13 +11,13 @@ const CONFIG = {
   scale: 3,
   
   animations: {
-    walk: { row: 8, frames: 9, fps: 12, dir: 'walk' },
-    idle: { row: 8, frames: 1, fps: 1, dir: 'walk' },
-    slash: { row: 12, frames: 6, fps: 12, dir: 'slash' },
+    walk: { row: 0, frames: 9, fps: 12, dir: 'walk' },
+    idle: { row: 0, frames: 1, fps: 1, dir: 'idle' },
+    slash: { row: 0, frames: 6, fps: 12, dir: 'slash' },
     spellcast: { row: 0, frames: 7, fps: 12, dir: 'spellcast' },
-    shoot: { row: 16, frames: 13, fps: 12, dir: 'shoot' },
-    thrust: { row: 4, frames: 8, fps: 12, dir: 'thrust' },
-    hurt: { row: 20, frames: 6, fps: 8, dir: 'hurt' }
+    shoot: { row: 0, frames: 13, fps: 12, dir: 'shoot' },
+    thrust: { row: 0, frames: 8, fps: 12, dir: 'thrust' },
+    hurt: { row: 0, frames: 6, fps: 8, dir: 'hurt' }
   },
   
   directions: {
