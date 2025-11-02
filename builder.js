@@ -28,10 +28,10 @@ const CONFIG = {
   },
   
   bodyTypes: {
-    male: { path: 'body/bodies/male', headPath: 'head/heads/human/male', color: 'light' },
-    female: { path: 'body/bodies/female', headPath: 'head/heads/human/female', color: 'light' },
-    child: { path: 'body/bodies/child', headPath: 'head/heads/human/child', color: 'light' },
-    teen: { path: 'body/bodies/teen', headPath: 'head/heads/human/male', color: 'light' }
+    male: { path: 'body/bodies/male', headPath: 'head/heads/human/male', color: 'light', headColor: 'light' },
+    female: { path: 'body/bodies/female', headPath: 'head/heads/human/female', color: 'light', headColor: 'light' },
+    child: { path: 'body/bodies/child', headPath: 'head/heads/human/child', color: 'light', headColor: null },
+    teen: { path: 'body/bodies/teen', headPath: 'head/heads/human/male', color: 'light', headColor: 'light' }
   }
 };
 
@@ -124,6 +124,7 @@ async function loadCharacter(gender, animation) {
   // Load body sprite for this animation
   const bodyPaths = [
     `/spritesheets/${bodyType.path}/${animDir}/${bodyType.color}.png`,
+    `/spritesheets/${bodyType.path}/${animDir}.png`,
     `/spritesheets/${bodyType.path}/${bodyType.color}.png`
   ];
   
@@ -139,10 +140,17 @@ async function loadCharacter(gender, animation) {
   }
   
   // Try to load head sprite
-  const headPaths = [
-    `/spritesheets/${bodyType.headPath}/${animDir}/${bodyType.color}.png`,
-    `/spritesheets/${bodyType.headPath}/${bodyType.color}.png`
-  ];
+  // Child heads have different structure: no subdirectory, no color suffix
+  const headPaths = bodyType.headColor 
+    ? [
+        `/spritesheets/${bodyType.headPath}/${animDir}/${bodyType.headColor}.png`,
+        `/spritesheets/${bodyType.headPath}/${animDir}.png`,
+        `/spritesheets/${bodyType.headPath}/${bodyType.headColor}.png`
+      ]
+    : [
+        `/spritesheets/${bodyType.headPath}/${animDir}.png`,
+        `/spritesheets/${bodyType.headPath}/${animDir}/${bodyType.color}.png`
+      ];
   
   console.log('Loading head:', headPaths[0]);
   
