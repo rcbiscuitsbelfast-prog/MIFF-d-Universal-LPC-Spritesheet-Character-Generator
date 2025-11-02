@@ -137,9 +137,14 @@ app.use('/content', express.static(path.join(__dirname, 'content'), {
   etag: true
 }));
 
+// Redirect root to new mobile builder
+app.get('/', (req, res) => {
+  res.redirect(301, '/builder.html');
+});
+
 // Serve main application
 app.use(express.static(__dirname, {
-  index: 'index.html',
+  index: false, // Disable auto-index since we handle / above
   maxAge: '1h'
 }));
 
