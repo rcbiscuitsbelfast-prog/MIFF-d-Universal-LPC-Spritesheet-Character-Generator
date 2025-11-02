@@ -182,6 +182,42 @@ function handleAnimationChange(event) {
 /**
  * Load sprite image for given gender
  */
+async function loadSprite(gender) {
+  return new Promise((resolve, reject) => {
+    const bodyType = CONFIG.bodyTypes[gender];
+    
+    // Construct sprite path
+    // Format: /spritesheets/body/bodies/{type}/walk/{color}.png
+    // For Phase 1, we'll use walk spritesheet as it contains multiple animations
+    const spritePath = `/spritesheets/${bodyType.path}/walk/${bodyType.color}.png`;
+    
+    console.log(`?? Loading sprite: ${spritePath}`);
+    
+    const img = new Image();
+    
+    img.onload = () => {
+      state.spriteImage = img;
+      console.log(`? Sprite loaded: ${img.width}x${img.height}`);
+      resolve(img);
+    };
+    
+    img.onerror = (error) => {
+      console.error('? Failed to load sprite:', spritePath);
+      
+      // Try alternative path (some sprites might be in different locations)
+      const altPath = `/spritesheets/body/bodies/${gender}/${bodyType.color}.png`;
+      console.log(`?? Trying alternative path: ${altPath}`);
+      
+      const altImg = new Image();
+      altImg.onload = () => {
+        state.spriteImage = altImg;
+        console.log(`? Sprite loaded from alt path`);
+        resolve(altImg);
+      };
+      altImg.onerror = () => {
+        console.error('? Failed to load sprite from alt path');
+        showToast('Failed to load character sprite');
+        reject(error);
       };
       altImg.src = altPath;
     };
@@ -274,115 +310,6 @@ if (document.readyState === 'loading') {
 }
 
 // Export for debugging
-if (typeof window !== 'undefined') {
-  window.LPCBuilder = {
-    state,
-    CONFIG,
-    loadSprite,
-    showToast
-  };
-}
-async function loadSprite(gender) {
-  return new Promise((resolve, reject) => {
-    const bodyType = CONFIG.bodyTypes[gender];
-    
-    const possiblePaths = [
-      `/spritesheets/body/bodies/${gender}/spellcast/${bodyType.color}.png`,
-      `/spritesheets/body/bodies/${gender}/walk/${bodyType.color}.png`,
-      `/spritesheets/body/bodies/${gender}/hurt/${bodyType.color}.png`,
-    ];
-    
-    let attemptIndex = 0;
-    
-    const tryNextPath = () => {
-      if (attemptIndex >= possiblePaths.length) {
-        console.error('Failed all paths');
-        showToast('Failed to load sprite');
-        reject(new Error('All paths failed'));
-        return;
-      }
-      
-      const spritePath = possiblePaths[attemptIndex];
-      console.log(`Try ${attemptIndex + 1}: ${spritePath}`);
-      
-      const img = new Image();
-      img.onload = () => {
-        state.spriteImage = img;
-        console.log(`Loaded: ${img.width}x${img.height}`);
-        resolve(img);
-      };
-      img.onerror = () => {
-        attemptIndex++;
-        tryNextPath();
-      };
-      img.src = spritePath;
-    };
-    
-    tryNextPath();
-  });
-}
-
-function animate(timestamp) {
-  if (!state.isPlaying) {
-    requestAnimationFrame(animate);
-    return;
-  }
-  
-  const animConfig = CONFIG.animations[state.currentAnimation];
-  const frameDelay = 1000 / animConfig.fps;
-  
-  if (timestamp - state.lastFrameTime >= frameDelay) {
-    state.currentFrame = (state.currentFrame + 1) % animConfig.frames;
-    state.lastFrameTime = timestamp;
-  }
-  
-  render();
-  requestAnimationFrame(animate);
-}
-
-function render() {
-  if (!state.spriteImage) return;
-  
-  const { ctx, canvas } = elements;
-  const animConfig = CONFIG.animations[state.currentAnimation];
-  const directionOffset = CONFIG.directions[state.currentDirection];
-  
-  const row = animConfig.row + directionOffset;
-  const col = state.currentFrame;
-  
-  const sx = col * CONFIG.spriteWidth;
-  const sy = row * CONFIG.spriteHeight;
-  
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-  ctx.drawImage(
-    state.spriteImage,
-    sx, sy,
-    CONFIG.spriteWidth, CONFIG.spriteHeight,
-    0, 0,
-    canvas.width, canvas.height
-  );
-}
-
-function showToast(message, duration = 3000) {
-  document.querySelectorAll('.toast').forEach(toast => toast.remove());
-  
-  const toast = document.createElement('div');
-  toast.className = 'toast';
-  toast.textContent = message;
-  document.body.appendChild(toast);
-  
-  setTimeout(() => {
-    toast.remove();
-  }, duration);
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
-
 if (typeof window !== 'undefined') {
   window.LPCBuilder = {
     state,
