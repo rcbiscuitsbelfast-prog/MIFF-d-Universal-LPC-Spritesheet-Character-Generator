@@ -30,7 +30,7 @@ const CONFIG = {
   bodyTypes: {
     male: { path: 'body/bodies/male', headPath: 'head/heads/human/male', color: 'light' },
     female: { path: 'body/bodies/female', headPath: 'head/heads/human/female', color: 'light' },
-    child: { path: 'body/bodies/child', headPath: 'head/heads/human/male', color: 'light' },
+    child: { path: 'body/bodies/child', headPath: 'head/heads/human/child', color: 'light' },
     teen: { path: 'body/bodies/teen', headPath: 'head/heads/human/male', color: 'light' }
   }
 };
@@ -122,28 +122,65 @@ async function loadCharacter(gender, animation) {
   const animDir = animConfig.dir;
   
   // Load body sprite for this animation
-  const bodyPath = `/spritesheets/${bodyType.path}/${animDir}/${bodyType.color}.png`;
-  console.log('Loading body:', bodyPath);
+  const bodyPaths = [
+    `/spritesheets/${bodyType.path}/${animDir}/${bodyType.color}.png`,
+    `/spritesheets/${bodyType.path}/${bodyType.color}.png`
+  ];
+  
+  console.log('Loading body:', bodyPaths[0]);
   
   try {
-    state.bodySprite = await loadImage(bodyPath);
+    state.bodySprite = await loadImageWithFallback(bodyPaths);
     console.log('Body loaded!');
   } catch (e) {
     console.error('Body failed:', e);
     state.bodySprite = null;
+    return;
   }
   
   // Try to load head sprite
-  const headPath = `/spritesheets/${bodyType.headPath}/${animDir}/${bodyType.color}.png`;
-  console.log('Loading head:', headPath);
+  const headPaths = [
+    `/spritesheets/${bodyType.headPath}/${animDir}/${bodyType.color}.png`,
+    `/spritesheets/${bodyType.headPath}/${bodyType.color}.png`
+  ];
+  
+  console.log('Loading head:', headPaths[0]);
   
   try {
-    state.headSprite = await loadImage(headPath);
+    state.headSprite = await loadImageWithFallback(headPaths);
     console.log('Head loaded!');
   } catch (e) {
     console.warn('Head not found, using body only');
     state.headSprite = null;
   }
+}
+
+function loadImageWithFallback(paths) {
+  return new Promise((resolve, reject) => {
+    let index = 0;
+    
+    const tryNext = () => {
+      if (index >= paths.length) {
+        reject(new Error('All paths failed'));
+        return;
+      }
+      
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => {
+        index++;
+        if (index < paths.length) {
+          console.log('Trying fallback:', paths[index]);
+          tryNext();
+        } else {
+          reject(new Error('All paths failed'));
+        }
+      };
+      img.src = paths[index];
+    };
+    
+    tryNext();
+  });
 }
 
 function loadImage(src) {
