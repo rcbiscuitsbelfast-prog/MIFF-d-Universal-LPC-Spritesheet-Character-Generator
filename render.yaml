@@ -1,0 +1,36 @@
+# Render Blueprint for LPC Avatar Builder
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: lpc-avatar-builder
+    env: node
+    region: oregon
+    plan: starter
+    buildCommand: npm install && git submodule init && git submodule update --recursive
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: SPRITESHEETS_PATH
+        value: /opt/render/project/src/spritesheets
+      - key: PERSISTENT_DISK_PATH
+        value: /opt/render/project/data
+      - key: MAX_FILE_SIZE
+        value: 5242880
+    disk:
+      name: lpc-assets
+      mountPath: /opt/render/project/data
+      sizeGB: 10
+    healthCheckPath: /health
+    autoDeploy: true
+    
+databases: []
+
+# Optional: Add Redis for caching
+# - type: redis
+#   name: lpc-cache
+#   ipAllowList: []
+#   plan: starter
