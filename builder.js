@@ -14,10 +14,18 @@ const CONFIG = {
     walk: { row: 0, frames: 9, fps: 12, dir: 'walk' },
     idle: { row: 0, frames: 1, fps: 1, dir: 'idle' },
     slash: { row: 0, frames: 6, fps: 12, dir: 'slash' },
+    halfslash: { row: 0, frames: 6, fps: 12, dir: 'halfslash' },
+    backslash: { row: 0, frames: 6, fps: 12, dir: 'backslash' },
     spellcast: { row: 0, frames: 7, fps: 12, dir: 'spellcast' },
     shoot: { row: 0, frames: 13, fps: 12, dir: 'shoot' },
     thrust: { row: 0, frames: 8, fps: 12, dir: 'thrust' },
-    hurt: { row: 0, frames: 6, fps: 8, dir: 'hurt' }
+    hurt: { row: 0, frames: 6, fps: 8, dir: 'hurt' },
+    jump: { row: 0, frames: 4, fps: 8, dir: 'jump' },
+    run: { row: 0, frames: 8, fps: 12, dir: 'run' },
+    sit: { row: 0, frames: 1, fps: 1, dir: 'sit' },
+    climb: { row: 0, frames: 4, fps: 8, dir: 'climb' },
+    combat_idle: { row: 0, frames: 4, fps: 4, dir: 'combat_idle' },
+    emote: { row: 0, frames: 4, fps: 6, dir: 'emote' }
   },
   
   directions: {
@@ -28,10 +36,10 @@ const CONFIG = {
   },
   
   bodyTypes: {
-    male: { path: 'body/bodies/male', headPath: 'head/heads/human/male', bodyColor: 'light', headColor: 'light' },
-    female: { path: 'body/bodies/female', headPath: 'head/heads/human/female', bodyColor: 'light', headColor: 'light' },
-    child: { path: 'body/bodies/child', headPath: 'head/heads/human/child', bodyColor: 'light', headColor: null },
-    teen: { path: 'body/bodies/teen', headPath: 'head/heads/human/male', bodyColor: 'light', headColor: 'light' }
+    male: { path: 'body/bodies/male', headPath: 'head/heads/human/male', bodyColor: 'light', headColor: 'light', loadHead: true },
+    female: { path: 'body/bodies/female', headPath: 'head/heads/human/female', bodyColor: 'light', headColor: 'light', loadHead: true },
+    child: { path: 'body/bodies/child', headPath: null, bodyColor: 'light', headColor: null, loadHead: false },
+    teen: { path: 'body/bodies/teen', headPath: 'head/heads/human/male', bodyColor: 'light', headColor: 'light', loadHead: true }
   }
 };
 
@@ -139,8 +147,14 @@ async function loadCharacter(gender, animation) {
     return;
   }
   
-  // Try to load head sprite
-  // Child heads have different structure: flat files with no color subdirectory
+  // Try to load head sprite (if needed)
+  // Child body includes head, so skip loading separate head
+  if (!bodyType.loadHead) {
+    console.log('?? Skipping head load (body includes head)');
+    state.headSprite = null;
+    return;
+  }
+  
   const headPaths = bodyType.headColor 
     ? [
         `/spritesheets/${bodyType.headPath}/${animDir}/${bodyType.headColor}.png`,

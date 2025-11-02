@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#667eea">
   <meta name="description" content="Create and customize LPC-style game characters with live animation preview">
-  <title>LPC Character Builder v1</title>
+  <title>LPC Character Builder v2</title>
   <link rel="stylesheet" href="builder.css">
   <style>
     /* Critical CSS for fast initial render */
@@ -52,7 +52,7 @@
   <div id="app" class="hidden">
     <!-- Top navigation bar -->
     <header class="top-nav">
-      <h1>?? LPC Builder <span style="font-size: 0.6em; opacity: 0.8;">v1</span></h1>
+      <h1>?? LPC Builder <span style="font-size: 0.6em; opacity: 0.8;">v2</span></h1>
       <div class="nav-actions">
         <button class="nav-btn" id="btn-export" aria-label="Export character">
           <span class="icon">??</span>
@@ -111,13 +111,33 @@
           <span class="icon">??</span>
           <span>Walk</span>
         </button>
+        <button class="anim-btn" data-animation="run">
+          <span class="icon">??</span>
+          <span>Run</span>
+        </button>
         <button class="anim-btn" data-animation="idle">
           <span class="icon">??</span>
           <span>Idle</span>
         </button>
+        <button class="anim-btn" data-animation="combat_idle">
+          <span class="icon">???</span>
+          <span>Combat</span>
+        </button>
         <button class="anim-btn" data-animation="slash">
           <span class="icon">??</span>
-          <span>Attack</span>
+          <span>Slash</span>
+        </button>
+        <button class="anim-btn" data-animation="halfslash">
+          <span class="icon">???</span>
+          <span>Half Slash</span>
+        </button>
+        <button class="anim-btn" data-animation="backslash">
+          <span class="icon">??</span>
+          <span>Back Slash</span>
+        </button>
+        <button class="anim-btn" data-animation="thrust">
+          <span class="icon">???</span>
+          <span>Thrust</span>
         </button>
         <button class="anim-btn" data-animation="spellcast">
           <span class="icon">?</span>
@@ -127,13 +147,25 @@
           <span class="icon">??</span>
           <span>Shoot</span>
         </button>
-        <button class="anim-btn" data-animation="thrust">
-          <span class="icon">???</span>
-          <span>Thrust</span>
-        </button>
         <button class="anim-btn" data-animation="hurt">
           <span class="icon">??</span>
           <span>Hurt</span>
+        </button>
+        <button class="anim-btn" data-animation="jump">
+          <span class="icon">??</span>
+          <span>Jump</span>
+        </button>
+        <button class="anim-btn" data-animation="sit">
+          <span class="icon">??</span>
+          <span>Sit</span>
+        </button>
+        <button class="anim-btn" data-animation="climb">
+          <span class="icon">??</span>
+          <span>Climb</span>
+        </button>
+        <button class="anim-btn" data-animation="emote">
+          <span class="icon">??</span>
+          <span>Emote</span>
         </button>
       </div>
     </footer>
