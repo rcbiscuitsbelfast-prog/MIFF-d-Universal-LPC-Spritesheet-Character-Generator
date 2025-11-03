@@ -1,5 +1,5 @@
 /**
- * LPC Character Builder - v6.4 CLICKABLE + DIRECT START
+ * LPC Character Builder - v6.4.1 FIXES
  */
 
 const CONFIG = {
