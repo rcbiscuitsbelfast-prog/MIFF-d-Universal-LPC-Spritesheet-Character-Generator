@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#667eea">
   <meta name="description" content="Create and customize LPC-style game characters with live animation preview">
-  <title>LPC Character Builder v6</title>
+  <title>LPC Character Builder v6.1</title>
   <link rel="stylesheet" href="builder.css">
 </head>
 <body>
@@ -22,20 +22,11 @@
   <div id="app" class="hidden">
     <!-- Top navigation bar -->
     <header class="top-nav">
-      <h1>?? LPC Builder <span style="font-size: 0.6em; opacity: 0.8;">v6</span></h1>
+      <h1>LPC Builder <span style="font-size: 0.6em; opacity: 0.8;">v6.1</span></h1>
       <div class="nav-actions">
-        <button class="nav-btn" id="btn-back" aria-label="Back" style="display: none;">
-          <span class="icon">?</span>
-          <span class="label">Back</span>
-        </button>
-        <button class="nav-btn" id="btn-export" aria-label="Export character">
-          <span class="icon">??</span>
-          <span class="label">Export</span>
-        </button>
-        <button class="nav-btn" id="btn-help" aria-label="Help">
-          <span class="icon">?</span>
-          <span class="label">Help</span>
-        </button>
+        <button class="nav-btn" id="btn-back" aria-label="Back" style="display: none;">Back</button>
+        <button class="nav-btn" id="btn-export" aria-label="Export character">Export</button>
+        <button class="nav-btn" id="btn-help" aria-label="Help">Help</button>
       </div>
     </header>
 
@@ -51,19 +42,19 @@
         
         <!-- Direction arrows -->
         <div class="direction-controls">
-          <button class="dir-arrow" data-direction="up" aria-label="Face Up">?</button>
+          <button class="dir-arrow" data-direction="up" aria-label="Face Up">UP</button>
           <div class="dir-row">
-            <button class="dir-arrow" data-direction="left" aria-label="Face Left">?</button>
-            <button class="dir-arrow active" data-direction="down" aria-label="Face Down">?</button>
-            <button class="dir-arrow" data-direction="right" aria-label="Face Right">?</button>
+            <button class="dir-arrow" data-direction="left" aria-label="Face Left">LEFT</button>
+            <button class="dir-arrow active" data-direction="down" aria-label="Face Down">DOWN</button>
+            <button class="dir-arrow" data-direction="right" aria-label="Face Right">RIGHT</button>
           </div>
         </div>
 
         <!-- Category Navigation (horizontal with arrows) -->
         <div class="category-nav" id="category-nav" style="display: none;">
-          <button class="nav-arrow" id="prev-category" aria-label="Previous">?</button>
+          <button class="nav-arrow" id="prev-category" aria-label="Previous">&lt;</button>
           <div class="category-label" id="current-category-label">Body</div>
-          <button class="nav-arrow" id="next-category" aria-label="Next">?</button>
+          <button class="nav-arrow" id="next-category" aria-label="Next">&gt;</button>
         </div>
       </div>
 
@@ -71,18 +62,9 @@
       <div id="body-selector" class="selection-section">
         <h2>Select Body Type</h2>
         <div class="option-grid">
-          <button class="option-btn active" data-gender="male">
-            <span class="icon">?</span>
-            <span>Male</span>
-          </button>
-          <button class="option-btn" data-gender="female">
-            <span class="icon">?</span>
-            <span>Female</span>
-          </button>
-          <button class="option-btn" data-gender="teen">
-            <span class="icon">??</span>
-            <span>Teen</span>
-          </button>
+          <button class="option-btn active" data-gender="male">Male</button>
+          <button class="option-btn" data-gender="female">Female</button>
+          <button class="option-btn" data-gender="teen">Teen</button>
         </div>
         
         <!-- Customize button below body types -->
@@ -105,30 +87,21 @@
     <!-- Bottom animation selector -->
     <footer class="animation-bar" id="animation-bar">
       <div class="animation-scroll">
-        <button class="anim-btn active" data-animation="walk">
-          <span class="icon">??</span>
-          <span>Walk</span>
-        </button>
-        <button class="anim-btn" data-animation="run">
-          <span class="icon">??</span>
-          <span>Run</span>
-        </button>
-        <button class="anim-btn" data-animation="idle">
-          <span class="icon">??</span>
-          <span>Idle</span>
-        </button>
-        <button class="anim-btn" data-animation="slash">
-          <span class="icon">?</span>
-          <span>Slash</span>
-        </button>
-        <button class="anim-btn" data-animation="spellcast">
-          <span class="icon">?</span>
-          <span>Cast</span>
-        </button>
-        <button class="anim-btn" data-animation="shoot">
-          <span class="icon">??</span>
-          <span>Shoot</span>
-        </button>
+        <button class="anim-btn active" data-animation="walk">Walk</button>
+        <button class="anim-btn" data-animation="run">Run</button>
+        <button class="anim-btn" data-animation="idle">Idle</button>
+        <button class="anim-btn" data-animation="slash">Slash</button>
+        <button class="anim-btn" data-animation="spellcast">Cast</button>
+        <button class="anim-btn" data-animation="thrust">Thrust</button>
+        <button class="anim-btn" data-animation="shoot">Shoot</button>
+        <button class="anim-btn" data-animation="hurt">Hurt</button>
+        <button class="anim-btn" data-animation="sit">Sit</button>
+        <button class="anim-btn" data-animation="climb">Climb</button>
+        <button class="anim-btn" data-animation="emote">Emote</button>
+        <button class="anim-btn" data-animation="combat_idle">Combat</button>
+        <button class="anim-btn" data-animation="slash_basic">Slash2</button>
+        <button class="anim-btn" data-animation="watering">Water</button>
+        <button class="anim-btn" data-animation="onehanded">1H-Slash</button>
       </div>
     </footer>
   </div>

@@ -1,5 +1,5 @@
 /**
- * LPC Character Builder - v6 WITH REAL ASSETS & HORIZONTAL NAV
+ * LPC Character Builder - v6.1 FIXED ANIMATIONS & ALL OPTIONS
  */
 
 const CONFIG = {
@@ -55,9 +55,14 @@ const state = {
   torsoSprite: null,
   legsSprite: null,
   weaponSprite: null,
+  bodyExtraSprite: null,
+  headExtraSprite: null,
   lastFrameTime: 0,
   currentCategoryIndex: 0,
   customization: {
+    bodyExtra: 'none',
+    headExtra: 'none',
+    headExtraColor: 'brown',
     hair: 'none',
     hairColor: 'black',
     torso: 'none',
@@ -225,9 +230,9 @@ function showCategory(category) {
 }
 
 function enterCustomizeMode() {
-  // Hide body selector and animation bar
+  // Hide body selector but KEEP animation bar
   document.getElementById('body-selector').classList.add('hidden');
-  document.getElementById('animation-bar').style.display = 'none';
+  // Animation bar stays visible!
   
   // Show customization section and nav
   const customizeSection = document.getElementById('customize-section');
@@ -273,10 +278,10 @@ function loadCategoryContent(category, container) {
   
   switch(category) {
     case 'body':
-      container.innerHTML = '<p style="text-align: center; color: #64748b;">Body type selected: ' + state.currentGender + '</p>';
+      loadBodyOptions(container);
       break;
     case 'head':
-      container.innerHTML = '<p style="text-align: center; color: #64748b;">Head automatically matches body type</p>';
+      loadHeadOptions(container);
       break;
     case 'hair':
       loadHairOptions(container);
@@ -294,6 +299,58 @@ function loadCategoryContent(category, container) {
       loadWeaponOptions(container);
       break;
   }
+}
+
+function loadBodyOptions(container) {
+  const bodyExtras = ['wings', 'tail', 'fins'];
+  
+  let html = '<div class="content-subsection">';
+  html += '<h3>Body Type</h3>';
+  html += '<p style="text-align: center; color: #64748b; margin-bottom: 1rem;">Current: ' + state.currentGender + '</p>';
+  html += '</div>';
+  
+  html += '<div class="content-subsection">';
+  html += '<h3>Body Extras</h3>';
+  html += '<div class="items-grid">';
+  html += '<button class="item-card active" onclick="selectBodyExtra(\'none\')">None</button>';
+  bodyExtras.forEach(extra => {
+    html += `<button class="item-card" onclick="selectBodyExtra('${extra}')">${extra.charAt(0).toUpperCase() + extra.slice(1)}</button>`;
+  });
+  html += '</div></div>';
+  
+  container.innerHTML = html;
+}
+
+function loadHeadOptions(container) {
+  const headExtras = ['horns', 'ears_elven', 'ears_cat', 'antennae'];
+  const colors = ['brown', 'black', 'white', 'gray'];
+  
+  let html = '<div class="content-subsection">';
+  html += '<h3>Head Type</h3>';
+  html += '<p style="text-align: center; color: #64748b; margin-bottom: 1rem;">Matches body type</p>';
+  html += '</div>';
+  
+  html += '<div class="content-subsection">';
+  html += '<h3>Head Extras</h3>';
+  html += '<div class="items-grid">';
+  html += '<button class="item-card active" onclick="selectHeadExtra(\'none\')">None</button>';
+  headExtras.forEach(extra => {
+    html += `<button class="item-card" onclick="selectHeadExtra('${extra}')">${extra.replace('_', ' ').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</button>`;
+  });
+  html += '</div></div>';
+  
+  html += '<div class="content-subsection">';
+  html += '<h3>Extra Color</h3>';
+  html += '<div class="colors-grid">';
+  colors.forEach(color => {
+    const bgColor = getColorHex(color);
+    html += `<button class="color-card" style="background: ${bgColor};" onclick="selectHeadExtraColor('${color}')">`;
+    html += `<div class="color-card-label">${color}</div>`;
+    html += '</button>';
+  });
+  html += '</div></div>';
+  
+  container.innerHTML = html;
 }
 
 function loadHairOptions(container) {
@@ -886,3 +943,54 @@ async function loadLegsSprite() {
   }
 }
 
+
+// Reload all customization sprites when animation changes
+async function reloadAllCustomizationSprites() {
+  console.log('?? Reloading all customization sprites for animation:', state.currentAnimation);
+  
+  const promises = [];
+  
+  if (state.customization.hair !== 'none') {
+    promises.push(loadHairSprite());
+  }
+  
+  if (state.customization.torso !== 'none') {
+    promises.push(loadTorsoSprite());
+  }
+  
+  if (state.customization.legs !== 'none') {
+    promises.push(loadLegsSprite());
+  }
+  
+  await Promise.all(promises);
+  console.log('? All customization sprites reloaded');
+}
+
+// Global functions for body/head extras
+window.selectBodyExtra = function(extra) {
+  state.customization.bodyExtra = extra;
+  document.querySelectorAll('#category-content .item-card').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.toLowerCase() === extra);
+  });
+  console.log('Body extra selected:', extra);
+  // TODO: Load body extra sprite
+};
+
+window.selectHeadExtra = function(extra) {
+  state.customization.headExtra = extra;
+  document.querySelectorAll('#category-content .item-card').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.toLowerCase().replace(/ /g, '_') === extra);
+  });
+  console.log('Head extra selected:', extra);
+  // TODO: Load head extra sprite
+};
+
+window.selectHeadExtraColor = function(color) {
+  state.customization.headExtraColor = color;
+  document.querySelectorAll('#category-content .color-card').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  event.target.closest('.color-card').classList.add('active');
+  console.log('Head extra color selected:', color);
+  // TODO: Reload head extra sprite with color
+};

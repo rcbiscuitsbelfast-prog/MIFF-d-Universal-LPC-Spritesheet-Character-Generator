@@ -910,6 +910,11 @@ body {
   padding-bottom: 2rem;
 }
 
+/* v6.1: Always show animation bar */
+.customize-mode .animation-bar {
+  display: block !important;
+}
+
 /* v6: Horizontal category navigation */
 .category-nav {
   display: flex;
