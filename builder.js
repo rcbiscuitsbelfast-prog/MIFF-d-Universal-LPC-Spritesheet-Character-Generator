@@ -1,5 +1,5 @@
 /**
- * LPC Character Builder - v5 WITH CATEGORY SYSTEM
+ * LPC Character Builder - v6 WITH REAL ASSETS & HORIZONTAL NAV
  */
 
 const CONFIG = {
@@ -41,6 +41,8 @@ const CONFIG = {
   }
 };
 
+const CATEGORIES = ['body', 'head', 'hair', 'torso', 'legs', 'feet', 'weapon'];
+
 const state = {
   currentGender: 'male',
   currentAnimation: 'walk',
@@ -54,13 +56,15 @@ const state = {
   legsSprite: null,
   weaponSprite: null,
   lastFrameTime: 0,
+  currentCategoryIndex: 0,
   customization: {
     hair: 'none',
     hairColor: 'black',
     torso: 'none',
+    torsoColor: 'white',
     legs: 'none',
-    weapon: 'none',
-    extras: []
+    legsColor: 'brown',
+    weapon: 'none'
   }
 };
 
@@ -166,7 +170,7 @@ function setupEventListeners() {
   const btnHelp = document.getElementById('btn-help');
   if (btnHelp) {
     btnHelp.addEventListener('click', () => {
-      alert('LPC Character Builder v5\n\n1. Select body type\n2. Choose animation\n3. Click Customize\n4. Select from categories:\n   - Hair (style & color)\n   - Torso (clothing)\n   - Legs\n   - Weapons\n   - Accessories\n5. Export your character!');
+      alert('LPC Character Builder v6\n\n1. Select body type\n2. Choose animation\n3. Click Customize\n4. Use ? ? arrows to navigate:\n   Body ? Head ? Hair ? Torso ? Legs\n5. Select items and colors\n6. See changes on sprite instantly!\n7. Export your character!');
     });
   }
   
@@ -182,13 +186,11 @@ function setupEventListeners() {
     btnBack.addEventListener('click', exitCustomizeMode);
   }
   
-  // Category expansion
-  document.querySelectorAll('.category-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const category = e.currentTarget.dataset.category;
-      toggleCategory(category);
-    });
-  });
+  // Category navigation
+  const btnPrevCat = document.getElementById('prev-category');
+  const btnNextCat = document.getElementById('next-category');
+  if (btnPrevCat) btnPrevCat.addEventListener('click', () => navigateCategory(-1));
+  if (btnNextCat) btnNextCat.addEventListener('click', () => navigateCategory(1));
   
   // Export button
   const btnExport = document.getElementById('btn-export');
@@ -200,16 +202,46 @@ function setupEventListeners() {
   loadCustomizationOptions();
 }
 
+function navigateCategory(direction) {
+  state.currentCategoryIndex += direction;
+  
+  // Wrap around
+  if (state.currentCategoryIndex < 0) state.currentCategoryIndex = CATEGORIES.length - 1;
+  if (state.currentCategoryIndex >= CATEGORIES.length) state.currentCategoryIndex = 0;
+  
+  showCategory(CATEGORIES[state.currentCategoryIndex]);
+}
+
+function showCategory(category) {
+  const label = document.getElementById('current-category-label');
+  const title = document.getElementById('section-title');
+  const content = document.getElementById('category-content');
+  
+  if (label) label.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+  if (title) title.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+  
+  // Load content for this category
+  loadCategoryContent(category, content);
+}
+
 function enterCustomizeMode() {
   // Hide body selector and animation bar
   document.getElementById('body-selector').classList.add('hidden');
   document.getElementById('animation-bar').style.display = 'none';
   
-  // Show customization categories
-  document.getElementById('customize-categories').classList.remove('hidden');
+  // Show customization section and nav
+  const customizeSection = document.getElementById('customize-section');
+  if (customizeSection) customizeSection.classList.remove('hidden');
+  
+  const categoryNav = document.getElementById('category-nav');
+  if (categoryNav) categoryNav.style.display = 'flex';
   
   // Show back button
   document.getElementById('btn-back').style.display = 'flex';
+  
+  // Show first category
+  state.currentCategoryIndex = 0;
+  showCategory(CATEGORIES[0]);
   
   // Add customize mode class to body
   document.body.classList.add('customize-mode');
@@ -220,8 +252,12 @@ function exitCustomizeMode() {
   document.getElementById('body-selector').classList.remove('hidden');
   document.getElementById('animation-bar').style.display = 'block';
   
-  // Hide customization categories
-  document.getElementById('customize-categories').classList.add('hidden');
+  // Hide customization section and nav
+  const customizeSection = document.getElementById('customize-section');
+  if (customizeSection) customizeSection.classList.add('hidden');
+  
+  const categoryNav = document.getElementById('category-nav');
+  if (categoryNav) categoryNav.style.display = 'none';
   
   // Hide back button
   document.getElementById('btn-back').style.display = 'none';
@@ -230,22 +266,195 @@ function exitCustomizeMode() {
   document.body.classList.remove('customize-mode');
 }
 
-function toggleCategory(category) {
-  const btn = document.querySelector(`[data-category="${category}"]`);
-  const content = document.getElementById(`category-${category}`);
+function loadCategoryContent(category, container) {
+  if (!container) return;
   
-  const isActive = btn.classList.contains('active');
+  container.innerHTML = '';
   
-  // Close all categories
-  document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.category-content').forEach(c => c.classList.remove('active'));
-  
-  // Open this category if it wasn't active
-  if (!isActive) {
-    btn.classList.add('active');
-    content.classList.add('active');
+  switch(category) {
+    case 'body':
+      container.innerHTML = '<p style="text-align: center; color: #64748b;">Body type selected: ' + state.currentGender + '</p>';
+      break;
+    case 'head':
+      container.innerHTML = '<p style="text-align: center; color: #64748b;">Head automatically matches body type</p>';
+      break;
+    case 'hair':
+      loadHairOptions(container);
+      break;
+    case 'torso':
+      loadTorsoOptions(container);
+      break;
+    case 'legs':
+      loadLegsOptions(container);
+      break;
+    case 'feet':
+      loadFeetOptions(container);
+      break;
+    case 'weapon':
+      loadWeaponOptions(container);
+      break;
   }
 }
+
+function loadHairOptions(container) {
+  const hairStyles = ['long', 'short', 'ponytail', 'page', 'mohawk', 'curly'];
+  const hairColors = ['black', 'blonde', 'brown', 'gray', 'white', 'blue', 'green', 'pink', 'red'];
+  
+  let html = '<div class="content-subsection">';
+  html += '<h3>Hair Style</h3>';
+  html += '<div class="items-grid">';
+  html += '<button class="item-card active" onclick="selectHairStyle(\'none\')">None</button>';
+  hairStyles.forEach(style => {
+    html += `<button class="item-card" onclick="selectHairStyle('${style}')">${style.charAt(0).toUpperCase() + style.slice(1)}</button>`;
+  });
+  html += '</div></div>';
+  
+  html += '<div class="content-subsection">';
+  html += '<h3>Hair Color</h3>';
+  html += '<div class="colors-grid">';
+  hairColors.forEach(color => {
+    const bgColor = getColorHex(color);
+    const active = color === state.customization.hairColor ? 'active' : '';
+    html += `<button class="color-card ${active}" style="background: ${bgColor};" onclick="selectHairColor('${color}')">`;
+    html += `<div class="color-card-label">${color}</div>`;
+    html += '</button>';
+  });
+  html += '</div></div>';
+  
+  container.innerHTML = html;
+}
+
+function loadTorsoOptions(container) {
+  const torsoItems = ['blouse', 'shirt', 'robe', 'corset'];
+  const colors = ['white', 'black', 'blue', 'red', 'green', 'brown'];
+  
+  let html = '<div class="content-subsection">';
+  html += '<h3>Clothing</h3>';
+  html += '<div class="items-grid">';
+  html += '<button class="item-card active" onclick="selectTorso(\'none\')">None</button>';
+  torsoItems.forEach(item => {
+    html += `<button class="item-card" onclick="selectTorso('${item}')">${item.charAt(0).toUpperCase() + item.slice(1)}</button>`;
+  });
+  html += '</div></div>';
+  
+  html += '<div class="content-subsection">';
+  html += '<h3>Color</h3>';
+  html += '<div class="colors-grid">';
+  colors.forEach(color => {
+    const bgColor = getColorHex(color);
+    const active = color === state.customization.torsoColor ? 'active' : '';
+    html += `<button class="color-card ${active}" style="background: ${bgColor};" onclick="selectTorsoColor('${color}')">`;
+    html += `<div class="color-card-label">${color}</div>`;
+    html += '</button>';
+  });
+  html += '</div></div>';
+  
+  container.innerHTML = html;
+}
+
+function loadLegsOptions(container) {
+  const legsItems = ['pants', 'pants2', 'skirt'];
+  const colors = ['brown', 'black', 'blue', 'gray'];
+  
+  let html = '<div class="content-subsection">';
+  html += '<h3>Legwear</h3>';
+  html += '<div class="items-grid">';
+  html += '<button class="item-card active" onclick="selectLegs(\'none\')">None</button>';
+  legsItems.forEach(item => {
+    html += `<button class="item-card" onclick="selectLegs('${item}')">${item.charAt(0).toUpperCase() + item.slice(1)}</button>`;
+  });
+  html += '</div></div>';
+  
+  html += '<div class="content-subsection">';
+  html += '<h3>Color</h3>';
+  html += '<div class="colors-grid">';
+  colors.forEach(color => {
+    const bgColor = getColorHex(color);
+    const active = color === state.customization.legsColor ? 'active' : '';
+    html += `<button class="color-card ${active}" style="background: ${bgColor};" onclick="selectLegsColor('${color}')">`;
+    html += `<div class="color-card-label">${color}</div>`;
+    html += '</button>';
+  });
+  html += '</div></div>';
+  
+  container.innerHTML = html;
+}
+
+function loadFeetOptions(container) {
+  container.innerHTML = '<p style="text-align: center; color: #64748b;">Feet options coming soon</p>';
+}
+
+function loadWeaponOptions(container) {
+  container.innerHTML = '<p style="text-align: center; color: #64748b;">Weapon options coming soon</p>';
+}
+
+function getColorHex(colorName) {
+  const colors = {
+    black: '#1a1a1a',
+    white: '#f0f0f0',
+    brown: '#3d2817',
+    blonde: '#f0c674',
+    red: '#a0392e',
+    gray: '#808080',
+    blue: '#4a90e2',
+    green: '#4caf50',
+    pink: '#e91e63',
+    purple: '#9c27b0'
+  };
+  return colors[colorName] || '#cccccc';
+}
+
+// Global functions for onclick handlers
+window.selectHairStyle = function(style) {
+  state.customization.hair = style;
+  document.querySelectorAll('#category-content .item-card').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.toLowerCase() === style);
+  });
+  loadHairSprite();
+};
+
+window.selectHairColor = function(color) {
+  state.customization.hairColor = color;
+  document.querySelectorAll('#category-content .color-card').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  event.target.closest('.color-card').classList.add('active');
+  loadHairSprite();
+};
+
+window.selectTorso = function(item) {
+  state.customization.torso = item;
+  document.querySelectorAll('#category-content .item-card').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.toLowerCase() === item);
+  });
+  loadTorsoSprite();
+};
+
+window.selectTorsoColor = function(color) {
+  state.customization.torsoColor = color;
+  document.querySelectorAll('#category-content .color-card').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  event.target.closest('.color-card').classList.add('active');
+  loadTorsoSprite();
+};
+
+window.selectLegs = function(item) {
+  state.customization.legs = item;
+  document.querySelectorAll('#category-content .item-card').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.toLowerCase() === item);
+  });
+  loadLegsSprite();
+};
+
+window.selectLegsColor = function(color) {
+  state.customization.legsColor = color;
+  document.querySelectorAll('#category-content .color-card').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  event.target.closest('.color-card').classList.add('active');
+  loadLegsSprite();
+};
 
 async function loadCustomizationOptions() {
   // Hair styles
@@ -512,7 +721,9 @@ function render() {
   
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
-  // Draw body
+  // Layer order (bottom to top): body ? legs ? torso ? head ? hair ? weapon
+  
+  // 1. Draw body
   ctx.drawImage(
     state.bodySprite,
     sx, sy,
@@ -521,7 +732,29 @@ function render() {
     canvas.width, canvas.height
   );
   
-  // Draw head if available
+  // 2. Draw legs
+  if (state.legsSprite) {
+    ctx.drawImage(
+      state.legsSprite,
+      sx, sy,
+      CONFIG.spriteWidth, CONFIG.spriteHeight,
+      0, 0,
+      canvas.width, canvas.height
+    );
+  }
+  
+  // 3. Draw torso
+  if (state.torsoSprite) {
+    ctx.drawImage(
+      state.torsoSprite,
+      sx, sy,
+      CONFIG.spriteWidth, CONFIG.spriteHeight,
+      0, 0,
+      canvas.width, canvas.height
+    );
+  }
+  
+  // 4. Draw head
   if (state.headSprite) {
     ctx.drawImage(
       state.headSprite,
@@ -531,6 +764,125 @@ function render() {
       canvas.width, canvas.height
     );
   }
+  
+  // 5. Draw hair
+  if (state.hairSprite) {
+    ctx.drawImage(
+      state.hairSprite,
+      sx, sy,
+      CONFIG.spriteWidth, CONFIG.spriteHeight,
+      0, 0,
+      canvas.width, canvas.height
+    );
+  }
+  
+  // 6. Draw weapon
+  if (state.weaponSprite) {
+    ctx.drawImage(
+      state.weaponSprite,
+      sx, sy,
+      CONFIG.spriteWidth, CONFIG.spriteHeight,
+      0, 0,
+      canvas.width, canvas.height
+    );
+  }
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
+// Sprite loading functions for customizations
+async function loadHairSprite() {
+  if (state.customization.hair === 'none') {
+    state.hairSprite = null;
+    console.log('Hair removed');
+    return;
+  }
+  
+  const hair = state.customization.hair;
+  const color = state.customization.hairColor;
+  const anim = state.currentAnimation;
+  const animConfig = CONFIG.animations[anim];
+  const animDir = animConfig.dir;
+  
+  // Hair path: /hair/{style}/adult/{animation}/{color}.png
+  const paths = [
+    `/spritesheets/hair/${hair}/adult/${animDir}/${color}.png`,
+    `/spritesheets/hair/${hair}/${animDir}/${color}.png`,
+    `/spritesheets/hair/${hair}/adult/${animDir}/black.png`
+  ];
+  
+  console.log('Loading hair:', paths[0]);
+  
+  try {
+    state.hairSprite = await loadImageWithFallback(paths);
+    console.log('? Hair loaded!');
+  } catch (e) {
+    console.warn('Hair not found:', e);
+    state.hairSprite = null;
+  }
+}
+
+async function loadTorsoSprite() {
+  if (state.customization.torso === 'none') {
+    state.torsoSprite = null;
+    console.log('Torso removed');
+    return;
+  }
+  
+  const item = state.customization.torso;
+  const color = state.customization.torsoColor;
+  const gender = state.currentGender;
+  const anim = state.currentAnimation;
+  const animConfig = CONFIG.animations[anim];
+  const animDir = animConfig.dir;
+  
+  // Torso path: /torso/clothes/{item}/{gender}/{animation}/{color}.png
+  const paths = [
+    `/spritesheets/torso/clothes/${item}/${gender}/${animDir}/${color}.png`,
+    `/spritesheets/torso/clothes/${item}/male/${animDir}/${color}.png`,
+    `/spritesheets/torso/clothes/${item}/${animDir}/${color}.png`
+  ];
+  
+  console.log('Loading torso:', paths[0]);
+  
+  try {
+    state.torsoSprite = await loadImageWithFallback(paths);
+    console.log('? Torso loaded!');
+  } catch (e) {
+    console.warn('Torso not found:', e);
+    state.torsoSprite = null;
+  }
+}
+
+async function loadLegsSprite() {
+  if (state.customization.legs === 'none') {
+    state.legsSprite = null;
+    console.log('Legs removed');
+    return;
+  }
+  
+  const item = state.customization.legs;
+  const color = state.customization.legsColor;
+  const gender = state.currentGender;
+  const anim = state.currentAnimation;
+  const animConfig = CONFIG.animations[anim];
+  const animDir = animConfig.dir;
+  
+  // Legs path: /legs/{item}/{gender}/{animation}/{color}.png
+  const paths = [
+    `/spritesheets/legs/${item}/${gender}/${animDir}/${color}.png`,
+    `/spritesheets/legs/${item}/male/${animDir}/${color}.png`,
+    `/spritesheets/legs/${item}/${animDir}/${color}.png`
+  ];
+  
+  console.log('Loading legs:', paths[0]);
+  
+  try {
+    state.legsSprite = await loadImageWithFallback(paths);
+    console.log('? Legs loaded!');
+  } catch (e) {
+    console.warn('Legs not found:', e);
+    state.legsSprite = null;
+  }
+}
+
