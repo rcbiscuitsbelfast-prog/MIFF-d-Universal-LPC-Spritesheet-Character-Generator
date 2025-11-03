@@ -355,26 +355,44 @@ function loadHeadOptions(container) {
 
 async function loadHairOptions(container) {
   try {
+    console.log('?? Loading hair options...');
+    
     // Fetch actual hair directories
     const response = await fetch('/api/assets?category=hair');
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
+    }
     const data = await response.json();
+    console.log('?? Raw API response for hair:', data);
     
     // Get all hair style folders (filter out non-directories)
     const hairStyles = (data.items || []).filter(item => !item.includes('.'));
-    console.log('Found hair styles:', hairStyles.length, hairStyles.slice(0, 10));
+    console.log('? Found hair styles:', hairStyles.length, hairStyles);
+    
+    if (hairStyles.length === 0) {
+      console.error('? No hair styles found!');
+      // Fallback to known working styles
+      hairStyles.push('long', 'page', 'ponytail', 'short', 'mohawk', 'curly', 'afro', 'bangs', 'braid');
+    }
     
     // Get colors from a reference hair style (long)
     const anim = state.currentAnimation;
     const animConfig = CONFIG.animations[anim];
     const animDir = animConfig.dir;
     
+    console.log(`?? Fetching colors for hair/long/${animDir}...`);
     const colorsResponse = await fetch(`/api/assets?category=hair&subcategory=long&animation=${animDir}`);
+    if (!colorsResponse.ok) {
+      throw new Error(`Colors API error: ${colorsResponse.status}`);
+    }
     const colorsData = await colorsResponse.json();
+    console.log('?? Raw colors response:', colorsData);
     const hairColors = (colorsData.items || []).map(file => file.replace('.png', ''));
-    console.log('Found hair colors:', hairColors.length, hairColors.slice(0, 10));
+    console.log('? Found hair colors:', hairColors.length, hairColors);
     
     let html = '<div class="content-subsection">';
     html += '<h3>Hair Style</h3>';
+    html += `<p style="text-align: center; color: #64748b; font-size: 0.875rem; margin-bottom: 0.5rem;">Found ${hairStyles.length} styles</p>`;
     html += '<div class="items-grid">';
     html += '<button class="item-card active" onclick="selectHairStyle(\'none\')">None</button>';
     hairStyles.forEach(style => {
@@ -385,6 +403,7 @@ async function loadHairOptions(container) {
     
     html += '<div class="content-subsection">';
     html += '<h3>Hair Color</h3>';
+    html += `<p style="text-align: center; color: #64748b; font-size: 0.875rem; margin-bottom: 0.5rem;">Found ${hairColors.length} colors</p>`;
     html += '<div class="colors-grid">';
     hairColors.forEach(color => {
       const bgColor = getColorHex(color);
@@ -396,9 +415,17 @@ async function loadHairOptions(container) {
     html += '</div></div>';
     
     container.innerHTML = html;
+    console.log('? Hair options HTML generated');
   } catch (error) {
-    console.error('Error loading hair options:', error);
-    container.innerHTML = '<p style="text-align: center; color: red;">Error loading hair options</p>';
+    console.error('? Error loading hair options:', error);
+    container.innerHTML = `
+      <p style="text-align: center; color: red; padding: 1rem;">
+        Error loading hair options: ${error.message}
+      </p>
+      <p style="text-align: center; color: #64748b; font-size: 0.875rem;">
+        Check browser console for details
+      </p>
+    `;
   }
 }
 
