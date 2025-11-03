@@ -44,7 +44,7 @@ const CONFIG = {
   }
 };
 
-const CATEGORIES = ['body', 'head', 'hair', 'torso', 'legs', 'feet', 'weapon'];
+const CATEGORIES = ['body', 'head', 'ears', 'nose', 'wings', 'tail', 'hair', 'torso', 'legs', 'feet', 'weapon'];
 
 const state = {
   currentGender: 'male',
@@ -58,12 +58,24 @@ const state = {
   torsoSprite: null,
   legsSprite: null,
   weaponSprite: null,
+  earsSprite: null,
+  noseSprite: null,
+  wingsSprite: null,
+  tailSprite: null,
   bodyExtraSprite: null,
   headExtraSprite: null,
   lastFrameTime: 0,
   currentCategoryIndex: 0,
   customization: {
     bodyExtra: 'none',
+    ears: 'none',
+    earsColor: 'white',
+    nose: 'none',
+    noseColor: 'light',
+    wings: 'none',
+    wingsColor: 'white',
+    tail: 'none',
+    tailColor: 'brown',
     headExtra: 'none',
     headExtraColor: 'brown',
     hair: 'none',
@@ -306,12 +318,24 @@ async function loadCategoryContent(category, container) {
     case 'legs':
       await loadLegsOptions(container);
       break;
-    case 'feet':
-      loadFeetOptions(container);
-      break;
-    case 'weapon':
-      loadWeaponOptions(container);
-      break;
+      case 'ears':
+        loadEarsOptions(container);
+        break;
+      case 'nose':
+        loadNoseOptions(container);
+        break;
+      case 'wings':
+        loadWingsOptions(container);
+        break;
+      case 'tail':
+        loadTailOptions(container);
+        break;
+      case 'feet':
+        loadFeetOptions(container);
+        break;
+      case 'weapon':
+        loadWeaponOptions(container);
+        break;
   }
 }
 
@@ -982,6 +1006,28 @@ function render() {
     canvas.width, canvas.height
   );
   
+  // 1.5. Draw wings (behind body)
+  if (state.wingsSprite) {
+    ctx.drawImage(
+      state.wingsSprite,
+      sx, sy,
+      CONFIG.spriteWidth, CONFIG.spriteHeight,
+      0, 0,
+      canvas.width, canvas.height
+    );
+  }
+  
+  // 1.6. Draw tail (behind body)
+  if (state.tailSprite) {
+    ctx.drawImage(
+      state.tailSprite,
+      sx, sy,
+      CONFIG.spriteWidth, CONFIG.spriteHeight,
+      0, 0,
+      canvas.width, canvas.height
+    );
+  }
+  
   // 2. Draw legs
   if (state.legsSprite) {
     ctx.drawImage(
@@ -1008,6 +1054,28 @@ function render() {
   if (state.headSprite) {
     ctx.drawImage(
       state.headSprite,
+      sx, sy,
+      CONFIG.spriteWidth, CONFIG.spriteHeight,
+      0, 0,
+      canvas.width, canvas.height
+    );
+  }
+  
+  // 4.5. Draw ears (on head)
+  if (state.earsSprite) {
+    ctx.drawImage(
+      state.earsSprite,
+      sx, sy,
+      CONFIG.spriteWidth, CONFIG.spriteHeight,
+      0, 0,
+      canvas.width, canvas.height
+    );
+  }
+  
+  // 4.6. Draw nose (on head)
+  if (state.noseSprite) {
+    ctx.drawImage(
+      state.noseSprite,
       sx, sy,
       CONFIG.spriteWidth, CONFIG.spriteHeight,
       0, 0,
@@ -1054,30 +1122,36 @@ async function loadHairSprite() {
   const animConfig = CONFIG.animations[anim];
   const animDir = animConfig.dir;
   
+  // KEEP OLD SPRITE AS BACKUP
+  const previousSprite = state.hairSprite;
+  
   // Hair path: /hair/{style}/adult/{animation}/{color}.png
   const paths = [
     `/spritesheets/hair/${hair}/adult/${animDir}/${color}.png`,
     `/spritesheets/hair/${hair}/${animDir}/${color}.png`,
-    `/spritesheets/hair/${hair}/adult/${animDir}/black.png`
+    `/spritesheets/hair/${hair}/adult/${animDir}/black.png`,
+    `/spritesheets/hair/${hair}/adult/walk/${color}.png`
   ];
   
   console.log('Loading hair:', paths[0]);
   
   try {
     state.hairSprite = await loadImageWithFallback(paths);
-    console.log('? Hair loaded!');
+    console.log('✅ Hair loaded!');
   } catch (e) {
-    console.warn('Hair not found:', e);
-    state.hairSprite = null;
+    console.warn('⚠️ Hair not found, keeping previous:', e);
+    // KEEP PREVIOUS SPRITE instead of setting to null
+    state.hairSprite = previousSprite;
   }
 }
 
 async function loadTorsoSprite() {
   if (state.customization.torso === 'none') {
-    state.torsoSprite = null;
+    // KEEP PREVIOUS instead
     console.log('Torso removed');
     return;
   }
+  const previousSprite = state.torsoSprite;
   
   const item = state.customization.torso;
   const color = state.customization.torsoColor;
@@ -1103,7 +1177,8 @@ async function loadTorsoSprite() {
     console.log('? Torso loaded!');
   } catch (e) {
     console.warn('Torso not found:', e);
-    state.torsoSprite = null;
+    state.torsoSprite = previousSprite;
+    // KEEP PREVIOUS instead
   }
 }
 
@@ -1146,6 +1221,10 @@ async function reloadAllCustomizationSprites() {
   try {
     if (state.customization.hair !== 'none') await loadHairSprite();
     if (state.customization.torso !== 'none') await loadTorsoSprite();
+    if (state.customization.ears !== 'none') await loadEarsSprite();
+    if (state.customization.nose !== 'none') await loadNoseSprite();
+    if (state.customization.wings !== 'none') await loadWingsSprite();
+    if (state.customization.tail !== 'none') await loadTailSprite();
     if (state.customization.legs !== 'none') await loadLegsSprite();
     console.log('✅ Reloaded');
   } catch (e) { console.error('❌', e); }
@@ -1185,3 +1264,318 @@ window.selectHeadExtraColor = function(color) {
   console.log('Head extra color selected:', color);
   // TODO: Reload head extra sprite with color
 };
+
+// Load ears sprite
+async function loadEarsSprite() {
+  if (state.customization.ears === 'none') {
+    state.earsSprite = null;
+    return;
+  }
+  const item = state.customization.ears;
+  const color = state.customization.earsColor;
+  const anim = state.currentAnimation;
+  const animConfig = CONFIG.animations[anim];
+  const animDir = animConfig.dir;
+  const previousSprite = state.earsSprite;
+  
+  const paths = [
+    `/spritesheets/head/ears/${item}/adult/${animDir}/${color}.png`,
+    `/spritesheets/head/ears/${item}/adult/${animDir}/white.png`,
+    `/spritesheets/head/ears/${item}/adult/walk/${color}.png`,
+    `/spritesheets/head/ears/${item}/${animDir}/${color}.png`
+  ];
+  
+  try {
+    state.earsSprite = await loadImageWithFallback(paths);
+    console.log('✅ Ears loaded!');
+  } catch (e) {
+    console.warn('⚠️ Ears not found, keeping previous');
+    state.earsSprite = previousSprite;
+  }
+}
+
+// Load nose sprite
+async function loadNoseSprite() {
+  if (state.customization.nose === 'none') {
+    state.noseSprite = null;
+    return;
+  }
+  const item = state.customization.nose;
+  const color = state.customization.noseColor;
+  const anim = state.currentAnimation;
+  const animConfig = CONFIG.animations[anim];
+  const animDir = animConfig.dir;
+  const previousSprite = state.noseSprite;
+  
+  const paths = [
+    `/spritesheets/head/nose/${item}/adult/${animDir}/${color}.png`,
+    `/spritesheets/head/nose/${item}/${animDir}/${color}.png`,
+    `/spritesheets/head/nose/${item}/adult/walk/${color}.png`,
+    `/spritesheets/head/nose/${item}/${animDir}/light.png`
+  ];
+  
+  try {
+    state.noseSprite = await loadImageWithFallback(paths);
+    console.log('✅ Nose loaded!');
+  } catch (e) {
+    console.warn('⚠️ Nose not found, keeping previous');
+    state.noseSprite = previousSprite;
+  }
+}
+
+// Load wings sprite
+async function loadWingsSprite() {
+  if (state.customization.wings === 'none') {
+    state.wingsSprite = null;
+    return;
+  }
+  const item = state.customization.wings;
+  const color = state.customization.wingsColor;
+  const anim = state.currentAnimation;
+  const animConfig = CONFIG.animations[anim];
+  const animDir = animConfig.dir;
+  const previousSprite = state.wingsSprite;
+  
+  const paths = [
+    `/spritesheets/body/wings/${item}/adult/${animDir}/${color}.png`,
+    `/spritesheets/body/wings/${item}/${animDir}/${color}.png`,
+    `/spritesheets/body/wings/${item}/adult/walk/${color}.png`,
+    `/spritesheets/body/wings/${item}/adult/${animDir}/white.png`
+  ];
+  
+  try {
+    state.wingsSprite = await loadImageWithFallback(paths);
+    console.log('✅ Wings loaded!');
+  } catch (e) {
+    console.warn('⚠️ Wings not found, keeping previous');
+    state.wingsSprite = previousSprite;
+  }
+}
+
+// Load tail sprite
+async function loadTailSprite() {
+  if (state.customization.tail === 'none') {
+    state.tailSprite = null;
+    return;
+  }
+  const item = state.customization.tail;
+  const color = state.customization.tailColor;
+  const anim = state.currentAnimation;
+  const animConfig = CONFIG.animations[anim];
+  const animDir = animConfig.dir;
+  const previousSprite = state.tailSprite;
+  
+  const paths = [
+    `/spritesheets/body/tail/${item}/adult/${animDir}/${color}.png`,
+    `/spritesheets/body/tail/${item}/${animDir}/${color}.png`,
+    `/spritesheets/body/tail/${item}/adult/walk/${color}.png`,
+    `/spritesheets/body/tail/${item}/adult/${animDir}/brown.png`
+  ];
+  
+  try {
+    state.tailSprite = await loadImageWithFallback(paths);
+    console.log('✅ Tail loaded!');
+  } catch (e) {
+    console.warn('⚠️ Tail not found, keeping previous');
+    state.tailSprite = previousSprite;
+  }
+}
+
+
+// Load ears options
+async function loadEarsOptions(container) {
+  try {
+    const response = await fetch('/api/assets?category=head/ears');
+    const data = await response.json();
+    const items = (data.items || []).filter(item => !item.startsWith('.'));
+    
+    let html = '<div class="content-subsection">';
+    html += '<h3>Ears</h3>';
+    html += `<p style="text-align: center; color: #64748b; font-size: 0.875rem; margin-bottom: 0.5rem;">Found ${items.length} styles</p>`;
+    html += '<div class="items-grid">';
+    const activeItem = state.customization.ears || 'none';
+    html += `<button class="item-card ${activeItem === 'none' ? 'active' : ''}" onclick="window.selectEars('none')">None</button>`;
+    items.forEach(item => {
+      const displayName = item.replace(/_/g, ' ').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      const active = activeItem === item ? 'active' : '';
+      html += `<button class="item-card ${active}" onclick="window.selectEars('${item}')">${displayName}</button>`;
+    });
+    html += '</div></div>';
+    
+    // Colors
+    const colors = ['white', 'light', 'tan', 'brown', 'dark', 'black', 'gray'];
+    html += '<div class="content-subsection"><h3>Color</h3><div class="colors-grid">';
+    colors.forEach(color => {
+      const bgColor = getColorHex(color);
+      const active = color === state.customization.earsColor ? 'active' : '';
+      html += `<button class="color-card ${active}" style="background: ${bgColor};" onclick="window.selectEarsColor('${color}')">`;
+      html += `<div class="color-card-label">${color}</div></button>`;
+    });
+    html += '</div></div>';
+    
+    container.innerHTML = html;
+  } catch (error) {
+    console.error('Error loading ears options:', error);
+    container.innerHTML = '<p style="text-align: center; color: red;">Error loading ears options</p>';
+  }
+}
+
+// Load nose options
+async function loadNoseOptions(container) {
+  try {
+    const response = await fetch('/api/assets?category=head/nose');
+    const data = await response.json();
+    const items = (data.items || []).filter(item => !item.startsWith('.'));
+    
+    let html = '<div class="content-subsection">';
+    html += '<h3>Nose</h3>';
+    html += `<p style="text-align: center; color: #64748b; font-size: 0.875rem; margin-bottom: 0.5rem;">Found ${items.length} styles</p>`;
+    html += '<div class="items-grid">';
+    const activeItem = state.customization.nose || 'none';
+    html += `<button class="item-card ${activeItem === 'none' ? 'active' : ''}" onclick="window.selectNose('none')">None</button>`;
+    items.forEach(item => {
+      const displayName = item.replace(/_/g, ' ').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      const active = activeItem === item ? 'active' : '';
+      html += `<button class="item-card ${active}" onclick="window.selectNose('${item}')">${displayName}</button>`;
+    });
+    html += '</div></div>';
+    
+    // Colors
+    const colors = ['light', 'tan', 'medium', 'brown', 'dark', 'peach'];
+    html += '<div class="content-subsection"><h3>Color</h3><div class="colors-grid">';
+    colors.forEach(color => {
+      const bgColor = getColorHex(color);
+      const active = color === state.customization.noseColor ? 'active' : '';
+      html += `<button class="color-card ${active}" style="background: ${bgColor};" onclick="window.selectNoseColor('${color}')">`;
+      html += `<div class="color-card-label">${color}</div></button>`;
+    });
+    html += '</div></div>';
+    
+    container.innerHTML = html;
+  } catch (error) {
+    console.error('Error loading nose options:', error);
+    container.innerHTML = '<p style="text-align: center; color: red;">Error loading nose options</p>';
+  }
+}
+
+// Load wings options
+async function loadWingsOptions(container) {
+  try {
+    const response = await fetch('/api/assets?category=body/wings');
+    const data = await response.json();
+    const items = (data.items || []).filter(item => !item.startsWith('.'));
+    
+    let html = '<div class="content-subsection">';
+    html += '<h3>Wings</h3>';
+    html += `<p style="text-align: center; color: #64748b; font-size: 0.875rem; margin-bottom: 0.5rem;">Found ${items.length} styles</p>`;
+    html += '<div class="items-grid">';
+    const activeItem = state.customization.wings || 'none';
+    html += `<button class="item-card ${activeItem === 'none' ? 'active' : ''}" onclick="window.selectWings('none')">None</button>`;
+    items.forEach(item => {
+      const displayName = item.replace(/_/g, ' ').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      const active = activeItem === item ? 'active' : '';
+      html += `<button class="item-card ${active}" onclick="window.selectWings('${item}')">${displayName}</button>`;
+    });
+    html += '</div></div>';
+    
+    // Colors
+    const colors = ['white', 'light', 'tan', 'brown', 'black', 'red', 'blue', 'green', 'purple'];
+    html += '<div class="content-subsection"><h3>Color</h3><div class="colors-grid">';
+    colors.forEach(color => {
+      const bgColor = getColorHex(color);
+      const active = color === state.customization.wingsColor ? 'active' : '';
+      html += `<button class="color-card ${active}" style="background: ${bgColor};" onclick="window.selectWingsColor('${color}')">`;
+      html += `<div class="color-card-label">${color}</div></button>`;
+    });
+    html += '</div></div>';
+    
+    container.innerHTML = html;
+  } catch (error) {
+    console.error('Error loading wings options:', error);
+    container.innerHTML = '<p style="text-align: center; color: red;">Error loading wings options</p>';
+  }
+}
+
+// Load tail options
+async function loadTailOptions(container) {
+  try {
+    const response = await fetch('/api/assets?category=body/tail');
+    const data = await response.json();
+    const items = (data.items || []).filter(item => !item.startsWith('.'));
+    
+    let html = '<div class="content-subsection">';
+    html += '<h3>Tail</h3>';
+    html += `<p style="text-align: center; color: #64748b; font-size: 0.875rem; margin-bottom: 0.5rem;">Found ${items.length} styles</p>`;
+    html += '<div class="items-grid">';
+    const activeItem = state.customization.tail || 'none';
+    html += `<button class="item-card ${activeItem === 'none' ? 'active' : ''}" onclick="window.selectTail('none')">None</button>`;
+    items.forEach(item => {
+      const displayName = item.replace(/_/g, ' ').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      const active = activeItem === item ? 'active' : '';
+      html += `<button class="item-card ${active}" onclick="window.selectTail('${item}')">${displayName}</button>`;
+    });
+    html += '</div></div>';
+    
+    // Colors
+    const colors = ['brown', 'tan', 'gray', 'black', 'white', 'red', 'orange'];
+    html += '<div class="content-subsection"><h3>Color</h3><div class="colors-grid">';
+    colors.forEach(color => {
+      const bgColor = getColorHex(color);
+      const active = color === state.customization.tailColor ? 'active' : '';
+      html += `<button class="color-card ${active}" style="background: ${bgColor};" onclick="window.selectTailColor('${color}')">`;
+      html += `<div class="color-card-label">${color}</div></button>`;
+    });
+    html += '</div></div>';
+    
+    container.innerHTML = html;
+  } catch (error) {
+    console.error('Error loading tail options:', error);
+    container.innerHTML = '<p style="text-align: center; color: red;">Error loading tail options</p>';
+  }
+}
+
+// Selection handlers for new options
+window.selectEars = async function(item) {
+  state.customization.ears = item;
+  await loadEarsSprite();
+  await loadEarsOptions(document.getElementById('category-content'));
+};
+
+window.selectEarsColor = async function(color) {
+  state.customization.earsColor = color;
+  await loadEarsSprite();
+};
+
+window.selectNose = async function(item) {
+  state.customization.nose = item;
+  await loadNoseSprite();
+  await loadNoseOptions(document.getElementById('category-content'));
+};
+
+window.selectNoseColor = async function(color) {
+  state.customization.noseColor = color;
+  await loadNoseSprite();
+};
+
+window.selectWings = async function(item) {
+  state.customization.wings = item;
+  await loadWingsSprite();
+  await loadWingsOptions(document.getElementById('category-content'));
+};
+
+window.selectWingsColor = async function(color) {
+  state.customization.wingsColor = color;
+  await loadWingsSprite();
+};
+
+window.selectTail = async function(item) {
+  state.customization.tail = item;
+  await loadTailSprite();
+  await loadTailOptions(document.getElementById('category-content'));
+};
+
+window.selectTailColor = async function(color) {
+  state.customization.tailColor = color;
+  await loadTailSprite();
+};
+
