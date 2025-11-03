@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LPC Builder - Debug Version</title>
+  <style>
+    body { 
+      margin: 0; 
+      font-family: system-ui, sans-serif; 
+      background: #1a1a2e;
+      color: white;
+      padding: 20px;
+    }
+    .status { 
+      background: #16213e; 
+      padding: 15px; 
+      margin: 10px 0; 
+      border-radius: 8px;
+      border-left: 4px solid #0f3460;
+    }
+    .error { border-left-color: #e94560; }
+    .success { border-left-color: #4ecca3; }
+    .info { border-left-color: #4a90e2; }
+    #log { 
+      background: black; 
+      padding: 10px; 
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .log-entry { padding: 2px 0; }
+    .log-error { color: #e94560; }
+    .log-success { color: #4ecca3; }
+    .log-info { color: #4a90e2; }
+  </style>
+</head>
+<body>
+  <h1>?? LPC Builder - Debug Mode</h1>
+  
+  <div class="status info">
+    <strong>Status:</strong> <span id="status">Initializing...</span>
+  </div>
+  
+  <div class="status">
+    <strong>Test Results:</strong>
+    <div id="tests"></div>
+  </div>
+  
+  <div class="status">
+    <strong>Console Log:</strong>
+    <div id="log"></div>
+  </div>
+  
+  <script>
+    const log = document.getElementById('log');
+    const status = document.getElementById('status');
+    const tests = document.getElementById('tests');
+    
+    function addLog(message, type = 'info') {
+      const entry = document.createElement('div');
+      entry.className = `log-entry log-${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      log.appendChild(entry);
+      log.scrollTop = log.scrollHeight;
+    }
+    
+    function addTest(name, passed, details = '') {
+      const test = document.createElement('div');
+      test.innerHTML = `${passed ? '?' : '?'} ${name}${details ? `: ${details}` : ''}`;
+      tests.appendChild(test);
+    }
+    
+    // Test 1: JavaScript syntax
+    addLog('Testing JavaScript syntax...', 'info');
+    try {
+      const testCode = 'const x = { test: true };';
+      new Function(testCode)();
+      addTest('JavaScript execution', true);
+      addLog('JavaScript execution OK', 'success');
+    } catch (e) {
+      addTest('JavaScript execution', false, e.message);
+      addLog('JavaScript execution FAILED: ' + e.message, 'error');
+    }
+    
+    // Test 2: Fetch API
+    addLog('Testing fetch API...', 'info');
+    fetch('/builder.js', { method: 'HEAD' })
+      .then(response => {
+        if (response.ok) {
+          addTest('Fetch /builder.js', true, `Status: ${response.status}`);
+          addLog('Fetch API working', 'success');
+        } else {
+          addTest('Fetch /builder.js', false, `Status: ${response.status}`);
+          addLog('Fetch failed: ' + response.status, 'error');
+        }
+      })
+      .catch(e => {
+        addTest('Fetch API', false, e.message);
+        addLog('Fetch error: ' + e.message, 'error');
+      });
+    
+    // Test 3: Load actual builder.js
+    addLog('Loading builder.js...', 'info');
+    const script = document.createElement('script');
+    script.onerror = function() {
+      addTest('Load builder.js', false, 'Script failed to load');
+      addLog('builder.js failed to load', 'error');
+      status.textContent = '? Script loading failed';
+    };
+    script.onload = function() {
+      addTest('Load builder.js', true);
+      addLog('builder.js loaded', 'success');
+      
+      // Test 4: Check CONFIG exists
+      if (typeof CONFIG !== 'undefined') {
+        addTest('CONFIG object', true, `${Object.keys(CONFIG.animations).length} animations`);
+        addLog('CONFIG defined with ' + Object.keys(CONFIG.animations).length + ' animations', 'success');
+      } else {
+        addTest('CONFIG object', false, 'Not defined');
+        addLog('CONFIG not defined!', 'error');
+      }
+      
+      // Test 5: Check elements
+      if (typeof elements !== 'undefined') {
+        addTest('Elements object', true);
+        addLog('Elements object defined', 'success');
+      } else {
+        addTest('Elements object', false);
+        addLog('Elements object missing!', 'error');
+      }
+      
+      status.textContent = '? Tests complete - Check results above';
+    };
+    script.src = '/builder.js';
+    document.head.appendChild(script);
+    
+    // Catch global errors
+    window.onerror = function(msg, url, line, col, error) {
+      addLog(`ERROR: ${msg} at line ${line}:${col}`, 'error');
+      addTest('Runtime execution', false, `${msg} (line ${line})`);
+      status.textContent = '? Runtime error detected';
+      return false;
+    };
+    
+    window.addEventListener('unhandledrejection', function(event) {
+      addLog(`PROMISE ERROR: ${event.reason}`, 'error');
+      addTest('Promise execution', false, event.reason);
+    });
+  </script>
+</body>
+</html>
