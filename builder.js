@@ -1212,8 +1212,6 @@ async function loadLegsSprite() {
     `/spritesheets/legs/${item}/female/walk/${color}.png`,
     `/spritesheets/legs/${item}/walk/${color}.png`
   ];
-    `/spritesheets/legs/${item}/${item}/${gender}/${animDir}/${color}.png`
-  ];
   
   console.log(`Loading legs: ${item} (${color}) for ${animDir}`);
   
