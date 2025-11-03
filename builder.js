@@ -175,6 +175,12 @@ function setupEventListeners() {
           animText.textContent = previousAnimation.charAt(0).toUpperCase() + previousAnimation.slice(1).replace('_', ' ');
         }
       }
+        return;
+      }
+      
+      // RELOAD CUSTOMIZATIONS
+      console.log('✅ Reloading...');
+      try { await reloadAllCustomizationSprites(); } catch (e) { console.error('❌', e); }
     });
   });
   
@@ -1133,26 +1139,15 @@ async function loadLegsSprite() {
     console.log('? Legs loaded!');
   } catch (e) {
     console.warn('Legs not found:', e);
-    state.legsSprite = null;
-  }
-}
-
-
-// Reload all customization sprites when animation changes
 async function reloadAllCustomizationSprites() {
-  console.log('?? Reloading all customization sprites for animation:', state.currentAnimation);
-  
-  const promises = [];
-  
-  if (state.customization.hair !== 'none') {
-    promises.push(loadHairSprite());
-  }
-  
-  if (state.customization.torso !== 'none') {
-    promises.push(loadTorsoSprite());
-  }
-  
-  if (state.customization.legs !== 'none') {
+  console.log('🔄 Reloading...');
+  try {
+    if (state.customization.hair !== 'none') await loadHairSprite();
+    if (state.customization.torso !== 'none') await loadTorsoSprite();
+    if (state.customization.legs !== 'none') await loadLegsSprite();
+    console.log('✅ Reloaded');
+  } catch (e) { console.error('❌', e); }
+}
     promises.push(loadLegsSprite());
   }
   
