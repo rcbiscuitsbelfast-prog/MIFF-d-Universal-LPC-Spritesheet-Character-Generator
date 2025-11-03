@@ -95,6 +95,12 @@ async function init() {
   elements.loading.classList.add('hidden');
   elements.app.classList.remove('hidden');
   
+  // AUTO-ENTER CUSTOMIZATION MODE
+  console.log('? Auto-entering customization...');
+  const bodySelector = document.getElementById('body-selector');
+  if (bodySelector) bodySelector.style.display = 'none';
+  setTimeout(() => { enterCustomizeMode(); }, 100);
+  
   requestAnimationFrame(animate);
   console.log('Ready!');
 }
@@ -1072,14 +1078,17 @@ async function loadTorsoSprite() {
   const animConfig = CONFIG.animations[anim];
   const animDir = animConfig.dir;
   
-  // Torso path: /torso/clothes/{item}/{gender}/{animation}/{color}.png
+  // Torso paths - multiple variants
   const paths = [
     `/spritesheets/torso/clothes/${item}/${gender}/${animDir}/${color}.png`,
     `/spritesheets/torso/clothes/${item}/male/${animDir}/${color}.png`,
-    `/spritesheets/torso/clothes/${item}/${animDir}/${color}.png`
+    `/spritesheets/torso/clothes/${item}/female/${animDir}/${color}.png`,
+    `/spritesheets/torso/clothes/${item}/${animDir}/${color}.png`,
+    `/spritesheets/torso/clothes/shirt/child/${animDir}/${color}.png`,
+    `/spritesheets/torso/clothes/${item}/${item}/${gender}/${animDir}/${color}.png`
   ];
   
-  console.log('Loading torso:', paths[0]);
+  console.log('Loading torso:', item, color);
   
   try {
     state.torsoSprite = await loadImageWithFallback(paths);
@@ -1104,14 +1113,20 @@ async function loadLegsSprite() {
   const animConfig = CONFIG.animations[anim];
   const animDir = animConfig.dir;
   
-  // Legs path: /legs/{item}/{gender}/{animation}/{color}.png
+  // Legs paths - multiple variants including skirts
   const paths = [
     `/spritesheets/legs/${item}/${gender}/${animDir}/${color}.png`,
     `/spritesheets/legs/${item}/male/${animDir}/${color}.png`,
-    `/spritesheets/legs/${item}/${animDir}/${color}.png`
+    `/spritesheets/legs/${item}/female/${animDir}/${color}.png`,
+    `/spritesheets/legs/${item}/thin/${animDir}/${color}.png`,
+    `/spritesheets/legs/${item}/${animDir}/${color}.png`,
+    `/spritesheets/legs/skirts/${item}/${gender}/${animDir}/${color}.png`,
+    `/spritesheets/legs/skirts/${item}/female/${animDir}/${color}.png`,
+    `/spritesheets/legs/armour/${item}/${gender}/${animDir}/${color}.png`,
+    `/spritesheets/legs/${item}/${item}/${gender}/${animDir}/${color}.png`
   ];
   
-  console.log('Loading legs:', paths[0]);
+  console.log('Loading legs:', item, color);
   
   try {
     state.legsSprite = await loadImageWithFallback(paths);
