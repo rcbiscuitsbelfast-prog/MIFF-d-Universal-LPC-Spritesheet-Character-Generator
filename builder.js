@@ -1,5 +1,5 @@
 /**
- * LPC Character Builder - v6.1 FIXED ANIMATIONS & ALL OPTIONS
+ * LPC Character Builder - v6.2 REAL ASSET LOADING
  */
 
 const CONFIG = {
@@ -217,7 +217,7 @@ function navigateCategory(direction) {
   showCategory(CATEGORIES[state.currentCategoryIndex]);
 }
 
-function showCategory(category) {
+async function showCategory(category) {
   const label = document.getElementById('current-category-label');
   const title = document.getElementById('section-title');
   const content = document.getElementById('category-content');
@@ -226,7 +226,7 @@ function showCategory(category) {
   if (title) title.textContent = category.charAt(0).toUpperCase() + category.slice(1);
   
   // Load content for this category
-  loadCategoryContent(category, content);
+  await loadCategoryContent(category, content);
 }
 
 function enterCustomizeMode() {
@@ -271,10 +271,10 @@ function exitCustomizeMode() {
   document.body.classList.remove('customize-mode');
 }
 
-function loadCategoryContent(category, container) {
+async function loadCategoryContent(category, container) {
   if (!container) return;
   
-  container.innerHTML = '';
+  container.innerHTML = '<p style="text-align: center; color: #64748b;">Loading options...</p>';
   
   switch(category) {
     case 'body':
@@ -284,13 +284,13 @@ function loadCategoryContent(category, container) {
       loadHeadOptions(container);
       break;
     case 'hair':
-      loadHairOptions(container);
+      await loadHairOptions(container);
       break;
     case 'torso':
-      loadTorsoOptions(container);
+      await loadTorsoOptions(container);
       break;
     case 'legs':
-      loadLegsOptions(container);
+      await loadLegsOptions(container);
       break;
     case 'feet':
       loadFeetOptions(container);
@@ -353,88 +353,157 @@ function loadHeadOptions(container) {
   container.innerHTML = html;
 }
 
-function loadHairOptions(container) {
-  const hairStyles = ['long', 'short', 'ponytail', 'page', 'mohawk', 'curly'];
-  const hairColors = ['black', 'blonde', 'brown', 'gray', 'white', 'blue', 'green', 'pink', 'red'];
-  
-  let html = '<div class="content-subsection">';
-  html += '<h3>Hair Style</h3>';
-  html += '<div class="items-grid">';
-  html += '<button class="item-card active" onclick="selectHairStyle(\'none\')">None</button>';
-  hairStyles.forEach(style => {
-    html += `<button class="item-card" onclick="selectHairStyle('${style}')">${style.charAt(0).toUpperCase() + style.slice(1)}</button>`;
-  });
-  html += '</div></div>';
-  
-  html += '<div class="content-subsection">';
-  html += '<h3>Hair Color</h3>';
-  html += '<div class="colors-grid">';
-  hairColors.forEach(color => {
-    const bgColor = getColorHex(color);
-    const active = color === state.customization.hairColor ? 'active' : '';
-    html += `<button class="color-card ${active}" style="background: ${bgColor};" onclick="selectHairColor('${color}')">`;
-    html += `<div class="color-card-label">${color}</div>`;
-    html += '</button>';
-  });
-  html += '</div></div>';
-  
-  container.innerHTML = html;
+async function loadHairOptions(container) {
+  try {
+    // Fetch actual hair directories
+    const response = await fetch('/api/assets?category=hair');
+    const data = await response.json();
+    
+    // Get all hair style folders (filter out non-directories)
+    const hairStyles = (data.items || []).filter(item => !item.includes('.'));
+    console.log('Found hair styles:', hairStyles.length, hairStyles.slice(0, 10));
+    
+    // Get colors from a reference hair style (long)
+    const anim = state.currentAnimation;
+    const animConfig = CONFIG.animations[anim];
+    const animDir = animConfig.dir;
+    
+    const colorsResponse = await fetch(`/api/assets?category=hair&subcategory=long&animation=${animDir}`);
+    const colorsData = await colorsResponse.json();
+    const hairColors = (colorsData.items || []).map(file => file.replace('.png', ''));
+    console.log('Found hair colors:', hairColors.length, hairColors.slice(0, 10));
+    
+    let html = '<div class="content-subsection">';
+    html += '<h3>Hair Style</h3>';
+    html += '<div class="items-grid">';
+    html += '<button class="item-card active" onclick="selectHairStyle(\'none\')">None</button>';
+    hairStyles.forEach(style => {
+      const displayName = style.replace(/_/g, ' ').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      html += `<button class="item-card" onclick="selectHairStyle('${style}')">${displayName}</button>`;
+    });
+    html += '</div></div>';
+    
+    html += '<div class="content-subsection">';
+    html += '<h3>Hair Color</h3>';
+    html += '<div class="colors-grid">';
+    hairColors.forEach(color => {
+      const bgColor = getColorHex(color);
+      const active = color === state.customization.hairColor ? 'active' : '';
+      html += `<button class="color-card ${active}" style="background: ${bgColor};" onclick="selectHairColor('${color}')">`;
+      html += `<div class="color-card-label">${color}</div>`;
+      html += '</button>';
+    });
+    html += '</div></div>';
+    
+    container.innerHTML = html;
+  } catch (error) {
+    console.error('Error loading hair options:', error);
+    container.innerHTML = '<p style="text-align: center; color: red;">Error loading hair options</p>';
+  }
 }
 
-function loadTorsoOptions(container) {
-  const torsoItems = ['blouse', 'shirt', 'robe', 'corset'];
-  const colors = ['white', 'black', 'blue', 'red', 'green', 'brown'];
-  
-  let html = '<div class="content-subsection">';
-  html += '<h3>Clothing</h3>';
-  html += '<div class="items-grid">';
-  html += '<button class="item-card active" onclick="selectTorso(\'none\')">None</button>';
-  torsoItems.forEach(item => {
-    html += `<button class="item-card" onclick="selectTorso('${item}')">${item.charAt(0).toUpperCase() + item.slice(1)}</button>`;
-  });
-  html += '</div></div>';
-  
-  html += '<div class="content-subsection">';
-  html += '<h3>Color</h3>';
-  html += '<div class="colors-grid">';
-  colors.forEach(color => {
-    const bgColor = getColorHex(color);
-    const active = color === state.customization.torsoColor ? 'active' : '';
-    html += `<button class="color-card ${active}" style="background: ${bgColor};" onclick="selectTorsoColor('${color}')">`;
-    html += `<div class="color-card-label">${color}</div>`;
-    html += '</button>';
-  });
-  html += '</div></div>';
-  
-  container.innerHTML = html;
+async function loadTorsoOptions(container) {
+  try {
+    // Fetch actual torso/clothes directories
+    const response = await fetch('/api/assets?category=torso');
+    const data = await response.json();
+    
+    // Filter to get only "clothes" subdirectory, then fetch its contents
+    const clothesResponse = await fetch('/spritesheets/torso/clothes');
+    const clothesHtml = await clothesResponse.text();
+    
+    // Simple directory listing parse or use direct folder list
+    // For now, use a curated list of known working items
+    const torsoItems = ['blouse', 'blouse_longsleeve', 'corset', 'longsleeve', 'robe', 'shirt', 'shortsleeve', 'sleeveless', 'tunic', 'vest'];
+    console.log('Found torso items:', torsoItems.length, torsoItems);
+    
+    // Get colors from a reference item
+    const anim = state.currentAnimation;
+    const animConfig = CONFIG.animations[anim];
+    const animDir = animConfig.dir;
+    const gender = state.currentGender;
+    
+    const colorsResponse = await fetch(`/api/assets?category=torso&subcategory=shirt&gender=${gender}&animation=${animDir}`);
+    const colorsData = await colorsResponse.json();
+    const colors = (colorsData.items || []).map(file => file.replace('.png', ''));
+    console.log('Found torso colors:', colors.length, colors.slice(0, 10));
+    
+    let html = '<div class="content-subsection">';
+    html += '<h3>Clothing</h3>';
+    html += '<div class="items-grid">';
+    html += '<button class="item-card active" onclick="selectTorso(\'none\')">None</button>';
+    torsoItems.forEach(item => {
+      const displayName = item.replace(/_/g, ' ').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      html += `<button class="item-card" onclick="selectTorso('${item}')">${displayName}</button>`;
+    });
+    html += '</div></div>';
+    
+    html += '<div class="content-subsection">';
+    html += '<h3>Color</h3>';
+    html += '<div class="colors-grid">';
+    colors.forEach(color => {
+      const bgColor = getColorHex(color);
+      const active = color === state.customization.torsoColor ? 'active' : '';
+      html += `<button class="color-card ${active}" style="background: ${bgColor};" onclick="selectTorsoColor('${color}')">`;
+      html += `<div class="color-card-label">${color}</div>`;
+      html += '</button>';
+    });
+    html += '</div></div>';
+    
+    container.innerHTML = html;
+  } catch (error) {
+    console.error('Error loading torso options:', error);
+    container.innerHTML = '<p style="text-align: center; color: red;">Error loading torso options</p>';
+  }
 }
 
-function loadLegsOptions(container) {
-  const legsItems = ['pants', 'pants2', 'skirt'];
-  const colors = ['brown', 'black', 'blue', 'gray'];
-  
-  let html = '<div class="content-subsection">';
-  html += '<h3>Legwear</h3>';
-  html += '<div class="items-grid">';
-  html += '<button class="item-card active" onclick="selectLegs(\'none\')">None</button>';
-  legsItems.forEach(item => {
-    html += `<button class="item-card" onclick="selectLegs('${item}')">${item.charAt(0).toUpperCase() + item.slice(1)}</button>`;
-  });
-  html += '</div></div>';
-  
-  html += '<div class="content-subsection">';
-  html += '<h3>Color</h3>';
-  html += '<div class="colors-grid">';
-  colors.forEach(color => {
-    const bgColor = getColorHex(color);
-    const active = color === state.customization.legsColor ? 'active' : '';
-    html += `<button class="color-card ${active}" style="background: ${bgColor};" onclick="selectLegsColor('${color}')">`;
-    html += `<div class="color-card-label">${color}</div>`;
-    html += '</button>';
-  });
-  html += '</div></div>';
-  
-  container.innerHTML = html;
+async function loadLegsOptions(container) {
+  try {
+    // Fetch actual legs directories
+    const response = await fetch('/api/assets?category=legs');
+    const data = await response.json();
+    
+    const legsItems = (data.items || []).filter(item => !item.includes('.'));
+    console.log('Found legs items:', legsItems.length, legsItems);
+    
+    // Get colors from a reference item (pants2)
+    const anim = state.currentAnimation;
+    const animConfig = CONFIG.animations[anim];
+    const animDir = animConfig.dir;
+    const gender = state.currentGender;
+    
+    const colorsResponse = await fetch(`/api/assets?category=legs&subcategory=pants2&gender=${gender}&animation=${animDir}`);
+    const colorsData = await colorsResponse.json();
+    const colors = (colorsData.items || []).map(file => file.replace('.png', ''));
+    console.log('Found legs colors:', colors.length, colors.slice(0, 10));
+    
+    let html = '<div class="content-subsection">';
+    html += '<h3>Legwear</h3>';
+    html += '<div class="items-grid">';
+    html += '<button class="item-card active" onclick="selectLegs(\'none\')">None</button>';
+    legsItems.forEach(item => {
+      const displayName = item.replace(/_/g, ' ').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      html += `<button class="item-card" onclick="selectLegs('${item}')">${displayName}</button>`;
+    });
+    html += '</div></div>';
+    
+    html += '<div class="content-subsection">';
+    html += '<h3>Color</h3>';
+    html += '<div class="colors-grid">';
+    colors.forEach(color => {
+      const bgColor = getColorHex(color);
+      const active = color === state.customization.legsColor ? 'active' : '';
+      html += `<button class="color-card ${active}" style="background: ${bgColor};" onclick="selectLegsColor('${color}')">`;
+      html += `<div class="color-card-label">${color}</div>`;
+      html += '</button>';
+    });
+    html += '</div></div>';
+    
+    container.innerHTML = html;
+  } catch (error) {
+    console.error('Error loading legs options:', error);
+    container.innerHTML = '<p style="text-align: center; color: red;">Error loading legs options</p>';
+  }
 }
 
 function loadFeetOptions(container) {
@@ -447,16 +516,39 @@ function loadWeaponOptions(container) {
 
 function getColorHex(colorName) {
   const colors = {
+    // Hair colors
+    ash: '#b0b0b0',
     black: '#1a1a1a',
-    white: '#f0f0f0',
-    brown: '#3d2817',
     blonde: '#f0c674',
-    red: '#a0392e',
-    gray: '#808080',
     blue: '#4a90e2',
+    carrot: '#ff6347',
+    chestnut: '#8b4513',
+    dark_brown: '#3d2817',
+    dark_gray: '#4a4a4a',
+    ginger: '#ff8c42',
+    gold: '#ffd700',
+    gray: '#808080',
     green: '#4caf50',
+    light_brown: '#a0522d',
+    navy: '#000080',
+    orange: '#ff8800',
     pink: '#e91e63',
-    purple: '#9c27b0'
+    purple: '#9c27b0',
+    red: '#a0392e',
+    ruby_red: '#e0115f',
+    white: '#f0f0f0',
+    // Clothing colors
+    brown: '#8b6f47',
+    bluegray: '#6699cc',
+    charcoal: '#36454f',
+    forest: '#228b22',
+    lavender: '#e6e6fa',
+    leather: '#c19a6b',
+    maroon: '#800000',
+    raven: '#1a1a1a',
+    teal: '#008080',
+    walnut: '#773f1a',
+    yellow: '#ffeb3b'
   };
   return colors[colorName] || '#cccccc';
 }

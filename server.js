@@ -151,23 +151,53 @@ app.use(express.static(__dirname, {
 // API: List available assets
 app.get('/api/assets', async (req, res) => {
   try {
-    const { category } = req.query;
-    const basePath = category 
-      ? path.join(config.spritesheetsPath, category)
-      : config.spritesheetsPath;
+    const { category, subcategory, gender, animation } = req.query;
+    
+    let basePath = config.spritesheetsPath;
+    
+    // Build path based on query params
+    if (category) {
+      basePath = path.join(basePath, category);
+      
+      // For clothes items
+      if (category === 'torso' && subcategory) {
+        basePath = path.join(basePath, 'clothes', subcategory);
+        if (gender) {
+          basePath = path.join(basePath, gender);
+          if (animation) {
+            basePath = path.join(basePath, animation);
+          }
+        }
+      } 
+      // For legs
+      else if (category === 'legs' && subcategory) {
+        basePath = path.join(basePath, subcategory);
+        if (gender) {
+          basePath = path.join(basePath, gender);
+          if (animation) {
+            basePath = path.join(basePath, animation);
+          }
+        }
+      }
+      // For hair
+      else if (category === 'hair' && subcategory) {
+        basePath = path.join(basePath, subcategory, 'adult');
+        if (animation) {
+          basePath = path.join(basePath, animation);
+        }
+      }
+    }
 
     const files = await fs.readdir(basePath, { withFileTypes: true });
-    const assets = files.map(file => ({
-      name: file.name,
-      type: file.isDirectory() ? 'directory' : 'file',
-      path: category ? `${category}/${file.name}` : file.name
-    }));
+    const items = files
+      .filter(file => !file.name.startsWith('.'))
+      .map(file => file.name);
 
-    logger.info('Assets listed', { category, count: assets.length });
-    res.json({ assets, category: category || 'root' });
+    logger.info('Assets listed', { basePath, count: items.length });
+    res.json({ items, path: basePath });
   } catch (error) {
-    logger.error('Failed to list assets', error);
-    res.status(500).json({ error: 'Failed to list assets' });
+    logger.error('Failed to list assets', { error: error.message, path: basePath });
+    res.status(500).json({ error: 'Failed to list assets', message: error.message });
   }
 });
 
