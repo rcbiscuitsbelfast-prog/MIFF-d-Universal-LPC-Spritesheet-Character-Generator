@@ -188,6 +188,15 @@ app.get('/api/assets', async (req, res) => {
       }
     }
 
+    // Check if path exists
+    try {
+      await fs.access(basePath);
+    } catch (err) {
+      // Path doesn't exist, return empty
+      logger.warn('Path does not exist', { basePath });
+      return res.json({ items: [], path: basePath });
+    }
+
     const files = await fs.readdir(basePath, { withFileTypes: true });
     const items = files
       .filter(file => !file.name.startsWith('.'))
@@ -196,7 +205,7 @@ app.get('/api/assets', async (req, res) => {
     logger.info('Assets listed', { basePath, count: items.length });
     res.json({ items, path: basePath });
   } catch (error) {
-    logger.error('Failed to list assets', { error: error.message, path: basePath });
+    logger.error('Failed to list assets', { error: error.message });
     res.status(500).json({ error: 'Failed to list assets', message: error.message });
   }
 });

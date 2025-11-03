@@ -1,5 +1,5 @@
 /**
- * LPC Character Builder - v6.2 REAL ASSET LOADING
+ * LPC Character Builder - v6.3 MOBILE OPTIMIZED
  */
 
 const CONFIG = {

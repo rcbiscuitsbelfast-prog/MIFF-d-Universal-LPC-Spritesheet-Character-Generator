@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#667eea">
   <meta name="description" content="Create and customize LPC-style game characters with live animation preview">
-  <title>LPC Character Builder v6.2</title>
+  <title>LPC Character Builder v6.3</title>
   <link rel="stylesheet" href="builder.css">
 </head>
 <body>
@@ -22,7 +22,7 @@
   <div id="app" class="hidden">
     <!-- Top navigation bar -->
     <header class="top-nav">
-      <h1>LPC Builder <span style="font-size: 0.6em; opacity: 0.8;">v6.2</span></h1>
+      <h1>LPC Builder <span style="font-size: 0.6em; opacity: 0.8;">v6.3</span></h1>
       <div class="nav-actions">
         <button class="nav-btn" id="btn-back" aria-label="Back" style="display: none;">Back</button>
         <button class="nav-btn" id="btn-export" aria-label="Export character">Export</button>
@@ -34,19 +34,22 @@
     <main class="main-content">
       <!-- Character preview canvas -->
       <div class="preview-container">
-        <canvas id="character-canvas" width="192" height="192"></canvas>
-        <div class="preview-info">
-          <span id="current-animation">Walk</span>
-          <span id="current-direction">Down</span>
-        </div>
-        
-        <!-- Direction arrows -->
+        <!-- Direction arrows - LEFT of sprite -->
         <div class="direction-controls">
           <button class="dir-arrow" data-direction="up" aria-label="Face Up">UP</button>
           <div class="dir-row">
             <button class="dir-arrow" data-direction="left" aria-label="Face Left">LEFT</button>
-            <button class="dir-arrow active" data-direction="down" aria-label="Face Down">DOWN</button>
-            <button class="dir-arrow" data-direction="right" aria-label="Face Right">RIGHT</button>
+            <button class="dir-arrow" data-direction="down" aria-label="Face Down">DOWN</button>
+            <button class="dir-arrow active" data-direction="right" aria-label="Face Right">RIGHT</button>
+          </div>
+        </div>
+
+        <!-- Sprite - STICKY position -->
+        <div class="sprite-container">
+          <canvas id="character-canvas" width="192" height="192"></canvas>
+          <div class="preview-info">
+            <span id="current-animation">Walk</span>
+            <span id="current-direction">Down</span>
           </div>
         </div>
 
