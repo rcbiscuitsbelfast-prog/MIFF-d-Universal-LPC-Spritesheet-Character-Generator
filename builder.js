@@ -24,7 +24,10 @@ const CONFIG = {
     sit: { row: 0, frames: 3, fps: 4, dir: 'sit', singleDirection: false },
     climb: { row: 0, frames: 6, fps: 8, dir: 'climb', singleDirection: true },
     combat_idle: { row: 0, frames: 2, fps: 4, dir: 'combat_idle', singleDirection: false },
-    emote: { row: 0, frames: 3, fps: 6, dir: 'emote', singleDirection: false }
+    emote: { row: 0, frames: 3, fps: 6, dir: 'emote', singleDirection: false },
+    watering: { row: 0, frames: 9, fps: 8, dir: 'walk', singleDirection: false },
+    onehanded: { row: 0, frames: 6, fps: 10, dir: 'slash', singleDirection: false },
+    slash_basic: { row: 0, frames: 6, fps: 10, dir: 'slash', singleDirection: false }
   },
   
   directions: {
