@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#667eea">
   <meta name="description" content="Create and customize LPC-style game characters with live animation preview">
-  <title>LPC Character Builder v4</title>
+  <title>LPC Character Builder v3</title>
   <link rel="stylesheet" href="builder.css">
   <style>
     /* Critical CSS for fast initial render */
@@ -53,7 +53,7 @@
   <div id="app" class="hidden">
     <!-- Top navigation bar -->
     <header class="top-nav">
-      <h1>?? LPC Builder <span style="font-size: 0.6em; opacity: 0.8;">v4</span></h1>
+      <h1>?? LPC Builder <span style="font-size: 0.6em; opacity: 0.8;">v3</span></h1>
       <div class="nav-actions">
         <button class="nav-btn" id="btn-export" aria-label="Export character">
           <span class="icon">??</span>
@@ -82,11 +82,11 @@
         
         <!-- Direction arrows directly under sprite -->
         <div class="direction-controls">
-          <button class="dir-arrow" data-direction="up" aria-label="Face Up">?</button>
+          <button class="dir-arrow" data-direction="up" aria-label="Face Up">??</button>
           <div class="dir-row">
-            <button class="dir-arrow" data-direction="left" aria-label="Face Left">?</button>
-            <button class="dir-arrow active" data-direction="down" aria-label="Face Down">?</button>
-            <button class="dir-arrow" data-direction="right" aria-label="Face Right">?</button>
+            <button class="dir-arrow" data-direction="left" aria-label="Face Left">??</button>
+            <button class="dir-arrow active" data-direction="down" aria-label="Face Down">??</button>
+            <button class="dir-arrow" data-direction="right" aria-label="Face Right">??</button>
           </div>
         </div>
 
@@ -101,15 +101,15 @@
         <h2>Body Type</h2>
         <div class="option-grid">
           <button class="option-btn active" data-gender="male">
-            <span class="icon">?</span>
+            <span class="icon">??</span>
             <span>Male</span>
           </button>
           <button class="option-btn" data-gender="female">
-            <span class="icon">?</span>
+            <span class="icon">??</span>
             <span>Female</span>
           </button>
           <button class="option-btn" data-gender="teen">
-            <span class="icon">??</span>
+            <span class="icon">?????</span>
             <span>Teen</span>
           </button>
         </div>
@@ -132,23 +132,23 @@
           <span>Idle</span>
         </button>
         <button class="anim-btn" data-animation="combat_idle">
-          <span class="icon">??</span>
+          <span class="icon">???</span>
           <span>Combat</span>
         </button>
         <button class="anim-btn" data-animation="slash">
-          <span class="icon">?</span>
+          <span class="icon">??</span>
           <span>Slash</span>
         </button>
         <button class="anim-btn" data-animation="halfslash">
-          <span class="icon">??</span>
+          <span class="icon">???</span>
           <span>Half Slash</span>
         </button>
         <button class="anim-btn" data-animation="backslash">
-          <span class="icon">?</span>
+          <span class="icon">??</span>
           <span>Back Slash</span>
         </button>
         <button class="anim-btn" data-animation="thrust">
-          <span class="icon">?</span>
+          <span class="icon">???</span>
           <span>Thrust</span>
         </button>
         <button class="anim-btn" data-animation="spellcast">
@@ -164,7 +164,7 @@
           <span>Hurt</span>
         </button>
         <button class="anim-btn" data-animation="jump">
-          <span class="icon">?</span>
+          <span class="icon">??</span>
           <span>Jump</span>
         </button>
         <button class="anim-btn" data-animation="sit">
@@ -182,82 +182,10 @@
       </div>
     </footer>
 
-    <!-- Customization Panel (Slide-out) -->
-    <aside id="customize-panel" class="customize-panel">
-      <div class="panel-header">
-        <h2>Customize Character</h2>
-        <button class="panel-close" id="close-panel" aria-label="Close">?</button>
-      </div>
-      
-      <div class="panel-tabs">
-        <button class="tab-btn active" data-tab="hair">Hair</button>
-        <button class="tab-btn" data-tab="torso">Torso</button>
-        <button class="tab-btn" data-tab="legs">Legs</button>
-        <button class="tab-btn" data-tab="weapon">Weapon</button>
-        <button class="tab-btn" data-tab="extras">Extras</button>
-      </div>
-      
-      <div class="panel-content">
-        <!-- Hair Tab -->
-        <div class="tab-panel active" id="tab-hair">
-          <h3>Hair Style</h3>
-          <div class="option-list" id="hair-list">
-            <button class="list-btn" data-hair="none">None</button>
-            <!-- Will be populated by JS -->
-          </div>
-          
-          <h3>Hair Color</h3>
-          <div class="color-grid" id="hair-colors">
-            <button class="color-btn" data-color="black" style="background: #1a1a1a"></button>
-            <button class="color-btn" data-color="brown" style="background: #3d2817"></button>
-            <button class="color-btn" data-color="blonde" style="background: #f0c674"></button>
-            <button class="color-btn" data-color="red" style="background: #a0392e"></button>
-            <button class="color-btn" data-color="white" style="background: #f0f0f0"></button>
-          </div>
-        </div>
-        
-        <!-- Torso Tab -->
-        <div class="tab-panel" id="tab-torso">
-          <h3>Clothing</h3>
-          <div class="option-list" id="torso-list">
-            <button class="list-btn" data-torso="none">None</button>
-            <!-- Will be populated by JS -->
-          </div>
-        </div>
-        
-        <!-- Legs Tab -->
-        <div class="tab-panel" id="tab-legs">
-          <h3>Leg Wear</h3>
-          <div class="option-list" id="legs-list">
-            <button class="list-btn" data-legs="none">None</button>
-            <!-- Will be populated by JS -->
-          </div>
-        </div>
-        
-        <!-- Weapon Tab -->
-        <div class="tab-panel" id="tab-weapon">
-          <h3>Weapon Type</h3>
-          <div class="option-list" id="weapon-list">
-            <button class="list-btn" data-weapon="none">None</button>
-            <!-- Will be populated by JS -->
-          </div>
-        </div>
-        
-        <!-- Extras Tab -->
-        <div class="tab-panel" id="tab-extras">
-          <h3>Accessories</h3>
-          <div class="option-list">
-            <button class="list-btn" data-extra="cape">Cape</button>
-            <button class="list-btn" data-extra="backpack">Backpack</button>
-            <button class="list-btn" data-extra="shield">Shield</button>
-            <button class="list-btn" data-extra="hat">Hat</button>
-          </div>
-        </div>
-      </div>
-    </aside>
-
-    <!-- Panel overlay -->
-    <div id="panel-overlay" class="panel-overlay"></div>
+    <!-- Floating action button for menu (future phases) -->
+    <button class="fab" id="menu-fab" aria-label="Open menu">
+      <span class="icon">?</span>
+    </button>
   </div>
 
   <!-- Scripts -->

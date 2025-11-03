@@ -1,5 +1,5 @@
 /**
- * LPC Character Builder - v2 WITH ANIMATION SWITCHING FIX
+ * LPC Character Builder - v4 WITH FULL CUSTOMIZATION
  */
 
 const CONFIG = {
@@ -49,7 +49,19 @@ const state = {
   isPlaying: true,
   bodySprite: null,
   headSprite: null,
-  lastFrameTime: 0
+  hairSprite: null,
+  torsoSprite: null,
+  legsSprite: null,
+  weaponSprite: null,
+  lastFrameTime: 0,
+  customization: {
+    hair: 'none',
+    hairColor: 'black',
+    torso: 'none',
+    legs: 'none',
+    weapon: 'none',
+    extras: []
+  }
 };
 
 const elements = {
@@ -154,15 +166,151 @@ function setupEventListeners() {
   const btnHelp = document.getElementById('btn-help');
   if (btnHelp) {
     btnHelp.addEventListener('click', () => {
-      alert('LPC Character Builder v3\n\n1. Select body type\n2. Choose animation\n3. Pick direction\n4. Click Customize for more options!');
+      alert('LPC Character Builder v4\n\n1. Select body type\n2. Choose animation\n3. Pick direction\n4. Customize hair, clothes, weapons\n5. Export your character!');
     });
   }
   
   const btnNext = document.getElementById('next-customize');
   if (btnNext) {
-    btnNext.addEventListener('click', () => {
-      alert('Customization coming soon!\n\nNext features:\n- Hair styles\n- Clothing\n- Weapons\n- Accessories\n- Skin tones');
+    btnNext.addEventListener('click', openCustomizePanel);
+  }
+  
+  // Customization panel controls
+  const closePanel = document.getElementById('close-panel');
+  const panelOverlay = document.getElementById('panel-overlay');
+  
+  if (closePanel) closePanel.addEventListener('click', closeCustomizePanel);
+  if (panelOverlay) panelOverlay.addEventListener('click', closeCustomizePanel);
+  
+  // Tab switching
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const tabName = e.currentTarget.dataset.tab;
+      switchTab(tabName);
     });
+  });
+  
+  // Export button
+  const btnExport = document.getElementById('btn-export');
+  if (btnExport) {
+    btnExport.addEventListener('click', exportCharacter);
+  }
+  
+  // Initialize customization options
+  loadCustomizationOptions();
+}
+
+function openCustomizePanel() {
+  const panel = document.getElementById('customize-panel');
+  const overlay = document.getElementById('panel-overlay');
+  panel.classList.add('active');
+  overlay.classList.add('active');
+}
+
+function closeCustomizePanel() {
+  const panel = document.getElementById('customize-panel');
+  const overlay = document.getElementById('panel-overlay');
+  panel.classList.remove('active');
+  overlay.classList.remove('active');
+}
+
+function switchTab(tabName) {
+  // Update tab buttons
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tabName);
+  });
+  
+  // Update tab panels
+  document.querySelectorAll('.tab-panel').forEach(panel => {
+    panel.classList.toggle('active', panel.id === `tab-${tabName}`);
+  });
+}
+
+async function loadCustomizationOptions() {
+  try {
+    // Load hair options
+    const hairResponse = await fetch('/api/assets?category=hair');
+    const hairData = await hairResponse.json();
+    populateOptions('hair-list', hairData.items || [], 'hair');
+    
+    // Load torso options
+    const torsoResponse = await fetch('/api/assets?category=torso');
+    const torsoData = await torsoResponse.json();
+    populateOptions('torso-list', torsoData.items || [], 'torso');
+    
+    // Load legs options
+    const legsResponse = await fetch('/api/assets?category=legs');
+    const legsData = await legsResponse.json();
+    populateOptions('legs-list', legsData.items || [], 'legs');
+    
+    // Load weapon options
+    const weaponResponse = await fetch('/api/assets?category=weapon');
+    const weaponData = await weaponResponse.json();
+    populateOptions('weapon-list', weaponData.items || [], 'weapon');
+  } catch (e) {
+    console.warn('Could not load customization options:', e);
+    // Use fallback options
+    populateFallbackOptions();
+  }
+}
+
+function populateOptions(containerId, items, category) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  
+  items.forEach(item => {
+    const btn = document.createElement('button');
+    btn.className = 'list-btn';
+    btn.dataset[category] = item;
+    btn.textContent = item.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase());
+    btn.addEventListener('click', () => selectCustomization(category, item));
+    container.appendChild(btn);
+  });
+}
+
+function populateFallbackOptions() {
+  // Basic hair options
+  const hairList = document.getElementById('hair-list');
+  ['long', 'short', 'ponytail', 'bald'].forEach(hair => {
+    const btn = document.createElement('button');
+    btn.className = 'list-btn';
+    btn.dataset.hair = hair;
+    btn.textContent = hair.charAt(0).toUpperCase() + hair.slice(1);
+    btn.addEventListener('click', () => selectCustomization('hair', hair));
+    hairList.appendChild(btn);
+  });
+}
+
+function selectCustomization(category, value) {
+  state.customization[category] = value;
+  
+  // Update UI
+  document.querySelectorAll(`[data-${category}]`).forEach(btn => {
+    btn.classList.toggle('active', btn.dataset[category] === value);
+  });
+  
+  // Reload character with new customization
+  loadCharacterLayers(state.currentGender, state.currentAnimation);
+}
+
+async function exportCharacter() {
+  const canvas = document.getElementById('character-canvas');
+  
+  try {
+    // Create a download link
+    canvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = `lpc-character-${Date.now()}.png`;
+      link.href = url;
+      link.click();
+      URL.revokeObjectURL(url);
+      
+      alert('? Character exported as PNG!\n\nFrame: ' + state.currentAnimation + ' (' + state.currentDirection + ')');
+    });
+  } catch (e) {
+    console.error('Export failed:', e);
+    alert('? Export failed. Please try again.');
   }
 }
 
