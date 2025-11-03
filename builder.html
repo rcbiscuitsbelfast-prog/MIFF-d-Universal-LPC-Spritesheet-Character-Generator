@@ -6,39 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#667eea">
   <meta name="description" content="Create and customize LPC-style game characters with live animation preview">
-  <title>LPC Character Builder v4</title>
+  <title>LPC Character Builder v5</title>
   <link rel="stylesheet" href="builder.css">
-  <style>
-    /* Critical CSS for fast initial render */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-    
-    #loading {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      font-size: 1.5rem;
-      z-index: 9999;
-    }
-    
-    #loading.hidden {
-      display: none;
-    }
-  </style>
 </head>
 <body>
   <!-- Loading screen -->
@@ -53,15 +22,15 @@
   <div id="app" class="hidden">
     <!-- Top navigation bar -->
     <header class="top-nav">
-      <h1>?? LPC Builder <span style="font-size: 0.6em; opacity: 0.8;">v4</span></h1>
+      <h1>?? LPC Builder <span style="font-size: 0.6em; opacity: 0.8;">v5</span></h1>
       <div class="nav-actions">
+        <button class="nav-btn" id="btn-back" aria-label="Back" style="display: none;">
+          <span class="icon">?</span>
+          <span class="label">Back</span>
+        </button>
         <button class="nav-btn" id="btn-export" aria-label="Export character">
           <span class="icon">??</span>
           <span class="label">Export</span>
-        </button>
-        <button class="nav-btn" id="btn-import" aria-label="Import character">
-          <span class="icon">??</span>
-          <span class="label">Import</span>
         </button>
         <button class="nav-btn" id="btn-help" aria-label="Help">
           <span class="icon">?</span>
@@ -89,16 +58,11 @@
             <button class="dir-arrow" data-direction="right" aria-label="Face Right">?</button>
           </div>
         </div>
-
-        <!-- Next button for customization -->
-        <button class="next-btn" id="next-customize">
-          Customize ?
-        </button>
       </div>
 
-      <!-- Body Type selector -->
-      <div class="gender-selector">
-        <h2>Body Type</h2>
+      <!-- Body Type selector (Step 1) -->
+      <div id="body-selector" class="selection-section">
+        <h2>Select Body Type</h2>
         <div class="option-grid">
           <button class="option-btn active" data-gender="male">
             <span class="icon">?</span>
@@ -113,11 +77,153 @@
             <span>Teen</span>
           </button>
         </div>
+        
+        <!-- Customize button below body types -->
+        <button class="next-btn" id="btn-customize">
+          Customize Character ?
+        </button>
+      </div>
+
+      <!-- Customization Categories (Step 2 - replaces body selector) -->
+      <div id="customize-categories" class="selection-section hidden">
+        <h2>Customize Character</h2>
+        
+        <!-- Category: Hair -->
+        <div class="category-section">
+          <button class="category-btn" data-category="hair">
+            <span class="icon">??</span>
+            <span>Hair</span>
+            <span class="expand-icon">?</span>
+          </button>
+          <div class="category-content" id="category-hair">
+            <div class="subcategory">
+              <h4>Style</h4>
+              <div class="item-list" id="hair-styles">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+            <div class="subcategory">
+              <h4>Color</h4>
+              <div class="color-list" id="hair-colors">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category: Body/Torso -->
+        <div class="category-section">
+          <button class="category-btn" data-category="torso">
+            <span class="icon">??</span>
+            <span>Torso</span>
+            <span class="expand-icon">?</span>
+          </button>
+          <div class="category-content" id="category-torso">
+            <div class="subcategory">
+              <h4>Type</h4>
+              <div class="item-list" id="torso-types">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+            <div class="subcategory">
+              <h4>Item</h4>
+              <div class="item-list" id="torso-items">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+            <div class="subcategory">
+              <h4>Color</h4>
+              <div class="color-list" id="torso-colors">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category: Legs -->
+        <div class="category-section">
+          <button class="category-btn" data-category="legs">
+            <span class="icon">??</span>
+            <span>Legs</span>
+            <span class="expand-icon">?</span>
+          </button>
+          <div class="category-content" id="category-legs">
+            <div class="subcategory">
+              <h4>Type</h4>
+              <div class="item-list" id="legs-types">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+            <div class="subcategory">
+              <h4>Color</h4>
+              <div class="color-list" id="legs-colors">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category: Feet -->
+        <div class="category-section">
+          <button class="category-btn" data-category="feet">
+            <span class="icon">??</span>
+            <span>Feet</span>
+            <span class="expand-icon">?</span>
+          </button>
+          <div class="category-content" id="category-feet">
+            <div class="subcategory">
+              <h4>Type</h4>
+              <div class="item-list" id="feet-items">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category: Weapon -->
+        <div class="category-section">
+          <button class="category-btn" data-category="weapon">
+            <span class="icon">?</span>
+            <span>Weapon</span>
+            <span class="expand-icon">?</span>
+          </button>
+          <div class="category-content" id="category-weapon">
+            <div class="subcategory">
+              <h4>Type</h4>
+              <div class="item-list" id="weapon-types">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+            <div class="subcategory">
+              <h4>Item</h4>
+              <div class="item-list" id="weapon-items">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category: Accessories -->
+        <div class="category-section">
+          <button class="category-btn" data-category="accessories">
+            <span class="icon">??</span>
+            <span>Accessories</span>
+            <span class="expand-icon">?</span>
+          </button>
+          <div class="category-content" id="category-accessories">
+            <div class="subcategory">
+              <h4>Items</h4>
+              <div class="item-list" id="accessory-items">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
 
-    <!-- Bottom animation selector -->
-    <footer class="animation-bar">
+    <!-- Bottom animation selector (only visible in body selection mode) -->
+    <footer class="animation-bar" id="animation-bar">
       <div class="animation-scroll">
         <button class="anim-btn active" data-animation="walk">
           <span class="icon">??</span>
@@ -139,18 +245,6 @@
           <span class="icon">?</span>
           <span>Slash</span>
         </button>
-        <button class="anim-btn" data-animation="halfslash">
-          <span class="icon">??</span>
-          <span>Half Slash</span>
-        </button>
-        <button class="anim-btn" data-animation="backslash">
-          <span class="icon">?</span>
-          <span>Back Slash</span>
-        </button>
-        <button class="anim-btn" data-animation="thrust">
-          <span class="icon">?</span>
-          <span>Thrust</span>
-        </button>
         <button class="anim-btn" data-animation="spellcast">
           <span class="icon">?</span>
           <span>Cast</span>
@@ -163,101 +257,8 @@
           <span class="icon">??</span>
           <span>Hurt</span>
         </button>
-        <button class="anim-btn" data-animation="jump">
-          <span class="icon">?</span>
-          <span>Jump</span>
-        </button>
-        <button class="anim-btn" data-animation="sit">
-          <span class="icon">??</span>
-          <span>Sit</span>
-        </button>
-        <button class="anim-btn" data-animation="climb">
-          <span class="icon">??</span>
-          <span>Climb</span>
-        </button>
-        <button class="anim-btn" data-animation="emote">
-          <span class="icon">??</span>
-          <span>Emote</span>
-        </button>
       </div>
     </footer>
-
-    <!-- Customization Panel (Slide-out) -->
-    <aside id="customize-panel" class="customize-panel">
-      <div class="panel-header">
-        <h2>Customize Character</h2>
-        <button class="panel-close" id="close-panel" aria-label="Close">?</button>
-      </div>
-      
-      <div class="panel-tabs">
-        <button class="tab-btn active" data-tab="hair">Hair</button>
-        <button class="tab-btn" data-tab="torso">Torso</button>
-        <button class="tab-btn" data-tab="legs">Legs</button>
-        <button class="tab-btn" data-tab="weapon">Weapon</button>
-        <button class="tab-btn" data-tab="extras">Extras</button>
-      </div>
-      
-      <div class="panel-content">
-        <!-- Hair Tab -->
-        <div class="tab-panel active" id="tab-hair">
-          <h3>Hair Style</h3>
-          <div class="option-list" id="hair-list">
-            <button class="list-btn" data-hair="none">None</button>
-            <!-- Will be populated by JS -->
-          </div>
-          
-          <h3>Hair Color</h3>
-          <div class="color-grid" id="hair-colors">
-            <button class="color-btn" data-color="black" style="background: #1a1a1a"></button>
-            <button class="color-btn" data-color="brown" style="background: #3d2817"></button>
-            <button class="color-btn" data-color="blonde" style="background: #f0c674"></button>
-            <button class="color-btn" data-color="red" style="background: #a0392e"></button>
-            <button class="color-btn" data-color="white" style="background: #f0f0f0"></button>
-          </div>
-        </div>
-        
-        <!-- Torso Tab -->
-        <div class="tab-panel" id="tab-torso">
-          <h3>Clothing</h3>
-          <div class="option-list" id="torso-list">
-            <button class="list-btn" data-torso="none">None</button>
-            <!-- Will be populated by JS -->
-          </div>
-        </div>
-        
-        <!-- Legs Tab -->
-        <div class="tab-panel" id="tab-legs">
-          <h3>Leg Wear</h3>
-          <div class="option-list" id="legs-list">
-            <button class="list-btn" data-legs="none">None</button>
-            <!-- Will be populated by JS -->
-          </div>
-        </div>
-        
-        <!-- Weapon Tab -->
-        <div class="tab-panel" id="tab-weapon">
-          <h3>Weapon Type</h3>
-          <div class="option-list" id="weapon-list">
-            <button class="list-btn" data-weapon="none">None</button>
-            <!-- Will be populated by JS -->
-          </div>
-        </div>
-        
-        <!-- Extras Tab -->
-        <div class="tab-panel" id="tab-extras">
-          <h3>Accessories</h3>
-          <div class="option-list">
-            <button class="list-btn" data-extra="cape">Cape</button>
-            <button class="list-btn" data-extra="backpack">Backpack</button>
-            <button class="list-btn" data-extra="shield">Shield</button>
-            <button class="list-btn" data-extra="hat">Hat</button>
-          </div>
-        </div>
-      </div>
-    </aside>
-
-    <!-- Panel overlay -->
-    <div id="panel-overlay" class="panel-overlay"></div>
   </div>
 
   <!-- Scripts -->

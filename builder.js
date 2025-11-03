@@ -1,5 +1,5 @@
 /**
- * LPC Character Builder - v4 WITH FULL CUSTOMIZATION
+ * LPC Character Builder - v5 WITH CATEGORY SYSTEM
  */
 
 const CONFIG = {
@@ -166,27 +166,27 @@ function setupEventListeners() {
   const btnHelp = document.getElementById('btn-help');
   if (btnHelp) {
     btnHelp.addEventListener('click', () => {
-      alert('LPC Character Builder v4\n\n1. Select body type\n2. Choose animation\n3. Pick direction\n4. Customize hair, clothes, weapons\n5. Export your character!');
+      alert('LPC Character Builder v5\n\n1. Select body type\n2. Choose animation\n3. Click Customize\n4. Select from categories:\n   - Hair (style & color)\n   - Torso (clothing)\n   - Legs\n   - Weapons\n   - Accessories\n5. Export your character!');
     });
   }
   
-  const btnNext = document.getElementById('next-customize');
-  if (btnNext) {
-    btnNext.addEventListener('click', openCustomizePanel);
+  // Customize button
+  const btnCustomize = document.getElementById('btn-customize');
+  if (btnCustomize) {
+    btnCustomize.addEventListener('click', enterCustomizeMode);
   }
   
-  // Customization panel controls
-  const closePanel = document.getElementById('close-panel');
-  const panelOverlay = document.getElementById('panel-overlay');
+  // Back button
+  const btnBack = document.getElementById('btn-back');
+  if (btnBack) {
+    btnBack.addEventListener('click', exitCustomizeMode);
+  }
   
-  if (closePanel) closePanel.addEventListener('click', closeCustomizePanel);
-  if (panelOverlay) panelOverlay.addEventListener('click', closeCustomizePanel);
-  
-  // Tab switching
-  document.querySelectorAll('.tab-btn').forEach(btn => {
+  // Category expansion
+  document.querySelectorAll('.category-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      const tabName = e.currentTarget.dataset.tab;
-      switchTab(tabName);
+      const category = e.currentTarget.dataset.category;
+      toggleCategory(category);
     });
   });
   
@@ -200,97 +200,159 @@ function setupEventListeners() {
   loadCustomizationOptions();
 }
 
-function openCustomizePanel() {
-  const panel = document.getElementById('customize-panel');
-  const overlay = document.getElementById('panel-overlay');
-  panel.classList.add('active');
-  overlay.classList.add('active');
-}
-
-function closeCustomizePanel() {
-  const panel = document.getElementById('customize-panel');
-  const overlay = document.getElementById('panel-overlay');
-  panel.classList.remove('active');
-  overlay.classList.remove('active');
-}
-
-function switchTab(tabName) {
-  // Update tab buttons
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.tab === tabName);
-  });
+function enterCustomizeMode() {
+  // Hide body selector and animation bar
+  document.getElementById('body-selector').classList.add('hidden');
+  document.getElementById('animation-bar').style.display = 'none';
   
-  // Update tab panels
-  document.querySelectorAll('.tab-panel').forEach(panel => {
-    panel.classList.toggle('active', panel.id === `tab-${tabName}`);
-  });
+  // Show customization categories
+  document.getElementById('customize-categories').classList.remove('hidden');
+  
+  // Show back button
+  document.getElementById('btn-back').style.display = 'flex';
+  
+  // Add customize mode class to body
+  document.body.classList.add('customize-mode');
 }
 
-async function loadCustomizationOptions() {
-  try {
-    // Load hair options
-    const hairResponse = await fetch('/api/assets?category=hair');
-    const hairData = await hairResponse.json();
-    populateOptions('hair-list', hairData.items || [], 'hair');
-    
-    // Load torso options
-    const torsoResponse = await fetch('/api/assets?category=torso');
-    const torsoData = await torsoResponse.json();
-    populateOptions('torso-list', torsoData.items || [], 'torso');
-    
-    // Load legs options
-    const legsResponse = await fetch('/api/assets?category=legs');
-    const legsData = await legsResponse.json();
-    populateOptions('legs-list', legsData.items || [], 'legs');
-    
-    // Load weapon options
-    const weaponResponse = await fetch('/api/assets?category=weapon');
-    const weaponData = await weaponResponse.json();
-    populateOptions('weapon-list', weaponData.items || [], 'weapon');
-  } catch (e) {
-    console.warn('Could not load customization options:', e);
-    // Use fallback options
-    populateFallbackOptions();
+function exitCustomizeMode() {
+  // Show body selector and animation bar
+  document.getElementById('body-selector').classList.remove('hidden');
+  document.getElementById('animation-bar').style.display = 'block';
+  
+  // Hide customization categories
+  document.getElementById('customize-categories').classList.add('hidden');
+  
+  // Hide back button
+  document.getElementById('btn-back').style.display = 'none';
+  
+  // Remove customize mode class
+  document.body.classList.remove('customize-mode');
+}
+
+function toggleCategory(category) {
+  const btn = document.querySelector(`[data-category="${category}"]`);
+  const content = document.getElementById(`category-${category}`);
+  
+  const isActive = btn.classList.contains('active');
+  
+  // Close all categories
+  document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.category-content').forEach(c => c.classList.remove('active'));
+  
+  // Open this category if it wasn't active
+  if (!isActive) {
+    btn.classList.add('active');
+    content.classList.add('active');
   }
 }
 
-function populateOptions(containerId, items, category) {
+async function loadCustomizationOptions() {
+  // Hair styles
+  const hairStyles = ['long', 'short', 'ponytail', 'braided', 'curly', 'mohawk', 'bald', 'afro', 'bob', 'bun'];
+  populateItems('hair-styles', hairStyles, 'hair');
+  
+  // Hair colors
+  const hairColors = [
+    { name: 'black', color: '#1a1a1a' },
+    { name: 'brown', color: '#3d2817' },
+    { name: 'blonde', color: '#f0c674' },
+    { name: 'red', color: '#a0392e' },
+    { name: 'white', color: '#f0f0f0' },
+    { name: 'gray', color: '#808080' },
+    { name: 'blue', color: '#4a90e2' },
+    { name: 'green', color: '#4caf50' },
+    { name: 'pink', color: '#e91e63' },
+    { name: 'purple', color: '#9c27b0' }
+  ];
+  populateColors('hair-colors', hairColors, 'hairColor');
+  
+  // Torso types
+  const torsoTypes = ['clothes', 'armour', 'bandage', 'chainmail', 'jacket'];
+  populateItems('torso-types', torsoTypes, 'torsoType');
+  
+  // Torso items (will load based on type selection)
+  // Initially load clothes
+  const clothesItems = ['shirt', 'blouse', 'robe', 'tunic', 'corset'];
+  populateItems('torso-items', clothesItems, 'torso');
+  
+  // Legs types
+  const legsTypes = ['pants', 'armour', 'formal', 'leggings'];
+  populateItems('legs-types', legsTypes, 'legs');
+  
+  // Weapon types
+  const weaponTypes = ['sword', 'blunt', 'magic', 'polearm', 'ranged'];
+  populateItems('weapon-types', weaponTypes, 'weaponType');
+  
+  // Accessories
+  const accessories = ['cape', 'backpack', 'shield', 'hat', 'quiver'];
+  populateItems('accessory-items', accessories, 'accessory');
+}
+
+function populateItems(containerId, items, category) {
   const container = document.getElementById(containerId);
   if (!container) return;
   
+  container.innerHTML = '<button class="item-btn active" data-item="none">None</button>';
+  
   items.forEach(item => {
     const btn = document.createElement('button');
-    btn.className = 'list-btn';
-    btn.dataset[category] = item;
+    btn.className = 'item-btn';
+    btn.dataset.item = item;
     btn.textContent = item.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase());
-    btn.addEventListener('click', () => selectCustomization(category, item));
+    btn.addEventListener('click', () => selectItem(category, item, btn));
     container.appendChild(btn);
   });
 }
 
-function populateFallbackOptions() {
-  // Basic hair options
-  const hairList = document.getElementById('hair-list');
-  ['long', 'short', 'ponytail', 'bald'].forEach(hair => {
+function populateColors(containerId, colors, category) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  
+  container.innerHTML = '';
+  
+  colors.forEach(colorObj => {
     const btn = document.createElement('button');
-    btn.className = 'list-btn';
-    btn.dataset.hair = hair;
-    btn.textContent = hair.charAt(0).toUpperCase() + hair.slice(1);
-    btn.addEventListener('click', () => selectCustomization('hair', hair));
-    hairList.appendChild(btn);
+    btn.className = 'color-btn';
+    btn.style.background = colorObj.color;
+    btn.dataset.color = colorObj.name;
+    btn.dataset.label = colorObj.name.charAt(0).toUpperCase() + colorObj.name.slice(1);
+    btn.addEventListener('click', () => selectColor(category, colorObj.name, btn));
+    container.appendChild(btn);
   });
+  
+  // Select first color by default
+  if (colors.length > 0) {
+    container.firstChild.classList.add('active');
+  }
 }
 
-function selectCustomization(category, value) {
-  state.customization[category] = value;
+function selectItem(category, item, btn) {
+  // Update active state
+  btn.parentElement.querySelectorAll('.item-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
   
-  // Update UI
-  document.querySelectorAll(`[data-${category}]`).forEach(btn => {
-    btn.classList.toggle('active', btn.dataset[category] === value);
-  });
+  // Update state
+  state.customization[category] = item;
   
-  // Reload character with new customization
-  loadCharacterLayers(state.currentGender, state.currentAnimation);
+  console.log(`Selected ${category}: ${item}`);
+  
+  // TODO: Reload character with new customization
+  // loadCharacterWithCustomization();
+}
+
+function selectColor(category, color, btn) {
+  // Update active state
+  btn.parentElement.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  // Update state
+  state.customization[category] = color;
+  
+  console.log(`Selected ${category}: ${color}`);
+  
+  // TODO: Reload character with new color
+  // loadCharacterWithCustomization();
 }
 
 async function exportCharacter() {
