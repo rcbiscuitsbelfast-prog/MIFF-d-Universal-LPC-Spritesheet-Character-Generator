@@ -1,5 +1,5 @@
 /**
- * LPC Character Builder - v6.4.1 FIXES
+ * LPC Character Builder - v6.5 ALL FIXES
  */
 
 const CONFIG = {
