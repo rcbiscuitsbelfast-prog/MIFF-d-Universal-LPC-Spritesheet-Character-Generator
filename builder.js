@@ -174,7 +174,6 @@ function setupEventListeners() {
         if (animText) {
           animText.textContent = previousAnimation.charAt(0).toUpperCase() + previousAnimation.slice(1).replace('_', ' ');
         }
-      }
         return;
       }
       
