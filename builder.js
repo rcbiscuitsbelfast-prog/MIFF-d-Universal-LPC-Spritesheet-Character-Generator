@@ -25,9 +25,7 @@ const CONFIG = {
     climb: { row: 0, frames: 6, fps: 8, dir: 'climb', singleDirection: true },
     combat_idle: { row: 0, frames: 2, fps: 4, dir: 'combat_idle', singleDirection: false },
     emote: { row: 0, frames: 3, fps: 6, dir: 'emote', singleDirection: false },
-    watering: { row: 0, frames: 9, fps: 8, dir: 'walk', singleDirection: false },
-    onehanded: { row: 0, frames: 6, fps: 10, dir: 'slash', singleDirection: false },
-    slash_basic: { row: 0, frames: 6, fps: 10, dir: 'slash', singleDirection: false }
+    // Removed watering, onehanded, slash_basic - these don't exist in LPC sprites
   },
   
   directions: {
@@ -1147,7 +1145,7 @@ async function loadHairSprite() {
 
 async function loadTorsoSprite() {
   if (state.customization.torso === 'none') {
-    // KEEP PREVIOUS instead
+    state.torsoSprite = null;
     console.log('Torso removed');
     return;
   }
@@ -1160,25 +1158,30 @@ async function loadTorsoSprite() {
   const animConfig = CONFIG.animations[anim];
   const animDir = animConfig.dir;
   
-  // Torso paths - multiple variants
+  // CRITICAL: Clothes often only have walk animation!
+  // Try animation-specific first, then fallback to walk
   const paths = [
     `/spritesheets/torso/clothes/${item}/${gender}/${animDir}/${color}.png`,
     `/spritesheets/torso/clothes/${item}/male/${animDir}/${color}.png`,
     `/spritesheets/torso/clothes/${item}/female/${animDir}/${color}.png`,
     `/spritesheets/torso/clothes/${item}/${animDir}/${color}.png`,
-    `/spritesheets/torso/clothes/shirt/child/${animDir}/${color}.png`,
-    `/spritesheets/torso/clothes/${item}/${item}/${gender}/${animDir}/${color}.png`
+    `/spritesheets/torso/clothes/${item}/${item}/${gender}/${animDir}/${color}.png`,
+    // FALLBACK TO WALK if animation doesn't exist
+    `/spritesheets/torso/clothes/${item}/${gender}/walk/${color}.png`,
+    `/spritesheets/torso/clothes/${item}/male/walk/${color}.png`,
+    `/spritesheets/torso/clothes/${item}/female/walk/${color}.png`,
+    `/spritesheets/torso/clothes/${item}/walk/${color}.png`,
+    `/spritesheets/torso/clothes/shirt/child/walk/${color}.png`
   ];
   
-  console.log('Loading torso:', item, color);
+  console.log(`Loading torso: ${item} (${color}) for ${animDir}`);
   
   try {
     state.torsoSprite = await loadImageWithFallback(paths);
-    console.log('? Torso loaded!');
+    console.log('✅ Torso loaded!');
   } catch (e) {
-    console.warn('Torso not found:', e);
-    state.torsoSprite = previousSprite;
-    // KEEP PREVIOUS instead
+    console.warn('⚠️ Torso not found, removing:', e);
+    state.torsoSprite = null; // Remove instead of keeping misaligned sprite
   }
 }
 
@@ -1195,27 +1198,31 @@ async function loadLegsSprite() {
   const anim = state.currentAnimation;
   const animConfig = CONFIG.animations[anim];
   const animDir = animConfig.dir;
-  
-  // Legs paths - multiple variants including skirts
   const paths = [
     `/spritesheets/legs/${item}/${gender}/${animDir}/${color}.png`,
     `/spritesheets/legs/${item}/male/${animDir}/${color}.png`,
     `/spritesheets/legs/${item}/female/${animDir}/${color}.png`,
-    `/spritesheets/legs/${item}/thin/${animDir}/${color}.png`,
     `/spritesheets/legs/${item}/${animDir}/${color}.png`,
     `/spritesheets/legs/skirts/${item}/${gender}/${animDir}/${color}.png`,
-    `/spritesheets/legs/skirts/${item}/female/${animDir}/${color}.png`,
     `/spritesheets/legs/armour/${item}/${gender}/${animDir}/${color}.png`,
+    `/spritesheets/legs/${item}/thin/${animDir}/${color}.png`,
+    // FALLBACK TO WALK
+    `/spritesheets/legs/${item}/${gender}/walk/${color}.png`,
+    `/spritesheets/legs/${item}/male/walk/${color}.png`,
+    `/spritesheets/legs/${item}/female/walk/${color}.png`,
+    `/spritesheets/legs/${item}/walk/${color}.png`
+  ];
     `/spritesheets/legs/${item}/${item}/${gender}/${animDir}/${color}.png`
   ];
   
-  console.log('Loading legs:', item, color);
+  console.log(`Loading legs: ${item} (${color}) for ${animDir}`);
   
   try {
     state.legsSprite = await loadImageWithFallback(paths);
     console.log('? Legs loaded!');
   } catch (e) {
-    console.warn('Legs not found:', e);
+    console.warn('⚠️ Legs not found, removing:', e);
+    state.legsSprite = null;
 async function reloadAllCustomizationSprites() {
   console.log('🔄 Reloading...');
   try {
@@ -1280,17 +1287,22 @@ async function loadEarsSprite() {
   
   const paths = [
     `/spritesheets/head/ears/${item}/adult/${animDir}/${color}.png`,
+    `/spritesheets/head/ears/${item}/child/${animDir}/${color}.png`,
     `/spritesheets/head/ears/${item}/adult/${animDir}/white.png`,
+    `/spritesheets/head/ears/${item}/child/${animDir}/white.png`,
     `/spritesheets/head/ears/${item}/adult/walk/${color}.png`,
+    `/spritesheets/head/ears/${item}/child/walk/${color}.png`,
     `/spritesheets/head/ears/${item}/${animDir}/${color}.png`
   ];
+  
+  console.log(`Loading ears: ${item} (${color}) for ${animDir}`);
   
   try {
     state.earsSprite = await loadImageWithFallback(paths);
     console.log('✅ Ears loaded!');
   } catch (e) {
-    console.warn('⚠️ Ears not found, keeping previous');
-    state.earsSprite = previousSprite;
+    console.warn('⚠️ Ears not found, removing:', e);
+    state.earsSprite = null;
   }
 }
 
@@ -1336,19 +1348,27 @@ async function loadWingsSprite() {
   const animDir = animConfig.dir;
   const previousSprite = state.wingsSprite;
   
+  // Wings have bg/ and fg/ folders, try both
   const paths = [
+    `/spritesheets/body/wings/${item}/adult/bg/${animDir}/${color}.png`,
+    `/spritesheets/body/wings/${item}/adult/fg/${animDir}/${color}.png`,
     `/spritesheets/body/wings/${item}/adult/${animDir}/${color}.png`,
     `/spritesheets/body/wings/${item}/${animDir}/${color}.png`,
+    `/spritesheets/body/wings/${item}/adult/bg/walk/${color}.png`,
+    `/spritesheets/body/wings/${item}/adult/fg/walk/${color}.png`,
     `/spritesheets/body/wings/${item}/adult/walk/${color}.png`,
-    `/spritesheets/body/wings/${item}/adult/${animDir}/white.png`
+    `/spritesheets/body/wings/${item}/adult/bg/${animDir}/white.png`,
+    `/spritesheets/body/wings/${item}/adult/fg/${animDir}/white.png`
   ];
+  
+  console.log(`Loading wings: ${item} (${color}) for ${animDir}`);
   
   try {
     state.wingsSprite = await loadImageWithFallback(paths);
     console.log('✅ Wings loaded!');
   } catch (e) {
-    console.warn('⚠️ Wings not found, keeping previous');
-    state.wingsSprite = previousSprite;
+    console.warn('⚠️ Wings not found, removing:', e);
+    state.wingsSprite = null;
   }
 }
 
