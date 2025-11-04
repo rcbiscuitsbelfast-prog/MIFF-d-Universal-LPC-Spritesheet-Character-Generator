@@ -134,8 +134,8 @@ function setupEventListeners() {
       state.currentFrame = 0;
       
       await loadCharacter(gender, state.currentAnimation);
-    });
       await reloadAllCustomizationSprites();
+    });
   });
   
   document.querySelectorAll('[data-direction]').forEach(button => {
@@ -253,8 +253,9 @@ function setupEventListeners() {
     btnCustomize.addEventListener('click', enterCustomizeMode);
   }
       
-      // RELOAD ALL CUSTOMIZATIONS FOR NEW ANIMATION
+      
       await reloadAllCustomizationSprites();
+      // RELOAD ALL CUSTOMIZATIONS FOR NEW ANIMATION
   
   // Back button
   const btnBack = document.getElementById('btn-back');
