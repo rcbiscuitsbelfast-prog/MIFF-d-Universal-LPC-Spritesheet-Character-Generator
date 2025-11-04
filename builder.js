@@ -50,6 +50,7 @@ const state = {
   currentDirection: 'down',
   currentFrame: 0,
   isPlaying: true,
+  compositeSpriteSheet: null, // NEW: Single master sprite sheet
   bodySprite: null,
   headSprite: null,
   hairSprite: null,
@@ -64,6 +65,8 @@ const state = {
   headExtraSprite: null,
   lastFrameTime: 0,
   currentCategoryIndex: 0,
+  excludeMale: false, // NEW: Gender filter
+  excludeFemale: false, // NEW: Gender filter
   customization: {
     bodyExtra: 'none',
     ears: 'none',
@@ -199,7 +202,47 @@ function setupEventListeners() {
   const btnHelp = document.getElementById('btn-help');
   if (btnHelp) {
     btnHelp.addEventListener('click', () => {
-      alert('LPC Character Builder v6\n\n1. Select body type\n2. Choose animation\n3. Click Customize\n4. Use ? ? arrows to navigate:\n   Body ? Head ? Hair ? Torso ? Legs\n5. Select items and colors\n6. See changes on sprite instantly!\n7. Export your character!');
+      alert('LPC Character Builder v7\n\n1. Select body type\n2. Choose animation\n3. Click Customize\n4. Use LEFT/RIGHT arrows to navigate:\n   Body → Head → Ears → Nose → Wings → Tail → Hair → Torso → Legs\n5. Select items and colors\n6. Use Exclude button to filter male/female items\n7. Export your character!');
+    });
+  }
+  
+  // Exclude button and panel
+  const btnExclude = document.getElementById('btn-exclude');
+  const excludePanel = document.getElementById('exclude-panel');
+  const excludeMaleCheckbox = document.getElementById('exclude-male');
+  const excludeFemaleCheckbox = document.getElementById('exclude-female');
+  
+  if (btnExclude && excludePanel) {
+    btnExclude.addEventListener('click', (e) => {
+      e.stopPropagation();
+      excludePanel.classList.toggle('hidden');
+    });
+    
+    // Close panel when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!excludePanel.contains(e.target) && e.target !== btnExclude) {
+        excludePanel.classList.add('hidden');
+      }
+    });
+  }
+  
+  if (excludeMaleCheckbox) {
+    excludeMaleCheckbox.addEventListener('change', (e) => {
+      state.excludeMale = e.target.checked;
+      console.log('Exclude male items:', state.excludeMale);
+      // Reload current category to apply filter
+      const currentCategory = CATEGORIES[state.currentCategoryIndex];
+      showCategory(currentCategory);
+    });
+  }
+  
+  if (excludeFemaleCheckbox) {
+    excludeFemaleCheckbox.addEventListener('change', (e) => {
+      state.excludeFemale = e.target.checked;
+      console.log('Exclude female items:', state.excludeFemale);
+      // Reload current category to apply filter
+      const currentCategory = CATEGORIES[state.currentCategoryIndex];
+      showCategory(currentCategory);
     });
   }
   
@@ -492,11 +535,15 @@ async function loadHairOptions(container) {
 
 async function loadTorsoOptions(container) {
   try {
-    console.log('?? Loading torso options...');
+    console.log('🔄 Loading torso options...');
     
     // Use curated list of known working items
-    const torsoItems = ['blouse', 'blouse_longsleeve', 'corset', 'longsleeve', 'robe', 'shirt', 'shortsleeve', 'sleeveless', 'tunic', 'vest'];
-    console.log('? Torso items:', torsoItems.length);
+    let torsoItems = ['blouse', 'blouse_longsleeve', 'corset', 'longsleeve', 'robe', 'shirt', 'shortsleeve', 'sleeveless', 'tunic', 'vest'];
+    
+    // APPLY GENDER FILTER
+    torsoItems = filterItemsByGender('torso', torsoItems, state.excludeMale, state.excludeFemale);
+    
+    console.log('✅ Torso items (filtered):', torsoItems.length);
     
     // Get colors dynamically based on current item selection or default to shirt
     const selectedItem = state.customization.torso === 'none' ? 'shirt' : state.customization.torso;
@@ -552,14 +599,18 @@ async function loadTorsoOptions(container) {
 
 async function loadLegsOptions(container) {
   try {
-    console.log('?? Loading legs options...');
+    console.log('🔄 Loading legs options...');
     
     // Fetch actual legs directories
     const response = await fetch('/api/assets?category=legs');
     const data = await response.json();
     
-    const legsItems = (data.items || []).filter(item => !item.includes('.'));
-    console.log('? Legs items:', legsItems.length);
+    let legsItems = (data.items || []).filter(item => !item.includes('.'));
+    
+    // APPLY GENDER FILTER
+    legsItems = filterItemsByGender('legs', legsItems, state.excludeMale, state.excludeFemale);
+    
+    console.log('✅ Legs items (filtered):', legsItems.length);
     
     // Get colors dynamically based on current selection or default
     const selectedItem = state.customization.legs === 'none' ? 'pants2' : state.customization.legs;
