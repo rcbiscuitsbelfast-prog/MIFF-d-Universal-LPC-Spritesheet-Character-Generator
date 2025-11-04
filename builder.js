@@ -717,7 +717,7 @@ window.selectHairStyle = function(style) {
   document.querySelectorAll('#category-content .item-card').forEach(btn => {
     btn.classList.toggle('active', btn.textContent.toLowerCase() === style);
   });
-  loadHairSprite();
+  reloadAllCustomizationSprites(); // Rebuild composite
 };
 
 window.selectHairColor = function(color) {
@@ -726,7 +726,7 @@ window.selectHairColor = function(color) {
     btn.classList.remove('active');
   });
   event.target.closest('.color-card').classList.add('active');
-  loadHairSprite();
+  reloadAllCustomizationSprites(); // Rebuild composite
 };
 
 window.selectTorso = async function(item) {
@@ -736,7 +736,7 @@ window.selectTorso = async function(item) {
     btn.classList.remove('active');
   });
   event.target.classList.add('active');
-  await loadTorsoSprite();
+  await reloadAllCustomizationSprites(); // Rebuild composite
   // Reload colors for this item
   const container = document.getElementById('category-content');
   if (container) {
@@ -751,7 +751,7 @@ window.selectTorsoColor = async function(color) {
     btn.classList.remove('active');
   });
   event.target.closest('.color-card').classList.add('active');
-  await loadTorsoSprite();
+  await reloadAllCustomizationSprites(); // Rebuild composite
 };
 
 window.selectLegs = async function(item) {
@@ -761,7 +761,7 @@ window.selectLegs = async function(item) {
     btn.classList.remove('active');
   });
   event.target.classList.add('active');
-  await loadLegsSprite();
+  await reloadAllCustomizationSprites(); // Rebuild composite
   // Reload colors for this item
   const container = document.getElementById('category-content');
   if (container) {
@@ -776,7 +776,7 @@ window.selectLegsColor = async function(color) {
     btn.classList.remove('active');
   });
   event.target.closest('.color-card').classList.add('active');
-  await loadLegsSprite();
+  await reloadAllCustomizationSprites(); // Rebuild composite
 };
 
 async function loadCustomizationOptions() {
@@ -888,82 +888,80 @@ function selectColor(category, color, btn) {
 }
 
 async function exportCharacter() {
-  const canvas = document.getElementById('character-canvas');
+  const link = document.createElement('a');
+  link.download = `character-spritesheet-${state.currentGender}-${Date.now()}.png`;
   
-  try {
-    // Create a download link
-    canvas.toBlob((blob) => {
+  if (state.compositeCanvas) {
+    state.compositeCanvas.toBlob(blob => {
       const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.download = `lpc-character-${Date.now()}.png`;
       link.href = url;
       link.click();
       URL.revokeObjectURL(url);
-      
-      alert('? Character exported as PNG!\n\nFrame: ' + state.currentAnimation + ' (' + state.currentDirection + ')');
+      console.log('✅ Full sprite sheet exported!', state.compositeCanvas.width, 'x', state.compositeCanvas.height);
     });
-  } catch (e) {
-    console.error('Export failed:', e);
-    alert('? Export failed. Please try again.');
+  } else {
+    console.error('❌ No composite sprite sheet to export');
+    alert('Please wait for character to load before exporting');
   }
 }
 
 async function loadCharacter(gender, animation) {
-  const bodyType = CONFIG.bodyTypes[gender];
-  const animConfig = CONFIG.animations[animation];
-  const animDir = animConfig.dir;
+  state.currentGender = gender;
+  state.currentAnimation = animation;
+  state.currentFrame = 0;
   
-  console.log(`?? Loading ${gender} ${animation}...`);
+  console.log('?? Building composite sprite sheet for', gender, '...');
   
-  // Load body sprite for this animation
-  const bodyPaths = [
-    `/spritesheets/${bodyType.path}/${animDir}/${bodyType.bodyColor}.png`,
-    `/spritesheets/${bodyType.path}/${animDir}.png`,
-    `/spritesheets/${bodyType.path}/${bodyType.bodyColor}.png`
-  ];
-  
-  console.log('Body paths:', bodyPaths);
-  
-  let newBodySprite;
+  // BUILD COMPOSITE SPRITE SHEET
   try {
-    newBodySprite = await loadImageWithFallback(bodyPaths);
+    const compositeResult = await createCompositeSpriteSheet({
+      bodyType: gender,
+      bodyColor: CONFIG.bodyTypes[gender].bodyColor,
+      headColor: CONFIG.bodyTypes[gender].headColor,
+      hair: state.customization.hair,
+      hairColor: state.customization.hairColor,
+      torso: state.customization.torso,
+      torsoColor: state.customization.torsoColor,
+      legs: state.customization.legs,
+      legsColor: state.customization.legsColor,
+      ears: state.customization.ears,
+      earsColor: state.customization.earsColor,
+      nose: state.customization.nose,
+      noseColor: state.customization.noseColor,
+      wings: state.customization.wings,
+      wingsColor: state.customization.wingsColor,
+      tail: state.customization.tail,
+      tailColor: state.customization.tailColor
+    });
+    
+    state.compositeSpriteSheet = compositeResult.image;
+    state.compositeCanvas = compositeResult.canvas;
+    
+    console.log('? Composite sprite sheet ready!', compositeResult.width, 'x', compositeResult.height);
+    
+    return true;
   } catch (e) {
-    console.error(`? Animation "${animation}" not available for ${gender}`);
-    return false; // Signal failure, keep current sprite
+    console.error('? Failed to create composite sprite sheet:', e);
+    return false;
   }
+}
+
+async function exportCharacter() {
+  const link = document.createElement('a');
+  link.download = `character-spritesheet-${state.currentGender}-${Date.now()}.png`;
   
-  // Only update state if load was successful
-  state.bodySprite = newBodySprite;
-  
-  // Try to load head sprite (if needed)
-  // Child body includes head, so skip loading separate head
-  if (!bodyType.loadHead) {
-    console.log('?? Skipping head load (body includes head)');
-    state.headSprite = null;
-    return true; // Success
+  if (state.compositeCanvas) {
+    state.compositeCanvas.toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      link.href = url;
+      link.click();
+      URL.revokeObjectURL(url);
+      console.log('✅ Full sprite sheet exported!', state.compositeCanvas.width, 'x', state.compositeCanvas.height);
+    });
+  } else {
+    console.error('❌ No composite sprite sheet to export');
+    alert('Please wait for character to load before exporting');
   }
-  
-  const headPaths = bodyType.headColor 
-    ? [
-        `/spritesheets/${bodyType.headPath}/${animDir}/${bodyType.headColor}.png`,
-        `/spritesheets/${bodyType.headPath}/${animDir}.png`,
-        `/spritesheets/${bodyType.headPath}/${bodyType.headColor}.png`
-      ]
-    : [
-        `/spritesheets/${bodyType.headPath}/${animDir}.png`,
-        `/spritesheets/${bodyType.headPath}/${animDir}/${bodyType.bodyColor}.png`
-      ];
-  
-  console.log('Head paths:', headPaths);
-  
-  try {
-    state.headSprite = await loadImageWithFallback(headPaths);
-  } catch (e) {
-    console.warn('?? Head not found, using body only');
-    state.headSprite = null;
-  }
-  
-  return true; // Success
 }
 
 function loadImageWithFallback(paths) {
@@ -1169,22 +1167,17 @@ async function loadLegsSprite() {
   } catch (e) {
     console.warn('⚠️ Legs not found, removing:', e);
     state.legsSprite = null;
-async function reloadAllCustomizationSprites() {
-  console.log('🔄 Reloading...');
-  try {
-    if (state.customization.hair !== 'none') await loadHairSprite();
-    if (state.customization.torso !== 'none') await loadTorsoSprite();
-    if (state.customization.ears !== 'none') await loadEarsSprite();
-    if (state.customization.nose !== 'none') await loadNoseSprite();
-    if (state.customization.wings !== 'none') await loadWingsSprite();
-    if (state.customization.tail !== 'none') await loadTailSprite();
-    if (state.customization.legs !== 'none') await loadLegsSprite();
-    console.log('✅ Reloaded');
-  } catch (e) { console.error('❌', e); }
-}
-    promises.push(loadLegsSprite());
   }
+}
+async function reloadAllCustomizationSprites() {
+  console.log('🔄 Rebuilding composite sprite sheet...');
   
+  // REBUILD ENTIRE COMPOSITE SHEET (not individual sprites!)
+  try {
+    await loadCharacter(state.currentGender, state.currentAnimation);
+    console.log('✅ Composite sheet rebuilt!');
+  } catch (e) {
+    console.error('❌ Failed to rebuild composite:', e);
   await Promise.all(promises);
   console.log('? All customization sprites reloaded');
 }
@@ -1503,45 +1496,45 @@ async function loadTailOptions(container) {
 // Selection handlers for new options
 window.selectEars = async function(item) {
   state.customization.ears = item;
-  await loadEarsSprite();
+  await reloadAllCustomizationSprites(); // Rebuild composite
   await loadEarsOptions(document.getElementById('category-content'));
 };
 
 window.selectEarsColor = async function(color) {
   state.customization.earsColor = color;
-  await loadEarsSprite();
+  await reloadAllCustomizationSprites(); // Rebuild composite
 };
 
 window.selectNose = async function(item) {
   state.customization.nose = item;
-  await loadNoseSprite();
+  await reloadAllCustomizationSprites(); // Rebuild composite
   await loadNoseOptions(document.getElementById('category-content'));
 };
 
 window.selectNoseColor = async function(color) {
   state.customization.noseColor = color;
-  await loadNoseSprite();
+  await reloadAllCustomizationSprites(); // Rebuild composite
 };
 
 window.selectWings = async function(item) {
   state.customization.wings = item;
-  await loadWingsSprite();
+  await reloadAllCustomizationSprites(); // Rebuild composite
   await loadWingsOptions(document.getElementById('category-content'));
 };
 
 window.selectWingsColor = async function(color) {
   state.customization.wingsColor = color;
-  await loadWingsSprite();
+  await reloadAllCustomizationSprites(); // Rebuild composite
 };
 
 window.selectTail = async function(item) {
   state.customization.tail = item;
-  await loadTailSprite();
+  await reloadAllCustomizationSprites(); // Rebuild composite
   await loadTailOptions(document.getElementById('category-content'));
 };
 
 window.selectTailColor = async function(color) {
   state.customization.tailColor = color;
-  await loadTailSprite();
+  await reloadAllCustomizationSprites(); // Rebuild composite
 };
 
