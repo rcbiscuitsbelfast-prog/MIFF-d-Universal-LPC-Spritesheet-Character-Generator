@@ -1538,3 +1538,4 @@ window.selectTailColor = async function(color) {
   await reloadAllCustomizationSprites(); // Rebuild composite
 };
 
+};
