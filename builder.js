@@ -911,48 +911,39 @@ async function loadCharacter(gender, animation) {
   state.currentAnimation = animation;
   state.currentFrame = 0;
   
-  const bodyType = CONFIG.bodyTypes[gender];
-  const animConfig = CONFIG.animations[animation];
-  const animDir = animConfig.dir;
+  console.log(`🎨 Building composite sprite sheet for ${gender}...`);
   
-  console.log(`🎨 Loading ${gender} ${animation}...`);
-  
-  // Load body sprite for this animation
-  const bodyPaths = [
-    `/spritesheets/${bodyType.path}/${animDir}/${bodyType.bodyColor}.png`,
-    `/spritesheets/${bodyType.path}/${animDir}.png`,
-    `/spritesheets/${bodyType.path}/${bodyType.bodyColor}.png`
-  ];
-  
+  // BUILD COMPOSITE SPRITE SHEET (all animations with current customization)
   try {
-    state.bodySprite = await loadImageWithFallback(bodyPaths);
-    console.log('✅ Body loaded!');
+    const compositeResult = await createCompositeSpriteSheet({
+      bodyType: gender,
+      bodyColor: CONFIG.bodyTypes[gender].bodyColor,
+      headColor: CONFIG.bodyTypes[gender].headColor,
+      hair: state.customization.hair,
+      hairColor: state.customization.hairColor,
+      torso: state.customization.torso,
+      torsoColor: state.customization.torsoColor,
+      legs: state.customization.legs,
+      legsColor: state.customization.legsColor,
+      ears: state.customization.ears,
+      earsColor: state.customization.earsColor,
+      nose: state.customization.nose,
+      noseColor: state.customization.noseColor,
+      wings: state.customization.wings,
+      wingsColor: state.customization.wingsColor,
+      tail: state.customization.tail,
+      tailColor: state.customization.tailColor
+    });
+    
+    state.compositeSpriteSheet = compositeResult.image;
+    state.compositeCanvas = compositeResult.canvas;
+    
+    console.log('✅ Composite sprite sheet ready!', compositeResult.width, 'x', compositeResult.height);
+    return true;
   } catch (e) {
-    console.error(`❌ Animation "${animation}" not available for ${gender}`);
+    console.error('❌ Failed to create composite sprite sheet:', e);
     return false;
   }
-  
-  // Load head if needed
-  if (bodyType.loadHead) {
-    const headPaths = [
-      `/spritesheets/${bodyType.headPath}/${animDir}/${bodyType.headColor}.png`,
-      `/spritesheets/${bodyType.headPath}/${animDir}.png`,
-      `/spritesheets/${bodyType.headPath}/${bodyType.bodyColor}.png`
-    ];
-    
-    try {
-      state.headSprite = await loadImageWithFallback(headPaths);
-      console.log('✅ Head loaded!');
-    } catch (e) {
-      console.warn('⚠️ Head not found, using body only');
-      state.headSprite = null;
-    }
-  } else {
-    state.headSprite = null;
-  }
-  
-  console.log('✅ Character loaded successfully!');
-  return true;
 }
 async function exportCharacter() {
   const link = document.createElement('a');
@@ -1034,120 +1025,27 @@ function animate(timestamp) {
 }
 
 function render() {
-  if (!state.bodySprite) return;
+  if (!state.compositeSpriteSheet) return;
   
   const { ctx, canvas } = elements;
-  const animConfig = CONFIG.animations[state.currentAnimation];
   
-  // Single-direction animations (hurt, climb) only have 1 row
-  const directionOffset = animConfig.singleDirection ? 0 : CONFIG.directions[state.currentDirection];
-  
-  const row = animConfig.row + directionOffset;
+  // Get the correct row from the composite sheet
+  const animRow = getAnimationRow(state.currentAnimation, state.currentDirection);
   const col = state.currentFrame;
   
-  const sx = col * CONFIG.spriteWidth;
-  const sy = row * CONFIG.spriteHeight;
+  const sx = col * 64;
+  const sy = animRow * 64;
   
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
-  // Layer order (bottom to top): body → wings → tail → legs → torso → head → ears → nose → hair
-  
-  // 1. Draw body
+  // Draw from composite sprite sheet - ALL layers already baked in!
   ctx.drawImage(
-    state.bodySprite,
+    state.compositeSpriteSheet,
     sx, sy,
-    CONFIG.spriteWidth, CONFIG.spriteHeight,
+    64, 64,
     0, 0,
     canvas.width, canvas.height
   );
-  
-  // 2. Draw wings (behind body)
-  if (state.wingsSprite) {
-    ctx.drawImage(
-      state.wingsSprite,
-      sx, sy,
-      CONFIG.spriteWidth, CONFIG.spriteHeight,
-      0, 0,
-      canvas.width, canvas.height
-    );
-  }
-  
-  // 3. Draw tail (behind body)
-  if (state.tailSprite) {
-    ctx.drawImage(
-      state.tailSprite,
-      sx, sy,
-      CONFIG.spriteWidth, CONFIG.spriteHeight,
-      0, 0,
-      canvas.width, canvas.height
-    );
-  }
-  
-  // 4. Draw legs
-  if (state.legsSprite) {
-    ctx.drawImage(
-      state.legsSprite,
-      sx, sy,
-      CONFIG.spriteWidth, CONFIG.spriteHeight,
-      0, 0,
-      canvas.width, canvas.height
-    );
-  }
-  
-  // 5. Draw torso
-  if (state.torsoSprite) {
-    ctx.drawImage(
-      state.torsoSprite,
-      sx, sy,
-      CONFIG.spriteWidth, CONFIG.spriteHeight,
-      0, 0,
-      canvas.width, canvas.height
-    );
-  }
-  
-  // 6. Draw head
-  if (state.headSprite) {
-    ctx.drawImage(
-      state.headSprite,
-      sx, sy,
-      CONFIG.spriteWidth, CONFIG.spriteHeight,
-      0, 0,
-      canvas.width, canvas.height
-    );
-  }
-  
-  // 7. Draw ears
-  if (state.earsSprite) {
-    ctx.drawImage(
-      state.earsSprite,
-      sx, sy,
-      CONFIG.spriteWidth, CONFIG.spriteHeight,
-      0, 0,
-      canvas.width, canvas.height
-    );
-  }
-  
-  // 8. Draw nose
-  if (state.noseSprite) {
-    ctx.drawImage(
-      state.noseSprite,
-      sx, sy,
-      CONFIG.spriteWidth, CONFIG.spriteHeight,
-      0, 0,
-      canvas.width, canvas.height
-    );
-  }
-  
-  // 9. Draw hair (top layer)
-  if (state.hairSprite) {
-    ctx.drawImage(
-      state.hairSprite,
-      sx, sy,
-      CONFIG.spriteWidth, CONFIG.spriteHeight,
-      0, 0,
-      canvas.width, canvas.height
-    );
-  }
 }
 
 document.addEventListener('DOMContentLoaded', init);
@@ -1596,46 +1494,46 @@ async function loadTailOptions(container) {
 // Selection handlers for new options
 window.selectEars = async function(item) {
   state.customization.ears = item;
-  await loadEarsSprite();
+  await reloadAllCustomizationSprites();
   await loadEarsOptions(document.getElementById('category-content'));
 };
 
 window.selectEarsColor = async function(color) {
   state.customization.earsColor = color;
-  await loadEarsSprite();
+  await reloadAllCustomizationSprites();
 };
 
 window.selectNose = async function(item) {
   state.customization.nose = item;
-  await loadNoseSprite();
+  await reloadAllCustomizationSprites();
   await loadNoseOptions(document.getElementById('category-content'));
 };
 
 window.selectNoseColor = async function(color) {
   state.customization.noseColor = color;
-  await loadNoseSprite();
+  await reloadAllCustomizationSprites();
 };
 
 window.selectWings = async function(item) {
   state.customization.wings = item;
-  await loadWingsSprite();
+  await reloadAllCustomizationSprites();
   await loadWingsOptions(document.getElementById('category-content'));
 };
 
 window.selectWingsColor = async function(color) {
   state.customization.wingsColor = color;
-  await loadWingsSprite();
+  await reloadAllCustomizationSprites();
 };
 
 window.selectTail = async function(item) {
   state.customization.tail = item;
-  await loadTailSprite();
+  await reloadAllCustomizationSprites();
   await loadTailOptions(document.getElementById('category-content'));
 };
 
 window.selectTailColor = async function(color) {
   state.customization.tailColor = color;
-  await loadTailSprite();
+  await reloadAllCustomizationSprites();
 };
 
 };
