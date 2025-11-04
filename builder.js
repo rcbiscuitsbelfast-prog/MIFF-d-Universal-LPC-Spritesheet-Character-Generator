@@ -717,7 +717,7 @@ window.selectHairStyle = function(style) {
   document.querySelectorAll('#category-content .item-card').forEach(btn => {
     btn.classList.toggle('active', btn.textContent.toLowerCase() === style);
   });
-  reloadAllCustomizationSprites(); // Rebuild composite
+  loadHairSprite();
 };
 
 window.selectHairColor = function(color) {
@@ -726,7 +726,7 @@ window.selectHairColor = function(color) {
     btn.classList.remove('active');
   });
   event.target.closest('.color-card').classList.add('active');
-  reloadAllCustomizationSprites(); // Rebuild composite
+  loadHairSprite();
 };
 
 window.selectTorso = async function(item) {
@@ -736,7 +736,7 @@ window.selectTorso = async function(item) {
     btn.classList.remove('active');
   });
   event.target.classList.add('active');
-  await reloadAllCustomizationSprites(); // Rebuild composite
+  await loadHairSprite();
   // Reload colors for this item
   const container = document.getElementById('category-content');
   if (container) {
@@ -751,7 +751,7 @@ window.selectTorsoColor = async function(color) {
     btn.classList.remove('active');
   });
   event.target.closest('.color-card').classList.add('active');
-  await reloadAllCustomizationSprites(); // Rebuild composite
+  await loadHairSprite();
 };
 
 window.selectLegs = async function(item) {
@@ -761,7 +761,7 @@ window.selectLegs = async function(item) {
     btn.classList.remove('active');
   });
   event.target.classList.add('active');
-  await reloadAllCustomizationSprites(); // Rebuild composite
+  await loadHairSprite();
   // Reload colors for this item
   const container = document.getElementById('category-content');
   if (container) {
@@ -776,7 +776,7 @@ window.selectLegsColor = async function(color) {
     btn.classList.remove('active');
   });
   event.target.closest('.color-card').classList.add('active');
-  await reloadAllCustomizationSprites(); // Rebuild composite
+  await loadHairSprite();
 };
 
 async function loadCustomizationOptions() {
@@ -1026,28 +1026,120 @@ function animate(timestamp) {
 }
 
 function render() {
-  if (!state.compositeSpriteSheet) return;
+  if (!state.bodySprite) return;
   
   const { ctx, canvas } = elements;
   const animConfig = CONFIG.animations[state.currentAnimation];
   
-  // Get the correct row from the composite sheet
-  const animRow = getAnimationRow(state.currentAnimation, state.currentDirection);
+  // Single-direction animations (hurt, climb) only have 1 row
+  const directionOffset = animConfig.singleDirection ? 0 : CONFIG.directions[state.currentDirection];
+  
+  const row = animConfig.row + directionOffset;
   const col = state.currentFrame;
   
-  const sx = col * 64;
-  const sy = animRow * 64;
+  const sx = col * CONFIG.spriteWidth;
+  const sy = row * CONFIG.spriteHeight;
   
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
-  // Draw from composite sprite sheet - ALL layers already baked in!
+  // Layer order (bottom to top): body → wings → tail → legs → torso → head → ears → nose → hair
+  
+  // 1. Draw body
   ctx.drawImage(
-    state.compositeSpriteSheet,
+    state.bodySprite,
     sx, sy,
-    64, 64,
+    CONFIG.spriteWidth, CONFIG.spriteHeight,
     0, 0,
     canvas.width, canvas.height
   );
+  
+  // 2. Draw wings (behind body)
+  if (state.wingsSprite) {
+    ctx.drawImage(
+      state.wingsSprite,
+      sx, sy,
+      CONFIG.spriteWidth, CONFIG.spriteHeight,
+      0, 0,
+      canvas.width, canvas.height
+    );
+  }
+  
+  // 3. Draw tail (behind body)
+  if (state.tailSprite) {
+    ctx.drawImage(
+      state.tailSprite,
+      sx, sy,
+      CONFIG.spriteWidth, CONFIG.spriteHeight,
+      0, 0,
+      canvas.width, canvas.height
+    );
+  }
+  
+  // 4. Draw legs
+  if (state.legsSprite) {
+    ctx.drawImage(
+      state.legsSprite,
+      sx, sy,
+      CONFIG.spriteWidth, CONFIG.spriteHeight,
+      0, 0,
+      canvas.width, canvas.height
+    );
+  }
+  
+  // 5. Draw torso
+  if (state.torsoSprite) {
+    ctx.drawImage(
+      state.torsoSprite,
+      sx, sy,
+      CONFIG.spriteWidth, CONFIG.spriteHeight,
+      0, 0,
+      canvas.width, canvas.height
+    );
+  }
+  
+  // 6. Draw head
+  if (state.headSprite) {
+    ctx.drawImage(
+      state.headSprite,
+      sx, sy,
+      CONFIG.spriteWidth, CONFIG.spriteHeight,
+      0, 0,
+      canvas.width, canvas.height
+    );
+  }
+  
+  // 7. Draw ears
+  if (state.earsSprite) {
+    ctx.drawImage(
+      state.earsSprite,
+      sx, sy,
+      CONFIG.spriteWidth, CONFIG.spriteHeight,
+      0, 0,
+      canvas.width, canvas.height
+    );
+  }
+  
+  // 8. Draw nose
+  if (state.noseSprite) {
+    ctx.drawImage(
+      state.noseSprite,
+      sx, sy,
+      CONFIG.spriteWidth, CONFIG.spriteHeight,
+      0, 0,
+      canvas.width, canvas.height
+    );
+  }
+  
+  // 9. Draw hair (top layer)
+  if (state.hairSprite) {
+    ctx.drawImage(
+      state.hairSprite,
+      sx, sy,
+      CONFIG.spriteWidth, CONFIG.spriteHeight,
+      0, 0,
+      canvas.width, canvas.height
+    );
+  }
 }
 
 document.addEventListener('DOMContentLoaded', init);
@@ -1496,46 +1588,46 @@ async function loadTailOptions(container) {
 // Selection handlers for new options
 window.selectEars = async function(item) {
   state.customization.ears = item;
-  await reloadAllCustomizationSprites(); // Rebuild composite
+  await loadHairSprite();
   await loadEarsOptions(document.getElementById('category-content'));
 };
 
 window.selectEarsColor = async function(color) {
   state.customization.earsColor = color;
-  await reloadAllCustomizationSprites(); // Rebuild composite
+  await loadHairSprite();
 };
 
 window.selectNose = async function(item) {
   state.customization.nose = item;
-  await reloadAllCustomizationSprites(); // Rebuild composite
+  await loadHairSprite();
   await loadNoseOptions(document.getElementById('category-content'));
 };
 
 window.selectNoseColor = async function(color) {
   state.customization.noseColor = color;
-  await reloadAllCustomizationSprites(); // Rebuild composite
+  await loadHairSprite();
 };
 
 window.selectWings = async function(item) {
   state.customization.wings = item;
-  await reloadAllCustomizationSprites(); // Rebuild composite
+  await loadHairSprite();
   await loadWingsOptions(document.getElementById('category-content'));
 };
 
 window.selectWingsColor = async function(color) {
   state.customization.wingsColor = color;
-  await reloadAllCustomizationSprites(); // Rebuild composite
+  await loadHairSprite();
 };
 
 window.selectTail = async function(item) {
   state.customization.tail = item;
-  await reloadAllCustomizationSprites(); // Rebuild composite
+  await loadHairSprite();
   await loadTailOptions(document.getElementById('category-content'));
 };
 
 window.selectTailColor = async function(color) {
   state.customization.tailColor = color;
-  await reloadAllCustomizationSprites(); // Rebuild composite
+  await loadHairSprite();
 };
 
 };
