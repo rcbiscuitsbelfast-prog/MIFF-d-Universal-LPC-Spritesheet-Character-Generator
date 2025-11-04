@@ -736,7 +736,7 @@ window.selectTorso = async function(item) {
     btn.classList.remove('active');
   });
   event.target.classList.add('active');
-  await loadHairSprite();
+  await loadTorsoSprite();
   // Reload colors for this item
   const container = document.getElementById('category-content');
   if (container) {
@@ -751,7 +751,7 @@ window.selectTorsoColor = async function(color) {
     btn.classList.remove('active');
   });
   event.target.closest('.color-card').classList.add('active');
-  await loadHairSprite();
+  await loadTorsoSprite();
 };
 
 window.selectLegs = async function(item) {
@@ -761,7 +761,7 @@ window.selectLegs = async function(item) {
     btn.classList.remove('active');
   });
   event.target.classList.add('active');
-  await loadHairSprite();
+  await loadLegsSprite();
   // Reload colors for this item
   const container = document.getElementById('category-content');
   if (container) {
@@ -776,7 +776,7 @@ window.selectLegsColor = async function(color) {
     btn.classList.remove('active');
   });
   event.target.closest('.color-card').classList.add('active');
-  await loadHairSprite();
+  await loadLegsSprite();
 };
 
 async function loadCustomizationOptions() {
