@@ -1028,131 +1028,28 @@ function animate(timestamp) {
 }
 
 function render() {
-  if (!state.bodySprite) return;
+  if (!state.compositeSpriteSheet) return;
   
   const { ctx, canvas } = elements;
   const animConfig = CONFIG.animations[state.currentAnimation];
   
-  // Single-direction animations (hurt, climb) only have 1 row
-  const directionOffset = animConfig.singleDirection ? 0 : CONFIG.directions[state.currentDirection];
-  
-  const row = animConfig.row + directionOffset;
+  // Get the correct row from the composite sheet
+  const animRow = getAnimationRow(state.currentAnimation, state.currentDirection);
   const col = state.currentFrame;
   
-  const sx = col * CONFIG.spriteWidth;
-  const sy = row * CONFIG.spriteHeight;
+  const sx = col * 64;
+  const sy = animRow * 64;
   
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
-  // Layer order (bottom to top): body ? legs ? torso ? head ? hair ? weapon
-  
-  // 1. Draw body
+  // Draw from composite sprite sheet - ALL layers already baked in!
   ctx.drawImage(
-    state.bodySprite,
+    state.compositeSpriteSheet,
     sx, sy,
-    CONFIG.spriteWidth, CONFIG.spriteHeight,
+    64, 64,
     0, 0,
     canvas.width, canvas.height
   );
-  
-  // 1.5. Draw wings (behind body)
-  if (state.wingsSprite) {
-    ctx.drawImage(
-      state.wingsSprite,
-      sx, sy,
-      CONFIG.spriteWidth, CONFIG.spriteHeight,
-      0, 0,
-      canvas.width, canvas.height
-    );
-  }
-  
-  // 1.6. Draw tail (behind body)
-  if (state.tailSprite) {
-    ctx.drawImage(
-      state.tailSprite,
-      sx, sy,
-      CONFIG.spriteWidth, CONFIG.spriteHeight,
-      0, 0,
-      canvas.width, canvas.height
-    );
-  }
-  
-  // 2. Draw legs
-  if (state.legsSprite) {
-    ctx.drawImage(
-      state.legsSprite,
-      sx, sy,
-      CONFIG.spriteWidth, CONFIG.spriteHeight,
-      0, 0,
-      canvas.width, canvas.height
-    );
-  }
-  
-  // 3. Draw torso
-  if (state.torsoSprite) {
-    ctx.drawImage(
-      state.torsoSprite,
-      sx, sy,
-      CONFIG.spriteWidth, CONFIG.spriteHeight,
-      0, 0,
-      canvas.width, canvas.height
-    );
-  }
-  
-  // 4. Draw head
-  if (state.headSprite) {
-    ctx.drawImage(
-      state.headSprite,
-      sx, sy,
-      CONFIG.spriteWidth, CONFIG.spriteHeight,
-      0, 0,
-      canvas.width, canvas.height
-    );
-  }
-  
-  // 4.5. Draw ears (on head)
-  if (state.earsSprite) {
-    ctx.drawImage(
-      state.earsSprite,
-      sx, sy,
-      CONFIG.spriteWidth, CONFIG.spriteHeight,
-      0, 0,
-      canvas.width, canvas.height
-    );
-  }
-  
-  // 4.6. Draw nose (on head)
-  if (state.noseSprite) {
-    ctx.drawImage(
-      state.noseSprite,
-      sx, sy,
-      CONFIG.spriteWidth, CONFIG.spriteHeight,
-      0, 0,
-      canvas.width, canvas.height
-    );
-  }
-  
-  // 5. Draw hair
-  if (state.hairSprite) {
-    ctx.drawImage(
-      state.hairSprite,
-      sx, sy,
-      CONFIG.spriteWidth, CONFIG.spriteHeight,
-      0, 0,
-      canvas.width, canvas.height
-    );
-  }
-  
-  // 6. Draw weapon
-  if (state.weaponSprite) {
-    ctx.drawImage(
-      state.weaponSprite,
-      sx, sy,
-      CONFIG.spriteWidth, CONFIG.spriteHeight,
-      0, 0,
-      canvas.width, canvas.height
-    );
-  }
 }
 
 document.addEventListener('DOMContentLoaded', init);
