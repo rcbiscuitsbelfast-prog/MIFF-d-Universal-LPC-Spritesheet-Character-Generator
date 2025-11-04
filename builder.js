@@ -1588,46 +1588,46 @@ async function loadTailOptions(container) {
 // Selection handlers for new options
 window.selectEars = async function(item) {
   state.customization.ears = item;
-  await loadHairSprite();
+  await loadEarsSprite();
   await loadEarsOptions(document.getElementById('category-content'));
 };
 
 window.selectEarsColor = async function(color) {
   state.customization.earsColor = color;
-  await loadHairSprite();
+  await loadEarsSprite();
 };
 
 window.selectNose = async function(item) {
   state.customization.nose = item;
-  await loadHairSprite();
+  await loadNoseSprite();
   await loadNoseOptions(document.getElementById('category-content'));
 };
 
 window.selectNoseColor = async function(color) {
   state.customization.noseColor = color;
-  await loadHairSprite();
+  await loadNoseSprite();
 };
 
 window.selectWings = async function(item) {
   state.customization.wings = item;
-  await loadHairSprite();
+  await loadWingsSprite();
   await loadWingsOptions(document.getElementById('category-content'));
 };
 
 window.selectWingsColor = async function(color) {
   state.customization.wingsColor = color;
-  await loadHairSprite();
+  await loadWingsSprite();
 };
 
 window.selectTail = async function(item) {
   state.customization.tail = item;
-  await loadHairSprite();
+  await loadTailSprite();
   await loadTailOptions(document.getElementById('category-content'));
 };
 
 window.selectTailColor = async function(color) {
   state.customization.tailColor = color;
-  await loadHairSprite();
+  await loadTailSprite();
 };
 
 };
