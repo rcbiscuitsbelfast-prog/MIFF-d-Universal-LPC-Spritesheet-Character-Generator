@@ -138,6 +138,7 @@ function setupEventListeners() {
   });
   
   document.querySelectorAll('[data-direction]').forEach(button => {
+      await reloadAllCustomizationSprites();
     button.addEventListener('click', (e) => {
       const direction = e.currentTarget.dataset.direction;
       if (direction === state.currentDirection) return;
@@ -251,6 +252,9 @@ function setupEventListeners() {
   if (btnCustomize) {
     btnCustomize.addEventListener('click', enterCustomizeMode);
   }
+      
+      // RELOAD ALL CUSTOMIZATIONS FOR NEW ANIMATION
+      await reloadAllCustomizationSprites();
   
   // Back button
   const btnBack = document.getElementById('btn-back');
