@@ -253,9 +253,6 @@ function setupEventListeners() {
     btnCustomize.addEventListener('click', enterCustomizeMode);
   }
       
-      
-      await reloadAllCustomizationSprites();
-      // RELOAD ALL CUSTOMIZATIONS FOR NEW ANIMATION
   
   // Back button
   const btnBack = document.getElementById('btn-back');
