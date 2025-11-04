@@ -22,13 +22,27 @@
   <div id="app" class="hidden">
     <!-- Top navigation bar -->
     <header class="top-nav">
-      <h1>LPC Builder <span style="font-size: 0.6em; opacity: 0.8;">v6.5</span></h1>
+      <h1>LPC Builder <span style="font-size: 0.6em; opacity: 0.8;">v7.0</span></h1>
       <div class="nav-actions">
         <button class="nav-btn" id="btn-back" aria-label="Back" style="display: none;">Back</button>
+        <button class="nav-btn" id="btn-exclude" aria-label="Exclude options">Exclude ?</button>
         <button class="nav-btn" id="btn-export" aria-label="Export character">Export</button>
         <button class="nav-btn" id="btn-help" aria-label="Help">Help</button>
       </div>
     </header>
+    
+    <!-- Exclude dropdown panel -->
+    <div id="exclude-panel" class="exclude-panel hidden">
+      <h3>Exclude Items</h3>
+      <label class="checkbox-label">
+        <input type="checkbox" id="exclude-male" />
+        <span>Exclude Male Items</span>
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="exclude-female" />
+        <span>Exclude Female Items</span>
+      </label>
+    </div>
 
     <!-- Main content area -->
     <main class="main-content">
@@ -108,6 +122,8 @@
   </div>
 
   <!-- Scripts -->
+  <script src="compositor.js"></script>
+  <script src="item-metadata.js"></script>
   <script src="builder.js"></script>
 </body>
 </html>
