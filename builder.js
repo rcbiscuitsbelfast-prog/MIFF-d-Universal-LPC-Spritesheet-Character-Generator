@@ -135,10 +135,10 @@ function setupEventListeners() {
       
       await loadCharacter(gender, state.currentAnimation);
     });
+      await reloadAllCustomizationSprites();
   });
   
   document.querySelectorAll('[data-direction]').forEach(button => {
-      await reloadAllCustomizationSprites();
     button.addEventListener('click', (e) => {
       const direction = e.currentTarget.dataset.direction;
       if (direction === state.currentDirection) return;
