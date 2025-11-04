@@ -272,6 +272,26 @@ function setupEventListeners() {
     btnExport.addEventListener('click', exportCharacter);
   }
   
+  // Animation buttons
+  document.querySelectorAll('.anim-btn').forEach(button => {
+    button.addEventListener('click', async (e) => {
+      const animName = e.currentTarget.dataset.animation;
+      if (animName === state.currentAnimation) return;
+      
+      document.querySelectorAll('.anim-btn').forEach(b => b.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      
+      const success = await loadCharacter(state.currentGender, animName);
+      
+      if (!success) {
+        return;
+      }
+      
+      // Reload customizations for new animation
+      await reloadAllCustomizationSprites();
+    });
+  });
+  
   // Initialize customization options
   loadCustomizationOptions();
 }
