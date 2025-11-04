@@ -736,7 +736,7 @@ window.selectTorso = async function(item) {
     btn.classList.remove('active');
   });
   event.target.classList.add('active');
-  await loadTorsoSprite();
+  await reloadAllCustomizationSprites();
   // Reload colors for this item
   const container = document.getElementById('category-content');
   if (container) {
@@ -751,7 +751,7 @@ window.selectTorsoColor = async function(color) {
     btn.classList.remove('active');
   });
   event.target.closest('.color-card').classList.add('active');
-  await loadTorsoSprite();
+  await reloadAllCustomizationSprites();
 };
 
 window.selectLegs = async function(item) {
@@ -761,7 +761,7 @@ window.selectLegs = async function(item) {
     btn.classList.remove('active');
   });
   event.target.classList.add('active');
-  await loadLegsSprite();
+  await reloadAllCustomizationSprites();
   // Reload colors for this item
   const container = document.getElementById('category-content');
   if (container) {
@@ -776,7 +776,7 @@ window.selectLegsColor = async function(color) {
     btn.classList.remove('active');
   });
   event.target.closest('.color-card').classList.add('active');
-  await loadLegsSprite();
+  await reloadAllCustomizationSprites();
 };
 
 async function loadCustomizationOptions() {
