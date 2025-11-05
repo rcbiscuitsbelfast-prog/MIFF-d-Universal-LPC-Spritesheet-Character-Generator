@@ -1,1 +1,40 @@
-_universal/
+# Dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Environment
+.env
+.env.local
+.env.production
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build
+dist/
+build/
+
+# Logs
+logs/
+*.log
+
+# Temporary
+tmp/
+temp/
+
+# Data (local development only)
+data/
+!data/.gitkeep
+
+# Don't ignore lockfiles (required for deployment)
+!package-lock.json
+!yarn.lock
+!pnpm-lock.yaml

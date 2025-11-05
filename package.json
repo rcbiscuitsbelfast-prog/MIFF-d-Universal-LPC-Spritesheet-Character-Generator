@@ -1,0 +1,42 @@
+{
+  "name": "lpc-avatar-builder",
+  "version": "9.0.0",
+  "description": "LPC Character Builder v9.0 ULTIMATE - Universal LPC Spritesheet Character Generator with full sprite sheet export",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "submodule:init": "git submodule init && git submodule update --recursive",
+    "submodule:update": "git submodule update --remote --merge",
+    "deploy:render": "npm run submodule:init && npm start",
+    "deploy:koyeb": "npm run submodule:init && npm start",
+    "build": "npm run submodule:init"
+  },
+  "keywords": [
+    "lpc",
+    "spritesheet",
+    "character-generator",
+    "avatar-builder",
+    "game-assets"
+  ],
+  "author": "LPC Community",
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/liberatedpixelcup/Universal-LPC-Spritesheet-Character-Generator.git"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "dependencies": {
+    "compression": "^1.7.4",
+    "express": "^4.18.2",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

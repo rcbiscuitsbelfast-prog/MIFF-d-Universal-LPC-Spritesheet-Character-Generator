@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#667eea">
+  <meta name="description" content="Create and customize LPC-style game characters with live animation preview">
+  <meta name="build-id" content="build-9.0">
+  <title>LPC Character Builder v9.0 - ULTIMATE EDITION</title>
+  <link rel="stylesheet" href="builder.css">
+  <script src="compositor.js"></script>
+</head>
+<body>
+  <!-- Loading screen -->
+  <div id="loading">
+    <div>
+      <div class="spinner"></div>
+      <p>Loading character builder...</p>
+    </div>
+  </div>
+
+  <!-- Main app container -->
+  <div id="app" class="hidden">
+    <!-- Top navigation bar -->
+    <header class="top-nav">
+      <h1>LPC Builder <span style="font-size: 0.6em; opacity: 0.8;">v9.0 ULTIMATE</span></h1>
+      <div class="nav-actions">
+        <button class="nav-btn" id="btn-back" aria-label="Back" style="display: none;">Back</button>
+        <button class="nav-btn" id="btn-exclude" aria-label="Exclude options">Exclude ?</button>
+        <button class="nav-btn" id="btn-export" aria-label="Export character">Export</button>
+        <button class="nav-btn" id="btn-help" aria-label="Help">Help</button>
+      </div>
+    </header>
+    
+    <!-- Exclude dropdown panel -->
+    <div id="exclude-panel" class="exclude-panel hidden">
+      <h3>Exclude Items</h3>
+      <label class="checkbox-label">
+        <input type="checkbox" id="exclude-male" />
+        <span>Exclude Male Items</span>
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="exclude-female" />
+        <span>Exclude Female Items</span>
+      </label>
+    </div>
+
+    <!-- Main content area -->
+    <main class="main-content">
+      <!-- Character preview canvas -->
+      <div class="preview-container">
+        <!-- Direction arrows - LEFT of sprite -->
+        <div class="direction-controls">
+          <button class="dir-arrow" data-direction="up" aria-label="Face Up">UP</button>
+          <div class="dir-row">
+            <button class="dir-arrow" data-direction="left" aria-label="Face Left">LEFT</button>
+            <button class="dir-arrow" data-direction="down" aria-label="Face Down">DOWN</button>
+            <button class="dir-arrow active" data-direction="right" aria-label="Face Right">RIGHT</button>
+          </div>
+        </div>
+
+        <!-- Sprite - STICKY position -->
+        <div class="sprite-container">
+          <canvas id="character-canvas" width="192" height="192"></canvas>
+          <div class="preview-info">
+            <span id="current-animation">Walk</span>
+            <span id="current-direction">Down</span>
+          </div>
+        </div>
+
+        <!-- Category Navigation (horizontal with arrows) -->
+        <div class="category-nav" id="category-nav" style="display: none;">
+          <button class="nav-arrow" id="prev-category" aria-label="Previous">&lt;</button>
+          <div class="category-label" id="current-category-label">Body</div>
+          <button class="nav-arrow" id="next-category" aria-label="Next">&gt;</button>
+        </div>
+      </div>
+
+      <!-- Body Type selector (Step 1) -->
+      <div id="body-selector" class="selection-section">
+        <h2>Select Body Type</h2>
+        <div class="option-grid">
+          <button class="option-btn active" data-gender="male">Male</button>
+          <button class="option-btn" data-gender="female">Female</button>
+          <button class="option-btn" data-gender="teen">Teen</button>
+        </div>
+        
+        <!-- Customize button below body types -->
+        <button class="next-btn" id="btn-customize">
+          Customize Character ?
+        </button>
+      </div>
+
+      <!-- Customization Section (Step 2) -->
+      <div id="customize-section" class="selection-section hidden">
+        <h2 id="section-title">Body</h2>
+        
+        <!-- Current category content -->
+        <div id="category-content">
+          <!-- Will be populated by JS based on current category -->
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom animation selector -->
+    <footer class="animation-bar" id="animation-bar">
+      <div class="animation-scroll">
+        <button class="anim-btn active" data-animation="walk">Walk</button>
+        <button class="anim-btn" data-animation="run">Run</button>
+        <button class="anim-btn" data-animation="idle">Idle</button>
+        <button class="anim-btn" data-animation="slash">Slash</button>
+        <button class="anim-btn" data-animation="spellcast">Cast</button>
+        <button class="anim-btn" data-animation="thrust">Thrust</button>
+        <button class="anim-btn" data-animation="shoot">Shoot</button>
+        <button class="anim-btn" data-animation="hurt">Hurt</button>
+        <button class="anim-btn" data-animation="sit">Sit</button>
+        <button class="anim-btn" data-animation="climb">Climb</button>
+        <button class="anim-btn" data-animation="emote">Emote</button>
+        <button class="anim-btn" data-animation="combat_idle">Combat</button>
+        <!-- Removed: slash_basic, watering, onehanded - these animations don't exist in sprites -->
+      </div>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="compositor.js"></script>
+  <script src="item-metadata.js"></script>
+  <script src="builder.js"></script>
+</body>
+</html>

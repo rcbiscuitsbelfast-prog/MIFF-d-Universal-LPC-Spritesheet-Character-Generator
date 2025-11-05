@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>SIMPLE TEST v7.2</title>
+  <style>
+    body { 
+      background: #1e293b; 
+      color: white; 
+      font-family: monospace;
+      padding: 20px;
+    }
+    canvas { 
+      border: 2px solid lime; 
+      image-rendering: pixelated;
+      width: 256px;
+      height: 256px;
+    }
+    #log {
+      background: #0f172a;
+      padding: 10px;
+      margin-top: 10px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>SIMPLE TEST v7.2</h1>
+  <canvas id="canvas" width="64" height="64"></canvas>
+  <div id="log"></div>
+  
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const log = document.getElementById('log');
+    
+    function addLog(msg) {
+      console.log(msg);
+      log.innerHTML += msg + '<br>';
+      log.scrollTop = log.scrollHeight;
+    }
+    
+    addLog('Starting test...');
+    
+    const img = new Image();
+    img.onload = () => {
+      addLog('✅ IMAGE LOADED: ' + img.width + 'x' + img.height);
+      ctx.drawImage(img, 0, 0, 64, 64, 0, 0, 64, 64);
+      addLog('✅ DRAWN TO CANVAS');
+    };
+    img.onerror = (e) => {
+      addLog('❌ FAILED TO LOAD IMAGE');
+      addLog('Error: ' + e);
+    };
+    
+    addLog('Loading: /spritesheets/body/male/light/walk/light.png');
+    img.src = '/spritesheets/body/male/light/walk/light.png';
+  </script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#667eea">
+  <meta name="description" content="Create and customize LPC-style game characters with live animation preview">
+  <title>LPC Character Builder v5</title>
+  <link rel="stylesheet" href="builder.css">
+</head>
+<body>
+  <!-- Loading screen -->
+  <div id="loading">
+    <div>
+      <div class="spinner"></div>
+      <p>Loading character builder...</p>
+    </div>
+  </div>
+
+  <!-- Main app container -->
+  <div id="app" class="hidden">
+    <!-- Top navigation bar -->
+    <header class="top-nav">
+      <h1>?? LPC Builder <span style="font-size: 0.6em; opacity: 0.8;">v5</span></h1>
+      <div class="nav-actions">
+        <button class="nav-btn" id="btn-back" aria-label="Back" style="display: none;">
+          <span class="icon">?</span>
+          <span class="label">Back</span>
+        </button>
+        <button class="nav-btn" id="btn-export" aria-label="Export character">
+          <span class="icon">??</span>
+          <span class="label">Export</span>
+        </button>
+        <button class="nav-btn" id="btn-help" aria-label="Help">
+          <span class="icon">?</span>
+          <span class="label">Help</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main content area -->
+    <main class="main-content">
+      <!-- Character preview canvas -->
+      <div class="preview-container">
+        <canvas id="character-canvas" width="192" height="192"></canvas>
+        <div class="preview-info">
+          <span id="current-animation">Walk</span>
+          <span id="current-direction">Down</span>
+        </div>
+        
+        <!-- Direction arrows directly under sprite -->
+        <div class="direction-controls">
+          <button class="dir-arrow" data-direction="up" aria-label="Face Up">?</button>
+          <div class="dir-row">
+            <button class="dir-arrow" data-direction="left" aria-label="Face Left">?</button>
+            <button class="dir-arrow active" data-direction="down" aria-label="Face Down">?</button>
+            <button class="dir-arrow" data-direction="right" aria-label="Face Right">?</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body Type selector (Step 1) -->
+      <div id="body-selector" class="selection-section">
+        <h2>Select Body Type</h2>
+        <div class="option-grid">
+          <button class="option-btn active" data-gender="male">
+            <span class="icon">?</span>
+            <span>Male</span>
+          </button>
+          <button class="option-btn" data-gender="female">
+            <span class="icon">?</span>
+            <span>Female</span>
+          </button>
+          <button class="option-btn" data-gender="teen">
+            <span class="icon">??</span>
+            <span>Teen</span>
+          </button>
+        </div>
+        
+        <!-- Customize button below body types -->
+        <button class="next-btn" id="btn-customize">
+          Customize Character ?
+        </button>
+      </div>
+
+      <!-- Customization Categories (Step 2 - replaces body selector) -->
+      <div id="customize-categories" class="selection-section hidden">
+        <h2>Customize Character</h2>
+        
+        <!-- Category: Hair -->
+        <div class="category-section">
+          <button class="category-btn" data-category="hair">
+            <span class="icon">??</span>
+            <span>Hair</span>
+            <span class="expand-icon">?</span>
+          </button>
+          <div class="category-content" id="category-hair">
+            <div class="subcategory">
+              <h4>Style</h4>
+              <div class="item-list" id="hair-styles">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+            <div class="subcategory">
+              <h4>Color</h4>
+              <div class="color-list" id="hair-colors">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category: Body/Torso -->
+        <div class="category-section">
+          <button class="category-btn" data-category="torso">
+            <span class="icon">??</span>
+            <span>Torso</span>
+            <span class="expand-icon">?</span>
+          </button>
+          <div class="category-content" id="category-torso">
+            <div class="subcategory">
+              <h4>Type</h4>
+              <div class="item-list" id="torso-types">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+            <div class="subcategory">
+              <h4>Item</h4>
+              <div class="item-list" id="torso-items">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+            <div class="subcategory">
+              <h4>Color</h4>
+              <div class="color-list" id="torso-colors">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category: Legs -->
+        <div class="category-section">
+          <button class="category-btn" data-category="legs">
+            <span class="icon">??</span>
+            <span>Legs</span>
+            <span class="expand-icon">?</span>
+          </button>
+          <div class="category-content" id="category-legs">
+            <div class="subcategory">
+              <h4>Type</h4>
+              <div class="item-list" id="legs-types">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+            <div class="subcategory">
+              <h4>Color</h4>
+              <div class="color-list" id="legs-colors">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category: Feet -->
+        <div class="category-section">
+          <button class="category-btn" data-category="feet">
+            <span class="icon">??</span>
+            <span>Feet</span>
+            <span class="expand-icon">?</span>
+          </button>
+          <div class="category-content" id="category-feet">
+            <div class="subcategory">
+              <h4>Type</h4>
+              <div class="item-list" id="feet-items">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category: Weapon -->
+        <div class="category-section">
+          <button class="category-btn" data-category="weapon">
+            <span class="icon">?</span>
+            <span>Weapon</span>
+            <span class="expand-icon">?</span>
+          </button>
+          <div class="category-content" id="category-weapon">
+            <div class="subcategory">
+              <h4>Type</h4>
+              <div class="item-list" id="weapon-types">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+            <div class="subcategory">
+              <h4>Item</h4>
+              <div class="item-list" id="weapon-items">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category: Accessories -->
+        <div class="category-section">
+          <button class="category-btn" data-category="accessories">
+            <span class="icon">??</span>
+            <span>Accessories</span>
+            <span class="expand-icon">?</span>
+          </button>
+          <div class="category-content" id="category-accessories">
+            <div class="subcategory">
+              <h4>Items</h4>
+              <div class="item-list" id="accessory-items">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom animation selector (only visible in body selection mode) -->
+    <footer class="animation-bar" id="animation-bar">
+      <div class="animation-scroll">
+        <button class="anim-btn active" data-animation="walk">
+          <span class="icon">??</span>
+          <span>Walk</span>
+        </button>
+        <button class="anim-btn" data-animation="run">
+          <span class="icon">??</span>
+          <span>Run</span>
+        </button>
+        <button class="anim-btn" data-animation="idle">
+          <span class="icon">??</span>
+          <span>Idle</span>
+        </button>
+        <button class="anim-btn" data-animation="combat_idle">
+          <span class="icon">??</span>
+          <span>Combat</span>
+        </button>
+        <button class="anim-btn" data-animation="slash">
+          <span class="icon">?</span>
+          <span>Slash</span>
+        </button>
+        <button class="anim-btn" data-animation="spellcast">
+          <span class="icon">?</span>
+          <span>Cast</span>
+        </button>
+        <button class="anim-btn" data-animation="shoot">
+          <span class="icon">??</span>
+          <span>Shoot</span>
+        </button>
+        <button class="anim-btn" data-animation="hurt">
+          <span class="icon">??</span>
+          <span>Hurt</span>
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="builder.js"></script>
+</body>
+</html>

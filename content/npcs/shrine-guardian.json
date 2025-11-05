@@ -1,0 +1,29 @@
+{
+  "name": "Shrine Guardian",
+  "sprite": {
+    "body": {
+      "type": "male",
+      "color": "light"
+    },
+    "clothes": {
+      "torso": "torso/robe/blue.png"
+    },
+    "hair": {
+      "style": "long",
+      "color": "black"
+    },
+    "weapon": null
+  },
+  "path": [
+    [5, 10],
+    [5, 11],
+    [5, 10]
+  ],
+  "dialogue": [
+    "Welcome to the shrine.",
+    "May the spirits guide you.",
+    "This sacred place has protected our village for generations."
+  ],
+  "behavior": "patrol",
+  "speed": 0.5
+}

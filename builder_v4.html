@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#667eea">
+  <meta name="description" content="Create and customize LPC-style game characters with live animation preview">
+  <title>LPC Character Builder v4</title>
+  <link rel="stylesheet" href="builder.css">
+  <style>
+    /* Critical CSS for fast initial render */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    #loading {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-size: 1.5rem;
+      z-index: 9999;
+    }
+    
+    #loading.hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading screen -->
+  <div id="loading">
+    <div>
+      <div class="spinner"></div>
+      <p>Loading character builder...</p>
+    </div>
+  </div>
+
+  <!-- Main app container -->
+  <div id="app" class="hidden">
+    <!-- Top navigation bar -->
+    <header class="top-nav">
+      <h1>?? LPC Builder <span style="font-size: 0.6em; opacity: 0.8;">v4</span></h1>
+      <div class="nav-actions">
+        <button class="nav-btn" id="btn-export" aria-label="Export character">
+          <span class="icon">??</span>
+          <span class="label">Export</span>
+        </button>
+        <button class="nav-btn" id="btn-import" aria-label="Import character">
+          <span class="icon">??</span>
+          <span class="label">Import</span>
+        </button>
+        <button class="nav-btn" id="btn-help" aria-label="Help">
+          <span class="icon">?</span>
+          <span class="label">Help</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main content area -->
+    <main class="main-content">
+      <!-- Character preview canvas -->
+      <div class="preview-container">
+        <canvas id="character-canvas" width="192" height="192"></canvas>
+        <div class="preview-info">
+          <span id="current-animation">Walk</span>
+          <span id="current-direction">Down</span>
+        </div>
+        
+        <!-- Direction arrows directly under sprite -->
+        <div class="direction-controls">
+          <button class="dir-arrow" data-direction="up" aria-label="Face Up">?</button>
+          <div class="dir-row">
+            <button class="dir-arrow" data-direction="left" aria-label="Face Left">?</button>
+            <button class="dir-arrow active" data-direction="down" aria-label="Face Down">?</button>
+            <button class="dir-arrow" data-direction="right" aria-label="Face Right">?</button>
+          </div>
+        </div>
+
+        <!-- Next button for customization -->
+        <button class="next-btn" id="next-customize">
+          Customize ?
+        </button>
+      </div>
+
+      <!-- Body Type selector -->
+      <div class="gender-selector">
+        <h2>Body Type</h2>
+        <div class="option-grid">
+          <button class="option-btn active" data-gender="male">
+            <span class="icon">?</span>
+            <span>Male</span>
+          </button>
+          <button class="option-btn" data-gender="female">
+            <span class="icon">?</span>
+            <span>Female</span>
+          </button>
+          <button class="option-btn" data-gender="teen">
+            <span class="icon">??</span>
+            <span>Teen</span>
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom animation selector -->
+    <footer class="animation-bar">
+      <div class="animation-scroll">
+        <button class="anim-btn active" data-animation="walk">
+          <span class="icon">??</span>
+          <span>Walk</span>
+        </button>
+        <button class="anim-btn" data-animation="run">
+          <span class="icon">??</span>
+          <span>Run</span>
+        </button>
+        <button class="anim-btn" data-animation="idle">
+          <span class="icon">??</span>
+          <span>Idle</span>
+        </button>
+        <button class="anim-btn" data-animation="combat_idle">
+          <span class="icon">??</span>
+          <span>Combat</span>
+        </button>
+        <button class="anim-btn" data-animation="slash">
+          <span class="icon">?</span>
+          <span>Slash</span>
+        </button>
+        <button class="anim-btn" data-animation="halfslash">
+          <span class="icon">??</span>
+          <span>Half Slash</span>
+        </button>
+        <button class="anim-btn" data-animation="backslash">
+          <span class="icon">?</span>
+          <span>Back Slash</span>
+        </button>
+        <button class="anim-btn" data-animation="thrust">
+          <span class="icon">?</span>
+          <span>Thrust</span>
+        </button>
+        <button class="anim-btn" data-animation="spellcast">
+          <span class="icon">?</span>
+          <span>Cast</span>
+        </button>
+        <button class="anim-btn" data-animation="shoot">
+          <span class="icon">??</span>
+          <span>Shoot</span>
+        </button>
+        <button class="anim-btn" data-animation="hurt">
+          <span class="icon">??</span>
+          <span>Hurt</span>
+        </button>
+        <button class="anim-btn" data-animation="jump">
+          <span class="icon">?</span>
+          <span>Jump</span>
+        </button>
+        <button class="anim-btn" data-animation="sit">
+          <span class="icon">??</span>
+          <span>Sit</span>
+        </button>
+        <button class="anim-btn" data-animation="climb">
+          <span class="icon">??</span>
+          <span>Climb</span>
+        </button>
+        <button class="anim-btn" data-animation="emote">
+          <span class="icon">??</span>
+          <span>Emote</span>
+        </button>
+      </div>
+    </footer>
+
+    <!-- Customization Panel (Slide-out) -->
+    <aside id="customize-panel" class="customize-panel">
+      <div class="panel-header">
+        <h2>Customize Character</h2>
+        <button class="panel-close" id="close-panel" aria-label="Close">?</button>
+      </div>
+      
+      <div class="panel-tabs">
+        <button class="tab-btn active" data-tab="hair">Hair</button>
+        <button class="tab-btn" data-tab="torso">Torso</button>
+        <button class="tab-btn" data-tab="legs">Legs</button>
+        <button class="tab-btn" data-tab="weapon">Weapon</button>
+        <button class="tab-btn" data-tab="extras">Extras</button>
+      </div>
+      
+      <div class="panel-content">
+        <!-- Hair Tab -->
+        <div class="tab-panel active" id="tab-hair">
+          <h3>Hair Style</h3>
+          <div class="option-list" id="hair-list">
+            <button class="list-btn" data-hair="none">None</button>
+            <!-- Will be populated by JS -->
+          </div>
+          
+          <h3>Hair Color</h3>
+          <div class="color-grid" id="hair-colors">
+            <button class="color-btn" data-color="black" style="background: #1a1a1a"></button>
+            <button class="color-btn" data-color="brown" style="background: #3d2817"></button>
+            <button class="color-btn" data-color="blonde" style="background: #f0c674"></button>
+            <button class="color-btn" data-color="red" style="background: #a0392e"></button>
+            <button class="color-btn" data-color="white" style="background: #f0f0f0"></button>
+          </div>
+        </div>
+        
+        <!-- Torso Tab -->
+        <div class="tab-panel" id="tab-torso">
+          <h3>Clothing</h3>
+          <div class="option-list" id="torso-list">
+            <button class="list-btn" data-torso="none">None</button>
+            <!-- Will be populated by JS -->
+          </div>
+        </div>
+        
+        <!-- Legs Tab -->
+        <div class="tab-panel" id="tab-legs">
+          <h3>Leg Wear</h3>
+          <div class="option-list" id="legs-list">
+            <button class="list-btn" data-legs="none">None</button>
+            <!-- Will be populated by JS -->
+          </div>
+        </div>
+        
+        <!-- Weapon Tab -->
+        <div class="tab-panel" id="tab-weapon">
+          <h3>Weapon Type</h3>
+          <div class="option-list" id="weapon-list">
+            <button class="list-btn" data-weapon="none">None</button>
+            <!-- Will be populated by JS -->
+          </div>
+        </div>
+        
+        <!-- Extras Tab -->
+        <div class="tab-panel" id="tab-extras">
+          <h3>Accessories</h3>
+          <div class="option-list">
+            <button class="list-btn" data-extra="cape">Cape</button>
+            <button class="list-btn" data-extra="backpack">Backpack</button>
+            <button class="list-btn" data-extra="shield">Shield</button>
+            <button class="list-btn" data-extra="hat">Hat</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Panel overlay -->
+    <div id="panel-overlay" class="panel-overlay"></div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="builder.js"></script>
+</body>
+</html>

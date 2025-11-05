@@ -1,0 +1,40 @@
+{
+  "name": "@lpc/avatar-builder",
+  "version": "1.0.0",
+  "description": "Modular LPC character system with asset loading, layered avatar building, player customization, and NPC support",
+  "main": "index.js",
+  "scripts": {
+    "demo": "npx serve .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "lpc",
+    "spritesheet",
+    "character",
+    "avatar",
+    "game",
+    "pixel-art",
+    "npc",
+    "animation"
+  ],
+  "author": "LPC Community",
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/liberatedpixelcup/Universal-LPC-Spritesheet-Character-Generator.git"
+  },
+  "files": [
+    "index.js",
+    "asset-loader.js",
+    "avatar-builder.js",
+    "player-customization.js",
+    "npc-system.js",
+    "avatar-builder.css",
+    "README.md"
+  ],
+  "dependencies": {},
+  "devDependencies": {},
+  "browser": {
+    "index.js": "./index.js"
+  }
+}
