@@ -1,0 +1,29 @@
+{
+  "name": "lpc-spritesheet-character-generator",
+  "version": "1.0.0",
+  "description": "Universal LPC Spritesheet Character Generator - A tool for creating custom character sprites using LPC (Liberated Pixel Cup) assets",
+  "main": "index.html",
+  "scripts": {
+    "start": "node server.js",
+    "generate": "node scripts/generate_sources.js",
+    "postinstall": "npm run generate"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/liberatedpixelcup/Universal-LPC-Spritesheet-Character-Generator"
+  },
+  "keywords": [
+    "lpc",
+    "sprite",
+    "character",
+    "generator",
+    "pixel-art",
+    "game-development"
+  ],
+  "author": "LPC Contributors",
+  "license": "SEE LICENSE FILE",
+  "engines": {
+    "node": ">=14.x"
+  },
+  "dependencies": {}
+}

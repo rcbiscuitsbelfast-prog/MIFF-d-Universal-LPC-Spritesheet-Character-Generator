@@ -1,1 +1,29 @@
-_universal/
+# Node modules (if any were added)
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment files
+.env
+.env.local
+
+# Build artifacts (not needed, index.html is checked in)
+# We keep index.html in repo since it's generated from source
+
+# Temporary files
+*.tmp
+*.temp

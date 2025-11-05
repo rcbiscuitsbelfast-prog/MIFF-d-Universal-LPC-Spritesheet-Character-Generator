@@ -1,0 +1,10 @@
+# Exclude from deployment slug to reduce size
+*.md
+!README.md
+.git
+.gitignore
+readme-images/
+CONTRIBUTING.md
+PERFORMANCE_PROFILING.md
+AUDIT_FIXES_SUMMARY.md
+tools/

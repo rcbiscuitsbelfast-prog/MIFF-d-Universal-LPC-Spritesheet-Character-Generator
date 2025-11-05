@@ -520,6 +520,32 @@ a {
     flex-direction: column;
     z-index: 100;
   }
+  
+  /* Body Type Selector */
+  .body-type-selector {
+    background: #fff;
+    padding: 8px 16px;
+    border-bottom: 1px solid #e1e5e9;
+    flex-shrink: 0;
+  }
+  
+  .body-type-selector select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    background: #fff;
+    color: #495057;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .body-type-selector select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+  }
 
   /* Category Tabs */
   .category-tabs {

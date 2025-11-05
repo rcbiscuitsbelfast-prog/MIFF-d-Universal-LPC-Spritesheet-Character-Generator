@@ -2,6 +2,7 @@
 <html lang="en-us">
 <head>
 	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
 	<title>Universal LPC Sprite Sheet Character Generator</title>
 	<link rel="stylesheet" type="text/css" href="sources/chargen.css">
@@ -21,6 +22,82 @@
 	</script>
 </head>
 <body>
+	<!-- Roblox-Style Avatar Editor Interface -->
+	<!-- Top Navigation Bar -->
+	<nav id="mobile-topbar" style="display: none;">
+		<!-- Force mobile view for testing - remove this button in production -->
+		<button id="force-mobile-btn" onclick="toggleMobileView()" style="position: fixed; top: 10px; left: 10px; z-index: 9999; background: #007bff; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-size: 12px;">Mobile View</button>
+		<h1>Avatar Editor</h1>
+		<div class="topbar-actions">
+			<button id="mobile-export-btn" aria-haspopup="true" aria-expanded="false">Export</button>
+			<button id="mobile-import-btn">Import</button>
+			<a href="https://github.com/liberatedpixelcup/Universal-LPC-Spritesheet-Character-Generator" target="_blank" rel="noopener">Help</a>
+		</div>
+	</nav>
+
+	<!-- Export Menu Dropdown -->
+	<div id="mobile-export-menu" hidden>
+		<button id="mobile-export-png">Download PNG</button>
+		<button id="mobile-export-zip-anims">Export by Animation (ZIP)</button>
+		<button id="mobile-export-zip-items">Export by Item (ZIP)</button>
+		<button id="mobile-export-zip-item-anims">Export by Animation & Item (ZIP)</button>
+		<hr>
+		<button id="mobile-export-credits-txt">Credits (TXT)</button>
+		<button id="mobile-export-credits-csv">Credits (CSV)</button>
+		<hr>
+		<button id="mobile-import-clipboard">Import from Clipboard</button>
+	</div>
+
+	<!-- Avatar Editor Main Interface (Top 2/3) -->
+	<div id="avatar-editor" class="avatar-editor">
+		<!-- Body Type Selector -->
+		<div class="body-type-selector">
+			<select id="mobile-body-type" aria-label="Body Type">
+				<option value="male">Male</option>
+				<option value="female">Female</option>
+				<option value="teen">Teen</option>
+				<option value="child">Child</option>
+				<option value="pregnant">Pregnant</option>
+				<option value="muscular">Muscular</option>
+			</select>
+		</div>
+		
+		<!-- Category Tabs -->
+		<div class="category-tabs">
+			<div class="category-tabs-container">
+				<!-- Category tabs will be populated by JavaScript -->
+			</div>
+		</div>
+
+		<!-- Subcategory Tabs (if applicable) -->
+		<div id="subcategory-tabs" class="subcategory-tabs" style="display: none;">
+			<div class="subcategory-tabs-container">
+				<!-- Subcategory tabs will be populated by JavaScript -->
+			</div>
+		</div>
+
+		<!-- Items Grid -->
+		<div class="items-section">
+			<div class="items-grid">
+				<!-- Item thumbnails will be populated by JavaScript -->
+			</div>
+		</div>
+	</div>
+
+	<!-- Character Preview Section (Bottom 1/3) -->
+	<section id="character-preview-section" class="character-preview-section">
+		<div class="preview-container">
+			<div id="previewAnimationsBox">
+				<canvas id="previewAnimations" width="256" height="64"></canvas>
+			</div>
+		</div>
+		<div class="animation-controls">
+			<div class="animation-buttons">
+				<!-- Animation buttons will be populated by JavaScript -->
+			</div>
+		</div>
+	</section>
+
 	<form id="customizeChar">
 		<section id="header-left" class="sticky">
 			<h1>Universal LPC Spritesheet Generator <a href="https://github.com/liberatedpixelcup/Universal-LPC-Spritesheet-Character-Generator"><img src="sources/github-mark.png" alt="View on GitHub" style="width:24px;height:24px;"></a> </h1>
