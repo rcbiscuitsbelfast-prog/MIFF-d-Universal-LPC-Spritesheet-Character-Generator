@@ -1,7 +1,7 @@
 {
   "name": "lpc-avatar-builder",
-  "version": "1.0.0",
-  "description": "Universal LPC Spritesheet Character Generator with modular avatar builder",
+  "version": "9.0.0",
+  "description": "LPC Character Builder v9.0 ULTIMATE - Universal LPC Spritesheet Character Generator with full sprite sheet export",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

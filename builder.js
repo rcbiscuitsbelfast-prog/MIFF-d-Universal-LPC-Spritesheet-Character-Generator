@@ -194,9 +194,14 @@ function setupEventListeners() {
         return;
       }
       
-      // RELOAD CUSTOMIZATIONS
-      console.log('✅ Reloading...');
-      try { await loadHairSprite(); } catch (e) { console.error('❌', e); }
+      // RELOAD ALL CUSTOMIZATIONS - CRITICAL FIX!
+      console.log('✅ Animation loaded, reloading all customizations...');
+      try {
+        await reloadAllCustomizationSprites();
+        console.log('✅ All customizations reloaded successfully!');
+      } catch (e) {
+        console.error('❌ Error reloading customizations:', e);
+      }
     });
   });
   
@@ -428,22 +433,30 @@ async function loadBodyOptions(container) {
 }
 
 window.selectBodyType = async function(type) {
-  console.log('Selecting body type:', type);
+  console.log('🚀 Switching body type to:', type);
   const previousGender = state.currentGender;
   state.currentGender = type;
   
-  // Update button states
+  // Update button states in category content
   document.querySelectorAll('#category-content .option-btn').forEach(btn => {
     btn.classList.remove('active');
   });
   event.target.classList.add('active');
   
-  // Reload character
-  await loadCharacter(type);
+  // Update gender buttons in top bar if they exist
+  document.querySelectorAll('[data-gender]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.gender === type);
+  });
   
-  // Reload all customization sprites for new body type
+  console.log(`⚡ Reloading character from ${previousGender} to ${type}...`);
+  
+  // Reload character with current animation
+  await loadCharacter(type, state.currentAnimation);
+  
+  // Reload ALL customization sprites for new body type
   if (previousGender !== type) {
-    await loadHairSprite();
+    await reloadAllCustomizationSprites();
+    console.log('✅ Body type switched and all customizations reloaded!');
   }
 };
 
@@ -909,25 +922,6 @@ function selectColor(category, color, btn) {
   // loadCharacterWithCustomization();
 }
 
-async function exportCharacter() {
-  const link = document.createElement('a');
-  link.download = `character-spritesheet-${state.currentGender}-${Date.now()}.png`;
-  
-  if (state.compositeCanvas) {
-    state.compositeCanvas.toBlob(blob => {
-      const url = URL.createObjectURL(blob);
-      link.href = url;
-      link.click();
-      URL.revokeObjectURL(url);
-      console.log('✅ Full sprite sheet exported!', state.compositeCanvas.width, 'x', state.compositeCanvas.height);
-    });
-  } else {
-    console.error('❌ No composite sprite sheet to export');
-    alert('Please wait for character to load before exporting');
-  }
-}
-
-
 async function loadCharacter(gender, animation) {
   state.currentGender = gender;
   state.currentAnimation = animation;
@@ -977,20 +971,95 @@ async function loadCharacter(gender, animation) {
   return true;
 }
 async function exportCharacter() {
-  const link = document.createElement('a');
-  link.download = `character-spritesheet-${state.currentGender}-${Date.now()}.png`;
+  console.log('🎨🎨 Starting FULL sprite sheet export...');
   
-  if (state.compositeCanvas) {
-    state.compositeCanvas.toBlob(blob => {
-      const url = URL.createObjectURL(blob);
-      link.href = url;
+  // Show loading indicator
+  const originalText = document.getElementById('btn-export')?.textContent;
+  const btnExport = document.getElementById('btn-export');
+  if (btnExport) {
+    btnExport.textContent = 'Building sprite sheet...';
+    btnExport.disabled = true;
+  }
+  
+  try {
+    // Use the compositor to create the full sprite sheet!
+    console.log('📦 Using compositor.js to build complete sprite sheet...');
+    
+    const compositeOptions = {
+      bodyType: state.currentGender,
+      bodyColor: CONFIG.bodyTypes[state.currentGender].bodyColor,
+      headColor: CONFIG.bodyTypes[state.currentGender].headColor,
+      hair: state.customization.hair,
+      hairColor: state.customization.hairColor,
+      torso: state.customization.torso,
+      torsoColor: state.customization.torsoColor,
+      legs: state.customization.legs,
+      legsColor: state.customization.legsColor,
+      ears: state.customization.ears,
+      earsColor: state.customization.earsColor,
+      nose: state.customization.nose,
+      noseColor: state.customization.noseColor,
+      wings: state.customization.wings,
+      wingsColor: state.customization.wingsColor,
+      tail: state.customization.tail,
+      tailColor: state.customization.tailColor
+    };
+    
+    console.log('🔧 Composite options:', compositeOptions);
+    
+    // This creates a full 832x3456 sprite sheet with ALL 15 animations!
+    const compositeResult = await createCompositeSpriteSheet(compositeOptions);
+    
+    console.log('✅ Composite created, converting to download...');
+    
+    // Create canvas from the composite image
+    const canvas = document.createElement('canvas');
+    canvas.width = 832;
+    canvas.height = 3456;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    
+    // compositeResult might be an image or object with canvas/image
+    if (compositeResult.canvas) {
+      ctx.drawImage(compositeResult.canvas, 0, 0);
+    } else if (compositeResult.image) {
+      ctx.drawImage(compositeResult.image, 0, 0);
+    } else {
+      ctx.drawImage(compositeResult, 0, 0);
+    }
+    
+    canvas.toBlob(blob => {
+      const link = document.createElement('a');
+      const timestamp = new Date().toISOString().slice(0,19).replace(/[:-]/g,'');
+      link.download = `lpc-character-${state.currentGender}-${timestamp}.png`;
+      link.href = URL.createObjectURL(blob);
       link.click();
-      URL.revokeObjectURL(url);
-      console.log('✅ Full sprite sheet exported!', state.compositeCanvas.width, 'x', state.compositeCanvas.height);
+      URL.revokeObjectURL(link.href);
+      
+      console.log('✅✅✅ FULL 832x3456 sprite sheet exported with ALL animations!');
+      alert(`✅ Export Complete!\n\n` +
+            `📦 Exported: ${canvas.width}x${canvas.height} sprite sheet\n` +
+            `🎬 Includes: ALL 15 animations × 4 directions\n` +
+            `👤 Character: ${state.currentGender}\n` +
+            `✨ With all your customizations!\n\n` +
+            `You can use this in any LPC-compatible game engine!`);
+      
+      // Reset button
+      if (btnExport) {
+        btnExport.textContent = originalText || 'Export';
+        btnExport.disabled = false;
+      }
     });
-  } else {
-    console.error('❌ No composite sprite sheet to export');
-    alert('Please wait for character to load before exporting');
+    
+  } catch (error) {
+    console.error('❌❌ Export failed:', error);
+    alert('❌ Export failed: ' + error.message + '\n\nPlease try again or check console for details.');
+    
+    // Reset button on error
+    if (btnExport) {
+      btnExport.textContent = originalText || 'Export';
+      btnExport.disabled = false;
+    }
   }
 }
 
@@ -1226,20 +1295,26 @@ async function loadTorsoSprite() {
   const animConfig = CONFIG.animations[anim];
   const animDir = animConfig.dir;
   
-  // CRITICAL: Clothes often only have walk animation!
-  // Try animation-specific first, then fallback to walk
+  // COMPREHENSIVE PATHS for all torso types (shirts, blouses, armour, robes)
   const paths = [
+    // Primary paths with gender and animation
     `/spritesheets/torso/clothes/${item}/${gender}/${animDir}/${color}.png`,
     `/spritesheets/torso/clothes/${item}/male/${animDir}/${color}.png`,
     `/spritesheets/torso/clothes/${item}/female/${animDir}/${color}.png`,
     `/spritesheets/torso/clothes/${item}/${animDir}/${color}.png`,
     `/spritesheets/torso/clothes/${item}/${item}/${gender}/${animDir}/${color}.png`,
-    // FALLBACK TO WALK if animation doesn't exist
+    // Special cases
+    `/spritesheets/torso/clothes/shirt/child/${animDir}/${color}.png`,
+    `/spritesheets/torso/armour/${item}/${gender}/${animDir}/${color}.png`,
+    `/spritesheets/torso/robes/${item}/${gender}/${animDir}/${color}.png`,
+    // CRITICAL FALLBACK TO WALK (most clothes only have walk!)
     `/spritesheets/torso/clothes/${item}/${gender}/walk/${color}.png`,
     `/spritesheets/torso/clothes/${item}/male/walk/${color}.png`,
     `/spritesheets/torso/clothes/${item}/female/walk/${color}.png`,
     `/spritesheets/torso/clothes/${item}/walk/${color}.png`,
-    `/spritesheets/torso/clothes/shirt/child/walk/${color}.png`
+    `/spritesheets/torso/clothes/shirt/child/walk/${color}.png`,
+    `/spritesheets/torso/armour/${item}/${gender}/walk/${color}.png`,
+    `/spritesheets/torso/robes/${item}/${gender}/walk/${color}.png`
   ];
   
   console.log(`Loading torso: ${item} (${color}) for ${animDir}`);
@@ -1266,19 +1341,33 @@ async function loadLegsSprite() {
   const anim = state.currentAnimation;
   const animConfig = CONFIG.animations[anim];
   const animDir = animConfig.dir;
+  
+  // COMPREHENSIVE PATH LIST for pants, skirts, armour, etc.
   const paths = [
+    // Standard paths
     `/spritesheets/legs/${item}/${gender}/${animDir}/${color}.png`,
     `/spritesheets/legs/${item}/male/${animDir}/${color}.png`,
     `/spritesheets/legs/${item}/female/${animDir}/${color}.png`,
     `/spritesheets/legs/${item}/${animDir}/${color}.png`,
-    `/spritesheets/legs/skirts/${item}/${gender}/${animDir}/${color}.png`,
-    `/spritesheets/legs/armour/${item}/${gender}/${animDir}/${color}.png`,
     `/spritesheets/legs/${item}/thin/${animDir}/${color}.png`,
-    // FALLBACK TO WALK
+    // Skirts (special structure)
+    `/spritesheets/legs/skirts/${item}/${gender}/${animDir}/${color}.png`,
+    `/spritesheets/legs/skirts/${item}/male/${animDir}/${color}.png`,
+    `/spritesheets/legs/skirts/${item}/female/${animDir}/${color}.png`,
+    `/spritesheets/legs/skirts/plain/${gender}/${animDir}/${color}.png`,
+    // Armour (special structure)
+    `/spritesheets/legs/armour/${item}/${gender}/${animDir}/${color}.png`,
+    `/spritesheets/legs/armour/${item}/male/${animDir}/${color}.png`,
+    `/spritesheets/legs/armour/${item}/female/${animDir}/${color}.png`,
+    `/spritesheets/legs/armour/plate/${gender}/${animDir}/${color}.png`,
+    // FALLBACK TO WALK (critical for clothes!)
     `/spritesheets/legs/${item}/${gender}/walk/${color}.png`,
     `/spritesheets/legs/${item}/male/walk/${color}.png`,
     `/spritesheets/legs/${item}/female/walk/${color}.png`,
-    `/spritesheets/legs/${item}/walk/${color}.png`
+    `/spritesheets/legs/${item}/walk/${color}.png`,
+    `/spritesheets/legs/skirts/${item}/${gender}/walk/${color}.png`,
+    `/spritesheets/legs/skirts/plain/${gender}/walk/${color}.png`,
+    `/spritesheets/legs/armour/${item}/${gender}/walk/${color}.png`
   ];
   
   console.log(`Loading legs: ${item} (${color}) for ${animDir}`);
@@ -1292,16 +1381,58 @@ async function loadLegsSprite() {
   }
 }
 async function reloadAllCustomizationSprites() {
-  console.log('🔄 Rebuilding composite sprite sheet...');
+  console.log('🔄🔄 Reloading ALL customization sprites for new animation...');
   
-  // REBUILD ENTIRE COMPOSITE SHEET (not individual sprites!)
+  // SEQUENTIAL LOADING (not parallel) to avoid race conditions
+  const promises = [];
+  
   try {
-    await loadCharacter(state.currentGender, state.currentAnimation);
-    console.log('✅ Composite sheet rebuilt!');
+    // Reload each customization that's active
+    if (state.customization.ears !== 'none') {
+      console.log('  🔄 Reloading ears...');
+      promises.push(loadEarsSprite().catch(e => console.error('❌ Ears:', e)));
+    }
+    
+    if (state.customization.nose !== 'none') {
+      console.log('  🔄 Reloading nose...');
+      promises.push(loadNoseSprite().catch(e => console.error('❌ Nose:', e)));
+    }
+    
+    if (state.customization.wings !== 'none') {
+      console.log('  🔄 Reloading wings...');
+      promises.push(loadWingsSprite().catch(e => console.error('❌ Wings:', e)));
+    }
+    
+    if (state.customization.tail !== 'none') {
+      console.log('  🔄 Reloading tail...');
+      promises.push(loadTailSprite().catch(e => console.error('❌ Tail:', e)));
+    }
+    
+    if (state.customization.hair !== 'none') {
+      console.log('  🔄 Reloading hair...');
+      promises.push(loadHairSprite().catch(e => console.error('❌ Hair:', e)));
+    }
+    
+    if (state.customization.torso !== 'none') {
+      console.log('  🔄 Reloading torso...');
+      promises.push(loadTorsoSprite().catch(e => console.error('❌ Torso:', e)));
+    }
+    
+    if (state.customization.legs !== 'none') {
+      console.log('  🔄 Reloading legs...');
+      promises.push(loadLegsSprite().catch(e => console.error('❌ Legs:', e)));
+    }
+    
+    if (state.customization.weapon !== 'none') {
+      console.log('  🔄 Reloading weapon...');
+      promises.push(loadWeaponSprite().catch(e => console.error('❌ Weapon:', e)));
+    }
+    
+    await Promise.all(promises);
+    console.log('✅✅ All customization sprites reloaded successfully!');
   } catch (e) {
-    console.error('❌ Failed to rebuild composite:', e);
-  await Promise.all(promises);
-  console.log('? All customization sprites reloaded');
+    console.error('❌❌ Failed to reload customizations:', e);
+  }
 }
 
 // Global functions for body/head extras
