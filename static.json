@@ -1,0 +1,31 @@
+{
+  "root": ".",
+  "clean_urls": false,
+  "routes": {
+    "/**": "index.html"
+  },
+  "headers": {
+    "/**": {
+      "Access-Control-Allow-Origin": "*",
+      "Cache-Control": "public, max-age=0, must-revalidate"
+    },
+    "/sources/**": {
+      "Cache-Control": "public, max-age=86400"
+    },
+    "/spritesheets/**": {
+      "Cache-Control": "public, max-age=86400"
+    },
+    "/**/*.png": {
+      "Cache-Control": "public, max-age=604800"
+    },
+    "/**/*.jpg": {
+      "Cache-Control": "public, max-age=604800"
+    },
+    "/**/*.css": {
+      "Cache-Control": "public, max-age=86400"
+    },
+    "/**/*.js": {
+      "Cache-Control": "public, max-age=86400"
+    }
+  }
+}
