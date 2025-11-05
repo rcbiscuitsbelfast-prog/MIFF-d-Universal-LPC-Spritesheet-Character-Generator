@@ -71,17 +71,15 @@ const profiler = new PerformanceProfiler({
 // Always expose profiler for manual control
 window.profiler = profiler;
 
+// Global state variables (exposed for mobile interface)
+let matchBodyColor = true;
+let itemsToDraw = [];
+let itemsMeta = {};
+let params = jHash.val();
+let sheetCredits = [];
+
 $(document).ready(function () {
-  let matchBodyColor = true;
-  
-  /** @type {ItemToDraw[]} */
-  let itemsToDraw = [];
-
-  /** @type {ItemsMeta} */
-  let itemsMeta = {};
-
-  let params = jHash.val();
-  let sheetCredits = [];
+  // Use global variables defined above
 
   let imagesToLoad = 0;
   let imagesLoaded = 0;
@@ -135,7 +133,8 @@ $(document).ready(function () {
   const allElements = document.querySelectorAll("#chooser [id][type=radio]");
   const ids = Array.prototype.map.call(allElements, (el) => el.id);
 
-  const getBodyTypeName = () => {
+  // Make getBodyTypeName globally accessible for mobile interface
+  window.getBodyTypeName = function getBodyTypeName() {
     return whichPropCheckedExact("sex", sexes);
   };
 
@@ -1206,7 +1205,8 @@ $(".exportSplitAnimations").click(async function() {
       .map((license) => license.trim());
   }
 
-  function redraw() {
+  // Make redraw globally accessible for mobile interface
+  window.redraw = function redraw() {
     profiler.mark('redraw:start');
     itemsToDraw = [];
     const bodyTypeName = getBodyTypeName();
@@ -1361,6 +1361,23 @@ $(".exportSplitAnimations").click(async function() {
   }
 
   /**
+   * Draw a single frame from source to destination
+   * @param {CanvasRenderingContext2D} destCtx
+   * @param {{x: number, y: number}} destPos
+   * @param {number} destFrameSize
+   * @param {CanvasImageSource} src
+   * @param {{x: number, y: number}} srcPos
+   * @param {number} srcFrameSize
+   */
+  function drawFrameToFrame(destCtx, destPos, destFrameSize, src, srcPos, srcFrameSize) {
+    destCtx.drawImage(
+      src,
+      srcPos.x, srcPos.y, srcFrameSize, srcFrameSize,
+      destPos.x, destPos.y, destFrameSize, destFrameSize
+    );
+  }
+
+  /**
    * 
    * @param {CanvasRenderingContext2D} customAnimationContext 
    * @param {CustomAnimationDefinition} customAnimationDefinition 
@@ -1501,7 +1518,8 @@ $(".exportSplitAnimations").click(async function() {
     }
   }
 
-  function showOrHideElements() {
+  // Make showOrHideElements globally accessible for mobile interface
+  window.showOrHideElements = function showOrHideElements() {
     profiler.mark('showOrHideElements:start');
     const bodyType = getBodyTypeName();
     const selectedAnims = getSelectedAnimations();
@@ -1723,7 +1741,8 @@ $(".exportSplitAnimations").click(async function() {
     });
   }
 
-  function setParams() {
+  // Make setParams globally accessible for mobile interface
+  window.setParams = function setParams() {
     $("#chooser input[type=radio]:checked").each(function () {
       const words = $(this).attr("id").split("-");
       const initial = words[0];
@@ -1732,7 +1751,7 @@ $(".exportSplitAnimations").click(async function() {
       }
     });
     jHash.val(params);
-  }
+  };
 
   function setParamsFromImport(spritesheet) {
     spritesheet.forEach((sprite) => {
@@ -2034,14 +2053,41 @@ function initializeMobileInterface() {
   });
   
   // Export menu actions - connect to original functions
-  $('#mobile-export-png').click(() => $('#saveAsPNG').click());
-  $('#mobile-export-zip-anims').click(() => $('.exportSplitAnimations').click());
-  $('#mobile-export-zip-items').click(() => $('.exportSplitItemSheets').click());
-  $('#mobile-export-zip-item-anims').click(() => $('.exportSplitItemAnimations').click());
-  $('#mobile-export-credits-txt').click(() => $('.generateSheetCreditsTxt').click());
-  $('#mobile-export-credits-csv').click(() => $('.generateSheetCreditsCsv').click());
-  $('#mobile-import-clipboard').click(() => $('.importFromClipboard').click());
+  $('#mobile-export-png').click(() => {
+    $('#saveAsPNG').click();
+    closeMobileExportMenu();
+  });
+  $('#mobile-export-zip-anims').click(() => {
+    $('.exportSplitAnimations').click();
+    closeMobileExportMenu();
+  });
+  $('#mobile-export-zip-items').click(() => {
+    $('.exportSplitItemSheets').click();
+    closeMobileExportMenu();
+  });
+  $('#mobile-export-zip-item-anims').click(() => {
+    $('.exportSplitItemAnimations').click();
+    closeMobileExportMenu();
+  });
+  $('#mobile-export-credits-txt').click(() => {
+    $('.generateSheetCreditsTxt').click();
+    closeMobileExportMenu();
+  });
+  $('#mobile-export-credits-csv').click(() => {
+    $('.generateSheetCreditsCsv').click();
+    closeMobileExportMenu();
+  });
+  $('#mobile-import-clipboard').click(() => {
+    $('.importFromClipboard').click();
+    closeMobileExportMenu();
+  });
   $('#mobile-import-btn').click(() => $('.importFromClipboard').click());
+  
+  // Mobile body type selector
+  $('#mobile-body-type').change(function() {
+    const bodyType = $(this).val();
+    $(`#sex-${bodyType}`).prop('checked', true).trigger('click');
+  });
   
   // Initialize character dresser
   initializeCharacterDresser();
@@ -2441,6 +2487,25 @@ function initializeCharacterDresser() {
   // Get the original form content and organize it into categories
   const chooser = $('#chooser');
   if (!chooser.length) return;
+  
+  // Listen for gender/body type changes to refresh the mobile interface
+  $('[name="sex"]').on('change', function() {
+    // Small delay to let the main system update first
+    setTimeout(() => {
+      const currentCategory = $('.category-tab.active').data('category');
+      if (currentCategory) {
+        // Find the category data and refresh
+        const categoryData = window.mobileCategories?.find(cat => cat.id === currentCategory);
+        if (categoryData) {
+          if (categoryData.subcategories.length > 1) {
+            initializeSubcategoryTabs(categoryData.subcategories);
+          } else {
+            initializeItemsGrid(categoryData, chooser);
+          }
+        }
+      }
+    }, 100);
+  });
 
   // Build categories dynamically from the actual form structure
   const categories = [];
@@ -2495,11 +2560,16 @@ function initializeCharacterDresser() {
     return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
   });
 
+  // Store categories globally for refreshing
+  window.mobileCategories = categories;
+  
   // Initialize category tabs
   initializeCategoryTabs(categories);
   
   // Initialize items grid
-  initializeItemsGrid(categories[0], chooser);
+  if (categories.length > 0) {
+    initializeItemsGrid(categories[0], chooser);
+  }
 }
 
 function initializeCategoryTabs(categories) {
@@ -2615,6 +2685,11 @@ function initializeSubSubcategoryTabs(subsubcategories) {
 function initializeItemsGrid(category, chooser) {
   const itemsGrid = $('.items-grid');
   itemsGrid.empty();
+  
+  if (!category) {
+    itemsGrid.html('<div style="text-align: center; padding: 20px; color: #6c757d;">No category selected</div>');
+    return;
+  }
 
   // Get the first subcategory (or the category itself if no subcategories)
   let subcategory = category.subcategories ? category.subcategories[0] : category;
@@ -2665,18 +2740,10 @@ function initializeItemsGrid(category, chooser) {
       $(this).addClass('selected');
       
       // Update the original form input and trigger the original system
-      input.prop('checked', true);
+      input.prop('checked', true).trigger('click');
       
-      // Call the original character generator functions
-      if (typeof setParams === 'function') {
-        setParams();
-      }
-      if (typeof redraw === 'function') {
-        redraw();
-      }
-      if (typeof showOrHideElements === 'function') {
-        showOrHideElements();
-      }
+      // The click event on the input will automatically trigger setParams, redraw, and showOrHideElements
+      // No need to call them manually here since they're already bound in the main code
     });
     
     itemsGrid.append(itemElement);
@@ -2706,7 +2773,7 @@ function cleanItemLabel(label, value) {
 
 function getImagePathFromInput(input) {
   const dataAttributes = input[0].attributes;
-  const bodyTypeName = getBodyTypeName();
+  const bodyTypeName = window.getBodyTypeName ? window.getBodyTypeName() : 'male';
   
   // First try to get the specific body type image
   const bodyTypeKey = `data-layer_1_${bodyTypeName}`;
